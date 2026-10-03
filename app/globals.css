@@ -6,8 +6,8 @@
 .dark { --bg: 8 8 15; --fg: 244 244 250; }
 
 @layer base {
-  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
-  body { @apply bg-[rgb(var(--bg))] text-[rgb(var(--fg))] font-sans antialiased; }
+  html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; touch-action: manipulation; }
+  body { @apply bg-[rgb(var(--bg))] text-[rgb(var(--fg))] font-sans antialiased; touch-action: manipulation; }
   ::selection { @apply bg-brand-500/30 text-inherit; }
   /* Butter-smooth page entrance — GPU-friendly transform/opacity only */
   main { animation: page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
