@@ -9,8 +9,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: { route: string; priority: number; freq: "daily" | "weekly" | "monthly" }[] = [
     { route: "", priority: 1, freq: "daily" },
     { route: "/ai-prompt-studio", priority: 0.9, freq: "weekly" },
+    { route: "/ai-voiceover", priority: 0.9, freq: "weekly" },
     { route: "/media-tools", priority: 0.9, freq: "weekly" },
+    { route: "/pdf-tools", priority: 0.9, freq: "weekly" },
     { route: "/social-tools", priority: 0.9, freq: "weekly" },
+    { route: "/web-tools", priority: 0.9, freq: "weekly" },
     { route: "/ai-directory", priority: 0.9, freq: "daily" },
     { route: "/blog", priority: 0.8, freq: "daily" },
     { route: "/privacy", priority: 0.3, freq: "monthly" },

@@ -1,4 +1,4 @@
-export type ToolCategory = "ai" | "image" | "social" | "web" | "text";
+export type ToolCategory = "ai" | "image" | "social" | "web" | "text" | "pdf";
 
 export interface Tool {
   id: string;

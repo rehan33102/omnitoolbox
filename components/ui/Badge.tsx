@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export type BadgeVariant = "ai" | "image" | "social" | "web" | "text" | "new" | "pro" | "default";
+export type BadgeVariant = "ai" | "image" | "social" | "web" | "text" | "pdf" | "new" | "pro" | "default";
 
 const styles: Record<BadgeVariant, string> = {
   ai: "bg-brand-500/15 text-brand-300 border-brand-500/30",
@@ -8,6 +8,7 @@ const styles: Record<BadgeVariant, string> = {
   social: "bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/30",
   web: "bg-blue-500/15 text-blue-300 border-blue-500/30",
   text: "bg-amber-500/15 text-amber-300 border-amber-500/30",
+  pdf: "bg-red-500/15 text-red-300 border-red-500/30",
   new: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
   pro: "bg-amber-500/15 text-amber-300 border-amber-500/30",
   default: "bg-white/10 text-zinc-300 border-white/15",

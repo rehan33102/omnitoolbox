@@ -68,7 +68,7 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="container py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-500">
           <p>© {new Date().getFullYear()} {SITE_NAME}. All rights reserved.</p>
-          <p>Made for the open web — fast, private, free.</p>
+          <p>Made by <span className="text-zinc-300 font-medium">Rehan</span> — fast, private, free.</p>
         </div>
       </div>
     </footer>

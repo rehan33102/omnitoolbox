@@ -7,6 +7,8 @@
     "lucide-react": "^0.400.0",
     "next": "14.2.4",
     "next-themes": "^0.3.0",
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.12.7",
@@ -16,6 +18,7 @@
   "description": "OmniToolBox — All-in-One AI & Web Utility Platform",
   "devDependencies": {
     "@types/node": "^20.14.0",
+    "@types/qrcode": "^1.5.6",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.19",
