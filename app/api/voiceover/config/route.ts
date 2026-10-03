@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { EDGE_LANGUAGES, EDGE_STYLES } from "@/lib/edge-tts";
 
 // Curated ElevenLabs voices (multilingual model speaks 32 languages incl. Urdu).
 const ELEVEN_VOICES = [
@@ -14,8 +15,19 @@ const ELEVEN_VOICES = [
 
 export async function GET() {
   const premium = Boolean(process.env.ELEVENLABS_API_KEY);
+  const edgeLanguages = Object.entries(EDGE_LANGUAGES).map(([code, l]) => ({
+    code,
+    label: l.label,
+    flag: l.flag,
+  }));
+  const edgeStyles = Object.entries(EDGE_STYLES).map(([key, s]) => ({
+    key,
+    label: s.label,
+  }));
   return NextResponse.json({
-    provider: premium ? "elevenlabs" : "google",
+    // "edge" is the primary free engine; "elevenlabs" unlocks premium voices.
+    provider: premium ? "elevenlabs" : "edge",
+    edge: { languages: edgeLanguages, styles: edgeStyles },
     voices: premium ? ELEVEN_VOICES : [],
   });
 }

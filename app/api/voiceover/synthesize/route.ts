@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { edgeTts, resolveEdgeParams, EDGE_LANGUAGES, type SpeechCue } from "@/lib/edge-tts";
 
 export const maxDuration = 60;
 
@@ -6,11 +7,13 @@ const MAX_CHARS = 600;
 const CHUNK_CHARS = 180;
 const LANG_RE = /^[a-z]{2}(-[A-Z]{2})?$/;
 const VOICE_ID_RE = /^[A-Za-z0-9]{20}$/;
+const EDGE_VOICE_RE = /^(male|female)$/;
+const EDGE_STYLE_RE = /^(sleep|calm|normal|energetic)$/;
 
 const UA =
   "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36";
 
-/* ---------------- Google TTS (free, always available) ---------------- */
+/* ---------------- Google TTS (free fallback) ---------------- */
 
 function chunkText(text: string): string[] {
   const sentences = text.match(/[^.!?;\n]+[.!?;\n]+["'”]?|\S[^.!?;\n]*$/g) ?? [text];
@@ -89,8 +92,24 @@ async function elevenLabsTTS(text: string, voiceId: string, speed: number): Prom
 
 /* ---------------- Handler ---------------- */
 
+type Body = {
+  text?: unknown;
+  lang?: unknown;
+  voiceId?: unknown;   // ElevenLabs voice id (premium)
+  speed?: unknown;     // ElevenLabs speed 0.7–1.2
+  voice?: unknown;     // Edge: "male" | "female"
+  style?: unknown;     // Edge: sleep | calm | normal | energetic
+  ratePct?: unknown;   // Edge: speed override, percent (-40..40)
+  pitchHz?: unknown;   // Edge: pitch override, Hz (-15..15)
+  pauseSec?: unknown;  // Edge: paragraph pause seconds (0..3)
+};
+
+function num(v: unknown): number | undefined {
+  return typeof v === "number" && isFinite(v) ? v : undefined;
+}
+
 export async function POST(req: NextRequest) {
-  let body: { text?: unknown; lang?: unknown; voiceId?: unknown; speed?: unknown };
+  let body: Body;
   try {
     body = await req.json();
   } catch {
@@ -100,7 +119,12 @@ export async function POST(req: NextRequest) {
   const text = typeof body.text === "string" ? body.text.trim() : "";
   const lang = typeof body.lang === "string" ? body.lang : "";
   const voiceId = typeof body.voiceId === "string" ? body.voiceId : "";
-  const speed = typeof body.speed === "number" && isFinite(body.speed) ? body.speed : 1;
+  const speed = num(body.speed) ?? 1;
+  const voice = typeof body.voice === "string" && EDGE_VOICE_RE.test(body.voice) ? body.voice as "male" | "female" : "male";
+  const style = typeof body.style === "string" && EDGE_STYLE_RE.test(body.style) ? body.style : "normal";
+  const ratePct = num(body.ratePct);
+  const pitchHz = num(body.pitchHz);
+  const pauseSec = num(body.pauseSec);
 
   if (!text || text.length > MAX_CHARS) {
     return NextResponse.json({ error: `Text must be 1–${MAX_CHARS} characters per part.` }, { status: 400 });
@@ -111,19 +135,47 @@ export async function POST(req: NextRequest) {
 
   try {
     let audio: Buffer;
-    // Premium path: valid ElevenLabs voice requested and key configured.
+    let cues: SpeechCue[] = [];
+    let engine = "google";
+
     if (voiceId && VOICE_ID_RE.test(voiceId) && process.env.ELEVENLABS_API_KEY) {
+      // Premium path: valid ElevenLabs voice requested and key configured.
       audio = await elevenLabsTTS(text, voiceId, speed);
+      engine = "elevenlabs";
+    } else if (EDGE_LANGUAGES[lang]) {
+      // Primary path: Microsoft Edge neural voices (free, no key).
+      try {
+        const p = resolveEdgeParams(lang, voice, style, ratePct, pitchHz, pauseSec);
+        const r = await edgeTts({
+          text,
+          voice: p.voiceName,
+          rate: p.rate,
+          pitch: p.pitch,
+          pauseSec: p.pause,
+        });
+        audio = r.audio;
+        cues = r.cues;
+        engine = "edge";
+      } catch (e) {
+        console.error("Edge TTS failed, falling back to Google:", e instanceof Error ? e.message : e);
+        audio = await googleTTS(text, lang);
+        engine = "google-fallback";
+      }
     } else {
       audio = await googleTTS(text, lang);
     }
-    return new NextResponse(new Uint8Array(audio), {
-      headers: {
-        "Content-Type": "audio/mpeg",
-        "Content-Length": String(audio.length),
-        "Cache-Control": "no-store",
-      },
-    });
+
+    const headers: Record<string, string> = {
+      "Content-Type": "audio/mpeg",
+      "Content-Length": String(audio.length),
+      "Cache-Control": "no-store",
+      "X-TTS-Engine": engine,
+    };
+    if (cues.length > 0) {
+      // Sentence timings (100ns-tick based, relative to this part) for SRT download.
+      headers["X-Speech-Cues"] = Buffer.from(JSON.stringify(cues), "utf-8").toString("base64url");
+    }
+    return new NextResponse(new Uint8Array(audio), { headers });
   } catch (e) {
     console.error("TTS synthesize failed:", e instanceof Error ? e.message : e);
     return NextResponse.json(

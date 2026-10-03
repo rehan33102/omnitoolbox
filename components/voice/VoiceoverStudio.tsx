@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Download, Languages, Loader2, Mic, Play, Square, Trash2, History } from "lucide-react";
+import { Download, Languages, Loader2, Mic, Play, Square, Trash2, History, FileText, Sparkles } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
@@ -12,9 +12,24 @@ const PART_CHARS = 500; // per server request; server chunks further internally
 const HISTORY_KEY = "omnitoolbox-voiceover-history";
 const HISTORY_LIMIT = 20;
 
-const LANGUAGES: { code: string; label: string }[] = [
-  { code: "ur", label: "Urdu" },
-  { code: "en", label: "English" },
+// Microsoft Edge neural voices (free, no key) — primary engine.
+const EDGE_LANGS_FALLBACK = [
+  { code: "en", label: "English", flag: "🇺🇸" },
+  { code: "es", label: "Spanish", flag: "🇪🇸" },
+  { code: "ur", label: "Urdu", flag: "🇵🇰" },
+  { code: "de", label: "German", flag: "🇩🇪" },
+  { code: "ja", label: "Japanese", flag: "🇯🇵" },
+  { code: "fr", label: "French", flag: "🇫🇷" },
+];
+const EDGE_STYLES_FALLBACK = [
+  { key: "sleep", label: "😴 Sleep / Deep Calm" },
+  { key: "calm", label: "🌿 Calm Story" },
+  { key: "normal", label: "🎙️ Normal" },
+  { key: "energetic", label: "⚡ Energetic / YouTube" },
+];
+
+// Other languages fall back to the free Google voice.
+const BASIC_LANGUAGES: { code: string; label: string }[] = [
   { code: "hi", label: "Hindi" },
   { code: "ar", label: "Arabic" },
   { code: "pa", label: "Punjabi" },
@@ -27,9 +42,6 @@ const LANGUAGES: { code: string; label: string }[] = [
   { code: "gu", label: "Gujarati" },
   { code: "kn", label: "Kannada" },
   { code: "ml", label: "Malayalam" },
-  { code: "es", label: "Spanish" },
-  { code: "fr", label: "French" },
-  { code: "de", label: "German" },
   { code: "it", label: "Italian" },
   { code: "pt", label: "Portuguese" },
   { code: "ru", label: "Russian" },
@@ -39,7 +51,6 @@ const LANGUAGES: { code: string; label: string }[] = [
   { code: "th", label: "Thai" },
   { code: "vi", label: "Vietnamese" },
   { code: "zh-CN", label: "Chinese (Simplified)" },
-  { code: "ja", label: "Japanese" },
   { code: "ko", label: "Korean" },
   { code: "nl", label: "Dutch" },
   { code: "pl", label: "Polish" },
@@ -61,9 +72,13 @@ type HistoryItem = {
   voiceLabel?: string;
   createdAt: number;
   chars: number;
+  srt?: string;
 };
 
 type ElevenVoice = { id: string; name: string; gender: string };
+type EdgeLang = { code: string; label: string; flag: string };
+type EdgeStyle = { key: string; label: string };
+type SpeechCue = { start: number; end: number; text: string };
 
 const DEFAULT_TEXT =
   "Assalam o alaikum! Welcome to the OmniToolBox AI Voiceover Studio. Type or paste your script here, pick a language, then press Generate — you'll get real MP3 audio you can play, download, and reuse.";
@@ -124,12 +139,74 @@ function chunkText(text: string, maxLen = PART_CHARS): string[] {
   return chunks.length > 0 ? chunks : [text];
 }
 
+function srtTime(t: number): string {
+  const ms = Math.max(0, Math.round(t * 1000));
+  const h = Math.floor(ms / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  const s = Math.floor((ms % 60000) / 1000);
+  const r = ms % 1000;
+  const p = (n: number, l = 2) => String(n).padStart(l, "0");
+  return `${p(h)}:${p(m)}:${p(s)},${p(r, 3)}`;
+}
+
+/** Build an SRT from per-part audio durations + server sentence timings (or estimates). */
+async function buildSrt(parts: { text: string; blob: Blob; cues: SpeechCue[] }[]): Promise<string> {
+  const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+  const ctx = new Ctx();
+  try {
+    const out: string[] = [];
+    let idx = 1;
+    let cursor = 0;
+    for (const part of parts) {
+      let dur = 0;
+      try {
+        const ab = await part.blob.arrayBuffer();
+        const decoded = await ctx.decodeAudioData(ab.slice(0));
+        dur = decoded.duration;
+      } catch {
+        // estimate ~14 chars/sec if decode fails
+        dur = Math.max(0.5, part.text.length / 14);
+      }
+      if (part.cues.length > 0) {
+        for (const c of part.cues) {
+          const s = cursor + c.start;
+          const e = cursor + Math.max(c.end, c.start + 0.2);
+          out.push(`${idx++}\n${srtTime(s)} --> ${srtTime(e)}\n${c.text.trim()}\n`);
+        }
+      } else {
+        const sents = part.text.match(/[^.!?…۔؟\n]+[.!?…۔؟]+["'”]?|[^\n]+$/g) ?? [part.text];
+        const total = sents.reduce((a, s) => a + s.length, 0) || 1;
+        let t = cursor;
+        for (const s of sents) {
+          const d = Math.max(0.2, dur * (s.length / total));
+          const txt = s.trim();
+          if (txt) out.push(`${idx++}\n${srtTime(t)} --> ${srtTime(t + d)}\n${txt}\n`);
+          t += d;
+        }
+      }
+      cursor += dur;
+    }
+    return out.join("\n");
+  } finally {
+    ctx.close().catch(() => {});
+  }
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
 export default function VoiceoverStudio() {
   const [lang, setLang] = useState("ur");
   const [text, setText] = useState(DEFAULT_TEXT);
   const [generating, setGenerating] = useState(false);
   const [genStep, setGenStep] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
+  const [srtText, setSrtText] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [playingId, setPlayingId] = useState<string | null>(null);
   // Premium (ElevenLabs) controls — only shown when the server has a key.
@@ -137,9 +214,23 @@ export default function VoiceoverStudio() {
   const [elevenVoices, setElevenVoices] = useState<ElevenVoice[]>([]);
   const [voiceId, setVoiceId] = useState("");
   const [speed, setSpeed] = useState(1);
+  // Edge neural voice controls (free, primary engine).
+  const [edgeLangs, setEdgeLangs] = useState<EdgeLang[]>(EDGE_LANGS_FALLBACK);
+  const [edgeStyles, setEdgeStyles] = useState<EdgeStyle[]>(EDGE_STYLES_FALLBACK);
+  const [edgeVoice, setEdgeVoice] = useState<"male" | "female">("male");
+  const [edgeStyle, setEdgeStyle] = useState("sleep");
+  const [ratePct, setRatePct] = useState(0);   // speed override, -40..40 (0 = style default)
+  const [pitchHz, setPitchHz] = useState(0);   // pitch override, -15..15 (0 = style default)
+  const [useCustomRate, setUseCustomRate] = useState(false);
+  const [useCustomPitch, setUseCustomPitch] = useState(false);
+  const [pauseSec, setPauseSec] = useState(0.5);
+  const [useCustomPause, setUseCustomPause] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stopRef = useRef(false);
   const { toast } = useToast();
+
+  const isEdgeLang = edgeLangs.some((l) => l.code === lang);
+  const showEdgeControls = isEdgeLang && !premium;
 
   useEffect(() => {
     try {
@@ -148,10 +239,11 @@ export default function VoiceoverStudio() {
     } catch {
       /* ignore */
     }
-    // Check if premium voices are available on the server.
     fetch("/api/voiceover/config")
       .then((r) => r.json())
-      .then((c: { provider?: string; voices?: ElevenVoice[] }) => {
+      .then((c: { provider?: string; voices?: ElevenVoice[]; edge?: { languages?: EdgeLang[]; styles?: EdgeStyle[] } }) => {
+        if (c.edge?.languages?.length) setEdgeLangs(c.edge.languages);
+        if (c.edge?.styles?.length) setEdgeStyles(c.edge.styles);
         if (c.provider === "elevenlabs" && c.voices?.length) {
           setPremium(true);
           setElevenVoices(c.voices);
@@ -170,6 +262,10 @@ export default function VoiceoverStudio() {
     }
   };
 
+  const langLabel = (code: string) =>
+    edgeLangs.find((l) => l.code === code)?.label ??
+    BASIC_LANGUAGES.find((l) => l.code === code)?.label ?? code;
+
   const generate = useCallback(async () => {
     const script = text.trim();
     if (!script) {
@@ -183,16 +279,30 @@ export default function VoiceoverStudio() {
     stopRef.current = false;
     setGenerating(true);
     setGenStep("");
+    setSrtText("");
     try {
       const parts = chunkText(script);
-      const blobs: Blob[] = [];
+      const partData: { text: string; blob: Blob; cues: SpeechCue[] }[] = [];
       for (let i = 0; i < parts.length; i++) {
         if (stopRef.current) return;
         setGenStep(parts.length > 1 ? `Generating part ${i + 1} of ${parts.length}…` : "Generating voice…");
+        const payload: Record<string, unknown> = { text: parts[i], lang };
+        if (premium && voiceId) {
+          payload.voiceId = voiceId;
+          payload.speed = speed;
+        } else if (edgeLangs.some((l) => l.code === lang)) {
+          payload.voice = edgeVoice;
+          payload.style = edgeStyle;
+          if (useCustomRate) payload.ratePct = ratePct;
+          if (useCustomPitch) payload.pitchHz = pitchHz;
+          if (useCustomPause) payload.pauseSec = pauseSec;
+        } else {
+          payload.speed = speed;
+        }
         const res = await fetch("/api/voiceover/synthesize", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: parts[i], lang, voiceId: premium ? voiceId : undefined, speed }),
+          body: JSON.stringify(payload),
         });
         if (!res.ok) {
           const err = (await res.json().catch(() => ({}))) as { error?: string };
@@ -200,30 +310,54 @@ export default function VoiceoverStudio() {
         }
         const buf = await res.arrayBuffer();
         if (buf.byteLength < 500) throw new Error("Empty audio");
-        blobs.push(new Blob([buf], { type: "audio/mpeg" }));
+        let cues: SpeechCue[] = [];
+        const cuesHeader = res.headers.get("X-Speech-Cues");
+        if (cuesHeader) {
+          try {
+            const raw = atob(cuesHeader.replace(/-/g, "+").replace(/_/g, "/"));
+            const json = decodeURIComponent(escape(raw));
+            const parsed = JSON.parse(json) as SpeechCue[];
+            if (Array.isArray(parsed)) cues = parsed;
+          } catch {
+            /* fall back to estimates */
+          }
+        }
+        partData.push({ text: parts[i], blob: new Blob([buf], { type: "audio/mpeg" }), cues });
       }
       if (stopRef.current) return;
-      const blob = new Blob(blobs, { type: "audio/mpeg" });
+      const blob = new Blob(partData.map((p) => p.blob), { type: "audio/mpeg" });
       const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       await idbPut(id, blob).catch(() => {});
       if (audioUrl) URL.revokeObjectURL(audioUrl);
       const url = URL.createObjectURL(blob);
       setAudioUrl(url);
-      const langLabel = LANGUAGES.find((l) => l.code === lang)?.label ?? lang;
-      const vLabel = premium ? elevenVoices.find((v) => v.id === voiceId)?.name : undefined;
+      // SRT subtitles from real timings (or estimates).
+      let srt = "";
+      try {
+        srt = await buildSrt(partData);
+        setSrtText(srt);
+      } catch {
+        /* SRT is best-effort */
+      }
+      const vLabel = premium
+        ? elevenVoices.find((v) => v.id === voiceId)?.name
+        : edgeLangs.some((l) => l.code === lang)
+          ? `${edgeVoice === "male" ? "Male" : "Female"} · ${edgeStyles.find((s) => s.key === edgeStyle)?.label ?? edgeStyle}`
+          : undefined;
       const item: HistoryItem = {
         id,
         text: script.slice(0, 120) + (script.length > 120 ? "…" : ""),
         lang,
-        langLabel,
+        langLabel: langLabel(lang),
         voiceLabel: vLabel,
         createdAt: Date.now(),
         chars: script.length,
+        srt: srt || undefined,
       };
       const next = [item, ...history].slice(0, HISTORY_LIMIT);
       for (const old of history.slice(HISTORY_LIMIT - 1)) idbDel(old.id);
       saveHistory(next);
-      toast({ title: "Voiceover ready", variant: "success", description: "Play it, or download the MP3." });
+      toast({ title: "Voiceover ready", variant: "success", description: "Play it, or download the MP3 + SRT." });
     } catch (e) {
       if (!stopRef.current) {
         toast({ title: "Generation failed", variant: "error", description: e instanceof Error ? e.message : "Try again." });
@@ -233,7 +367,7 @@ export default function VoiceoverStudio() {
       setGenStep("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, lang, history, audioUrl, toast, premium, voiceId, speed]);
+  }, [text, lang, history, audioUrl, toast, premium, voiceId, speed, edgeLangs, edgeStyles, edgeVoice, edgeStyle, ratePct, pitchHz, pauseSec, useCustomRate, useCustomPitch, useCustomPause]);
 
   const cancelGenerate = () => {
     stopRef.current = true;
@@ -270,11 +404,15 @@ export default function VoiceoverStudio() {
       toast({ title: "Audio not found", variant: "error", description: "This recording was cleared from the device." });
       return;
     }
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `voiceover-${item.lang}-${new Date(item.createdAt).toISOString().slice(0, 10)}.mp3`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    downloadBlob(blob, `voiceover-${item.lang}-${new Date(item.createdAt).toISOString().slice(0, 10)}.mp3`);
+  };
+
+  const downloadHistorySrt = (item: HistoryItem) => {
+    if (!item.srt) {
+      toast({ title: "No subtitles", variant: "error", description: "This recording has no subtitle data." });
+      return;
+    }
+    downloadBlob(new Blob([item.srt], { type: "text/srt" }), `voiceover-${item.lang}-${new Date(item.createdAt).toISOString().slice(0, 10)}.srt`);
   };
 
   const deleteHistory = async (id: string) => {
@@ -291,6 +429,11 @@ export default function VoiceoverStudio() {
     saveHistory([]);
     audioRef.current?.pause();
     setPlayingId(null);
+  };
+
+  const downloadSrt = () => {
+    if (!srtText) return;
+    downloadBlob(new Blob([srtText], { type: "text/srt" }), `voiceover-${lang}-${Date.now()}.srt`);
   };
 
   const overLimit = text.length > MAX_CHARS;
@@ -314,6 +457,7 @@ export default function VoiceoverStudio() {
             placeholder="Type or paste the text you want voiced…"
             rows={7}
           />
+          <p className="text-[11px] text-zinc-500 mt-1.5">Tip: leave a blank line between paragraphs for a natural pause.</p>
         </div>
 
         <div>
@@ -321,14 +465,101 @@ export default function VoiceoverStudio() {
             <Languages size={15} className="text-brand-400" /> Language
           </label>
           <select id="vo-lang" value={lang} onChange={(e) => setLang(e.target.value)} className="input-base w-full">
-            {LANGUAGES.map((l) => (
-              <option key={l.code} value={l.code}>
-                {l.label}
-              </option>
-            ))}
+            <optgroup label="✨ Neural voices (Microsoft · free)">
+              {edgeLangs.map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.flag} {l.label}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label="Basic voices (free)">
+              {BASIC_LANGUAGES.map((l) => (
+                <option key={l.code} value={l.code}>
+                  {l.label}
+                </option>
+              ))}
+            </optgroup>
           </select>
-          <p className="text-xs text-zinc-500 mt-1.5">{LANGUAGES.length} languages · free · MP3 download</p>
+          <p className="text-xs text-zinc-500 mt-1.5 flex items-center gap-1.5">
+            {isEdgeLang ? (
+              <><Sparkles size={12} className="text-brand-400" /> Microsoft neural voice · male/female · styles · free</>
+            ) : (
+              <>Basic free voice · MP3 download</>
+            )}
+          </p>
         </div>
+
+        {showEdgeControls && (
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="vo-evoice" className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
+                  <Mic size={15} className="text-brand-400" /> Voice
+                </label>
+                <select id="vo-evoice" value={edgeVoice} onChange={(e) => setEdgeVoice(e.target.value as "male" | "female")} className="input-base w-full">
+                  <option value="male">👨 Male</option>
+                  <option value="female">👩 Female</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="vo-style" className="text-sm font-medium text-zinc-300 mb-2 block">Style</label>
+                <select id="vo-style" value={edgeStyle} onChange={(e) => setEdgeStyle(e.target.value)} className="input-base w-full">
+                  {edgeStyles.map((s) => (
+                    <option key={s.key} value={s.key}>{s.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-sm font-medium text-zinc-300">
+                    Speed: <span className="text-brand-300">{useCustomRate ? `${ratePct > 0 ? "+" : ""}${ratePct}%` : "style default"}</span>
+                  </p>
+                  <label className="flex items-center gap-1.5 text-[11px] text-zinc-500">
+                    <input type="checkbox" checked={useCustomRate} onChange={(e) => setUseCustomRate(e.target.checked)} className="accent-brand-500" />
+                    custom
+                  </label>
+                </div>
+                <input type="range" min={-40} max={40} step={1} value={ratePct}
+                  disabled={!useCustomRate}
+                  onChange={(e) => setRatePct(Number(e.target.value))}
+                  className="w-full accent-brand-500 disabled:opacity-30" aria-label="Speech speed percent" />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-sm font-medium text-zinc-300">
+                    Pitch: <span className="text-brand-300">{useCustomPitch ? `${pitchHz > 0 ? "+" : ""}${pitchHz} Hz` : "style default"}</span>
+                  </p>
+                  <label className="flex items-center gap-1.5 text-[11px] text-zinc-500">
+                    <input type="checkbox" checked={useCustomPitch} onChange={(e) => setUseCustomPitch(e.target.checked)} className="accent-brand-500" />
+                    custom
+                  </label>
+                </div>
+                <input type="range" min={-15} max={15} step={1} value={pitchHz}
+                  disabled={!useCustomPitch}
+                  onChange={(e) => setPitchHz(Number(e.target.value))}
+                  className="w-full accent-brand-500 disabled:opacity-30" aria-label="Speech pitch" />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <p className="text-sm font-medium text-zinc-300">
+                    Paragraph pause: <span className="text-brand-300">{useCustomPause ? `${pauseSec.toFixed(1)}s` : "style default"}</span>
+                  </p>
+                  <label className="flex items-center gap-1.5 text-[11px] text-zinc-500">
+                    <input type="checkbox" checked={useCustomPause} onChange={(e) => setUseCustomPause(e.target.checked)} className="accent-brand-500" />
+                    custom
+                  </label>
+                </div>
+                <input type="range" min={0} max={3} step={0.1} value={pauseSec}
+                  disabled={!useCustomPause}
+                  onChange={(e) => setPauseSec(Number(e.target.value))}
+                  className="w-full accent-brand-500 disabled:opacity-30" aria-label="Paragraph pause" />
+              </div>
+            </div>
+          </>
+        )}
 
         {premium && (
           <>
@@ -363,7 +594,7 @@ export default function VoiceoverStudio() {
 
         {!generating ? (
           <Button onClick={generate} className="w-full">
-            <Mic size={16} /> Generate voiceover (MP3)
+            <Mic size={16} /> Generate voiceover (MP3 + SRT)
           </Button>
         ) : (
           <Button onClick={cancelGenerate} variant="danger" className="w-full">
@@ -381,16 +612,21 @@ export default function VoiceoverStudio() {
         {audioUrl && !generating && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3 animate-fade-up">
             <audio controls src={audioUrl} className="w-full" />
-            <a href={audioUrl} download={`voiceover-${lang}-${Date.now()}.mp3`}>
-              <Button className="w-full" variant="secondary">
-                <Download size={16} /> Download MP3
+            <div className="grid grid-cols-2 gap-3">
+              <a href={audioUrl} download={`voiceover-${lang}-${Date.now()}.mp3`}>
+                <Button className="w-full" variant="secondary">
+                  <Download size={16} /> MP3
+                </Button>
+              </a>
+              <Button className="w-full" variant="secondary" onClick={downloadSrt} disabled={!srtText}>
+                <FileText size={16} /> SRT subtitles
               </Button>
-            </a>
+            </div>
           </div>
         )}
 
         <p className="text-[11px] text-zinc-500 leading-relaxed">
-          Free AI voices generated on our server — the MP3 is yours to download and use anywhere.
+          Free AI voices generated on our server — the MP3 + subtitles are yours to download and use anywhere.
           Your recordings stay on this device.
         </p>
       </Card>
@@ -424,6 +660,11 @@ export default function VoiceoverStudio() {
                 <button onClick={() => downloadHistory(h)} className="p-2 text-zinc-400 hover:text-brand-300 transition" aria-label="Download MP3">
                   <Download size={15} />
                 </button>
+                {h.srt && (
+                  <button onClick={() => downloadHistorySrt(h)} className="p-2 text-zinc-400 hover:text-brand-300 transition" aria-label="Download SRT">
+                    <FileText size={15} />
+                  </button>
+                )}
                 <button onClick={() => deleteHistory(h.id)} className="p-2 text-zinc-400 hover:text-red-400 transition" aria-label="Delete">
                   <Trash2 size={15} />
                 </button>
