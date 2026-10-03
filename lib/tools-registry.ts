@@ -42,6 +42,14 @@ export const TOOLS: Tool[] = [
     keywords: ["photo maker", "remove background", "background remover", "transparent background", "png maker", "cutout", "erase bg", "photo editor", "bild hintergrund entfernen", "remove bg", "transparent png", "bg eraser", "photo cutout", "sticker maker", "photo background changer"],
   },
   {
+    id: "t21", slug: "background-studio", title: "Background Studio",
+    tagline: "Remove.bg-style studio — change backgrounds like a pro",
+    description: "Upload a photo, AI removes the background, then restyle it: solid colors, gradients, blurred background, custom photos, studio scenes. Add drop shadows, tune brightness & contrast, download in HD. 100% free, on-device.",
+    category: "image", href: "/media-tools#background-studio", icon: "Palette", image: "/images/tools/background-studio.jpg", badge: "new",
+    enabled: true, sortOrder: 5.5, usageCount: 0, updatedAt: "2026-10-04",
+    keywords: ["background studio", "change background", "photo background changer", "remove.bg alternative", "free remove.bg", "blur background", "photo background editor", "replace background", "background changer app", "portrait background", "studio background", "add shadow to photo", "photo editor online free", "hintergrund ändern", "foto hintergrund wechseln"],
+  },
+  {
     id: "t6", slug: "fancy-text", title: "Fancy Text Stylizer",
     tagline: "Unicode text styles with live preview — copy anywhere",
     description: "50+ unicode font styles for bios, captions and posts. Live preview, one-click copy.",
@@ -152,6 +160,14 @@ export const TOOLS: Tool[] = [
     category: "web", href: "/calculators#age", icon: "Cake", image: "/images/tools/age-calculator.jpg", badge: "new",
     enabled: true, sortOrder: 19, usageCount: 0, updatedAt: "2026-10-04",
     keywords: ["age calculator", "how old am i", "birthday calculator", "calculate age", "date of birth calculator", "age finder", "years old calculator", "days lived", "next birthday", "dob calculator", "my age", "age in days"],
+  },
+  {
+    id: "t20", slug: "watermark-remover", title: "Watermark Remover",
+    tagline: "Erase watermarks from photos & videos",
+    description: "Paint over watermarks, logos or text marks and erase them with smart AI inpainting — works on IMAGES and VIDEOS. Auto-detects corner watermarks (like Gemini AI marks). 100% client-side — nothing uploaded.",
+    category: "image", href: "/media-tools#watermark-remover", icon: "Droplets", image: "/images/tools/watermark-remover.jpg", badge: "new",
+    enabled: true, sortOrder: 20, usageCount: 0, updatedAt: "2026-10-04",
+    keywords: ["watermark remover", "remove watermark", "gemini watermark", "ai watermark remover", "logo remover", "remove logo from photo", "erase watermark", "watermark eraser", "text remover", "remove text from image", "clean image", "photo watermark remover", "free watermark remover", "video watermark remover", "remove watermark from video", "gemini video watermark"],
   },
 ];
 
