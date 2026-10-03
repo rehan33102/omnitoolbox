@@ -1,0 +1,71 @@
+import type { Metadata, Viewport } from "next";
+import { Inter, Space_Grotesk } from "next/font/google";
+import Script from "next/script";
+import { ThemeProvider } from "next-themes";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import { Toaster } from "@/components/ui/Toast";
+import { siteUrl } from "@/lib/utils";
+import { SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
+import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const display = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#08080f" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  ],
+};
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
+  title: {
+    default: `${SITE_NAME} — Free AI Tools, Image Utilities & Web Tools`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: `${SITE_TAGLINE} AI prompt studio, image converter & compressor, fancy text stylizer, bio generator, hashtag finder and more.`,
+  keywords: ["ai tools", "prompt generator", "image converter", "image compressor", "fancy text generator", "hashtag generator", "free online tools"],
+  authors: [{ name: SITE_NAME }],
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} — Free AI Tools & Web Utilities`,
+    description: SITE_TAGLINE,
+    url: siteUrl(),
+  },
+  twitter: { card: "summary_large_image", title: SITE_NAME, description: SITE_TAGLINE },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} ${display.variable} min-h-screen flex flex-col`}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <Toaster />
+          {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
+            <Script
+              id="adsense-script"
+              async
+              strategy="afterInteractive"
+              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+              crossOrigin="anonymous"
+            />
+          )}
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}

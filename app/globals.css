@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --bg: 255 255 255; --fg: 10 10 18; }
+.dark { --bg: 8 8 15; --fg: 244 244 250; }
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply bg-[rgb(var(--bg))] text-[rgb(var(--fg))] font-sans antialiased; }
+  ::selection { @apply bg-brand-500/30 text-inherit; }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/60 dark:bg-white/[0.04] backdrop-blur-xl border border-black/5 dark:border-white/10 shadow-glass;
+  }
+  .glass-strong {
+    @apply bg-white/80 dark:bg-ink-800/80 backdrop-blur-2xl border border-black/5 dark:border-white/10;
+  }
+  .text-gradient {
+    @apply bg-gradient-to-r from-brand-500 via-fuchsia-500 to-accent-400 bg-clip-text text-transparent;
+  }
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-glow;
+  }
+  .input-base {
+    @apply w-full rounded-xl glass px-4 py-2.5 text-sm outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:ring-2 focus:ring-brand-500/60 focus:border-brand-500/60 transition;
+  }
+  .btn-base {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/70;
+  }
+}
+
+* { scrollbar-width: thin; scrollbar-color: rgba(139, 92, 246, 0.4) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.35); border-radius: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
