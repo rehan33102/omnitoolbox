@@ -6,7 +6,6 @@ import CurrencyConverter from "@/components/calc/CurrencyConverter";
 import UnitConverter from "@/components/calc/UnitConverter";
 import BmiCalculator from "@/components/calc/BmiCalculator";
 import AgeCalculator from "@/components/calc/AgeCalculator";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
@@ -66,7 +65,6 @@ export default function CalculatorsPage() {
         <TabsContent value="age" id="age"><AgeCalculator /></TabsContent>
       </Tabs>
 
-      <DynamicAdSlot placement="calculators-bottom" format="horizontal" className="mt-10" />
     </div>
   );
 }

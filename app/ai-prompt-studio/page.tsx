@@ -2,7 +2,6 @@ import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import PromptBuilder from "@/components/prompt-studio/PromptBuilder";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
@@ -45,7 +44,6 @@ export default function PromptStudioPage() {
 
       <PromptBuilder />
 
-      <DynamicAdSlot placement="prompt-studio-mid" format="horizontal" className="mt-10" />
 
       <div className="grid sm:grid-cols-3 gap-4 mt-10">
         <h2 className="sm:col-span-3 font-display text-xl md:text-2xl font-bold tracking-tight">

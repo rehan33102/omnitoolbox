@@ -6,7 +6,6 @@ import Hero from "@/components/home/Hero";
 import ToolExplorer from "@/components/home/ToolExplorer";
 import UsageCounter from "@/components/home/UsageCounter";
 import SectionHeader from "@/components/home/SectionHeader";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import TrackUsage from "@/components/analytics/TrackUsage";
@@ -17,7 +16,7 @@ export const revalidate = 300;
 
 export const metadata = buildMetadata({
   title: "OmniToolBox — Free AI Tools, Image Utilities & Web Tools",
-  description: "50+ free AI & web utilities: AI prompt studio, image converter & compressor, fancy text stylizer, bio generator, hashtag finder. No signup, no lag.",
+  description: "50+ free AI & web utilities: AI prompt studio, image converter & compressor, fancy text stylizer, bio generator, hashtag finder. No signup required.",
   path: "/",
   keywords: ["free ai tools", "prompt generator", "image converter", "image compressor", "fancy text", "hashtag generator", "online utilities"],
 });
@@ -47,7 +46,6 @@ export default async function HomePage() {
 
       <Hero toolCount={tools.length} />
 
-      <DynamicAdSlot placement="homepage-top" format="horizontal" className="container mt-4" />
 
       <div className="mt-14 md:mt-20">
         <ToolExplorer tools={tools} />
@@ -78,7 +76,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <DynamicAdSlot placement="homepage-mid" format="horizontal" className="container mt-16" />
 
       <section className="container mt-20 md:mt-28 max-w-3xl">
         <SectionHeader
@@ -122,7 +119,6 @@ export default async function HomePage() {
         </Reveal>
       </section>
 
-      <DynamicAdSlot placement="homepage-bottom" format="horizontal" className="container mt-14" />
     </>
   );
 }

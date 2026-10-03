@@ -4,7 +4,6 @@ import JsonLd from "@/components/seo/JsonLd";
 import FancyTextStylator from "@/components/social/FancyTextStylator";
 import BioGenerator from "@/components/social/BioGenerator";
 import HashtagFinder from "@/components/social/HashtagFinder";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
@@ -50,7 +49,6 @@ export default function SocialToolsPage() {
         <TabsContent value="hashtags" id="hashtags"><HashtagFinder /></TabsContent>
       </Tabs>
 
-      <DynamicAdSlot placement="social-tools-bottom" format="horizontal" className="mt-10" />
     </div>
   );
 }

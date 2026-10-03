@@ -65,7 +65,7 @@ export default function Hero({ toolCount }: { toolCount: number }) {
           className="mt-6 text-zinc-400 text-base md:text-lg max-w-2xl mx-auto animate-fade-up [animation-delay:360ms]"
         >
           Prompt Studio, image converter &amp; compressor, AI voiceover, fancy
-          text, bio generator, hashtag finder and more — blazing fast, private,
+          text, bio generator, hashtag finder and more — private,
           and 100% free.
         </p>
 

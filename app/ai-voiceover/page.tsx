@@ -5,7 +5,6 @@ import Link from "next/link";
 import { Sparkles, ArrowRight } from "lucide-react";
 import JsonLd from "@/components/seo/JsonLd";
 import VoiceoverStudio from "@/components/voice/VoiceoverStudio";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 
@@ -60,7 +59,6 @@ export default function AIVoiceoverPage() {
         <VoiceoverStudio />
       </div>
 
-      <DynamicAdSlot placement="voiceover-bottom" format="horizontal" className="mt-10" />
     </div>
   );
 }

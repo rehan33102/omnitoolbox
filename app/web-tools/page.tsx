@@ -3,7 +3,6 @@ import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import WebToolTabs from "@/components/web/WebToolTabs";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 
@@ -51,7 +50,6 @@ export default function WebToolsPage() {
 
       <WebToolTabs />
 
-      <DynamicAdSlot placement="web-tools-bottom" format="horizontal" className="mt-10" />
     </div>
   );
 }

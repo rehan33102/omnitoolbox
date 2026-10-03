@@ -2,7 +2,6 @@ import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import DirectoryExplorer from "@/components/directory/DirectoryExplorer";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 import { getListings } from "@/lib/get-directory";
@@ -41,11 +40,9 @@ export default async function DirectoryPage() {
         </p>
       </div>
 
-      <DynamicAdSlot placement="directory-top" format="horizontal" className="mb-8" />
 
       <DirectoryExplorer tools={tools} />
 
-      <DynamicAdSlot placement="directory-bottom" format="horizontal" className="mt-10" />
     </div>
   );
 }

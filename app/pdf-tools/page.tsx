@@ -3,7 +3,6 @@ import { serverSiteUrl } from "@/lib/seo";
 import Image from "next/image";
 import JsonLd from "@/components/seo/JsonLd";
 import PdfToolTabs from "@/components/pdf/PdfToolTabs";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 
@@ -33,7 +32,7 @@ export default function PdfToolsPage() {
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Professional PDF utilities that run entirely in your browser.
-          Zero uploads, zero lag, zero cost.
+          Private and free — no uploads needed.
         </p>
       </div>
 
@@ -51,7 +50,6 @@ export default function PdfToolsPage() {
 
       <PdfToolTabs />
 
-      <DynamicAdSlot placement="pdf-tools-bottom" format="horizontal" className="mt-10" />
     </div>
   );
 }

@@ -2,7 +2,6 @@ import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import MediaToolTabs from "@/components/media/MediaToolTabs";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 
@@ -32,13 +31,12 @@ export default function MediaToolsPage() {
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Professional image utilities that run entirely in your browser.
-          Zero uploads, zero lag, zero cost.
+          Private and free — no uploads needed.
         </p>
       </div>
 
       <MediaToolTabs />
 
-      <DynamicAdSlot placement="media-tools-bottom" format="horizontal" className="mt-10" />
     </div>
   );
 }

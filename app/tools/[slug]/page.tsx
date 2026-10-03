@@ -7,7 +7,6 @@ import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd, serverSiteUrl } fro
 import JsonLd from "@/components/seo/JsonLd";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import { getListings } from "@/lib/get-directory";
 
 /**
@@ -108,7 +107,6 @@ export default async function ToolPage({ params }: { params: { slug: string } })
 
       <ToolComponent {...extraProps} />
 
-      <DynamicAdSlot placement="tool-page-bottom" format="horizontal" className="mt-10" />
     </div>
   );
 }

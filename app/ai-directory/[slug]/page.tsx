@@ -9,7 +9,6 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import VoteButtons from "@/components/directory/VoteButtons";
 import DirectoryCard from "@/components/directory/DirectoryCard";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import { getListing, getListings } from "@/lib/get-directory";
 import { AI_TOOLS_SEED } from "@/data/ai-tools-seed";
@@ -80,7 +79,6 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
         </div>
       </Card>
 
-      <DynamicAdSlot placement="directory-detail" format="horizontal" className="mb-8" />
 
       {related.length > 0 && (
         <div>

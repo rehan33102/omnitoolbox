@@ -1,5 +1,5 @@
 export const SITE_NAME = "OmniToolBox";
-export const SITE_TAGLINE = "50+ free AI & web utilities. No signup, no lag.";
+export const SITE_TAGLINE = "50+ free AI & web utilities. No signup required.";
 
 export const NAV_LINKS = [
   { href: "/", label: "Home" },

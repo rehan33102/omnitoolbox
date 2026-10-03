@@ -12,7 +12,7 @@ export const TOOLS: Tool[] = [
   {
     id: "t2", slug: "image-converter", title: "Image Converter",
     tagline: "Convert WebP ↔ PNG ↔ JPG instantly in your browser",
-    description: "Client-side image format converter. Zero upload, zero lag — your files never leave the device.",
+    description: "Client-side image format converter. Your files never leave your device.",
     category: "image", href: "/tools/image-converter", icon: "RefreshCw", image: "/images/tools/image-converter.jpg", badge: "popular",
     enabled: true, sortOrder: 2, usageCount: 0, updatedAt: "2026-10-03",
     keywords: ["image converter", "convert image", "webp to png", "png to jpg", "jpg to png", "webp converter", "photo converter", "format converter", "picture converter", "convert webp", "image format changer", "photo format converter", "png to webp"],

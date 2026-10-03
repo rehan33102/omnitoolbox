@@ -1,7 +1,6 @@
 import { buildMetadata, websiteJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import BlogListClient from "@/components/blog/BlogListClient";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import Badge from "@/components/ui/Badge";
 import { getPosts } from "@/lib/blog";
 
@@ -35,7 +34,6 @@ export default async function BlogPage() {
         </p>
       </div>
 
-      <DynamicAdSlot placement="blog-top" format="horizontal" className="mb-8" />
 
       <BlogListClient initialPosts={posts} />
     </div>

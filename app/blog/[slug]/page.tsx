@@ -5,7 +5,6 @@ import JsonLd from "@/components/seo/JsonLd";
 import ArticleBody from "@/components/blog/ArticleBody";
 import ArticleCard from "@/components/blog/ArticleCard";
 import AdminArticleFallback from "@/components/blog/AdminArticleFallback";
-import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import Badge from "@/components/ui/Badge";
 import { getPost, getPosts } from "@/lib/blog";
 import { BLOG_SEED } from "@/data/blog-templates";
@@ -73,7 +72,6 @@ export default async function ArticlePage({ params }: { params: { slug: string }
           <ArticleBody body={post.body} />
         </div>
 
-        <DynamicAdSlot placement="blog-article" format="horizontal" className="mt-10" />
       </div>
 
       {related.length > 0 && (
