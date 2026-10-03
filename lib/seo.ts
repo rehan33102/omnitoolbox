@@ -1,6 +1,33 @@
 import type { Metadata } from "next";
-import { siteUrl } from "./utils";
+import { headers } from "next/headers";
 import { SITE_NAME } from "./constants";
+
+/** Production domain — last-resort fallback so SEO output never says localhost. */
+const PROD_URL = "https://omnitoolbox-zeta.vercel.app";
+
+/**
+ * Server-only base URL for all SEO output (canonicals, sitemap, robots, JSON-LD).
+ * 1. NEXT_PUBLIC_SITE_URL env var, when the owner sets it
+ * 2. The real request host (Vercel sends x-forwarded-host automatically)
+ * 3. Hardcoded production domain — production never emits localhost
+ */
+export function serverSiteUrl(path = ""): string {
+  const clean = (u: string) => `${u.replace(/\/$/, "")}${path}`;
+  const env = process.env.NEXT_PUBLIC_SITE_URL;
+  if (env) return clean(env);
+  try {
+    const h = headers();
+    const host = h.get("x-forwarded-host") ?? h.get("host");
+    if (host) {
+      if (host.includes("localhost") || host.startsWith("127.")) return `http://${host}${path}`;
+      const proto = h.get("x-forwarded-proto") ?? "https";
+      return `${proto}://${host}${path}`;
+    }
+  } catch {
+    /* statically prerendered — fall through to the production domain */
+  }
+  return clean(PROD_URL);
+}
 
 interface PageMeta {
   title: string;
@@ -12,7 +39,7 @@ interface PageMeta {
 }
 
 export function buildMetadata({ title, description, path = "/", keywords = [], image, noIndex }: PageMeta): Metadata {
-  const url = siteUrl(path);
+  const url = serverSiteUrl(path);
   return {
     title,
     description,
@@ -24,9 +51,9 @@ export function buildMetadata({ title, description, path = "/", keywords = [], i
       title,
       description,
       url,
-      images: image ? [{ url: siteUrl(image), width: 1200, height: 630 }] : undefined,
+      images: image ? [{ url: serverSiteUrl(image), width: 1200, height: 630 }] : undefined,
     },
-    twitter: { card: "summary_large_image", title, description, images: image ? [siteUrl(image)] : undefined },
+    twitter: { card: "summary_large_image", title, description, images: image ? [serverSiteUrl(image)] : undefined },
     ...(noIndex ? { robots: { index: false, follow: false } } : {}),
   };
 }
@@ -36,10 +63,10 @@ export function websiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: SITE_NAME,
-    url: siteUrl(),
+    url: serverSiteUrl(),
     potentialAction: {
       "@type": "SearchAction",
-      target: `${siteUrl()}/?q={query}`,
+      target: `${serverSiteUrl()}/?q={query}`,
       "query-input": "required name=query",
     },
   };
@@ -65,7 +92,7 @@ export function articleJsonLd(post: { title: string; excerpt: string; slug: stri
     "@type": "Article",
     headline: post.title,
     description: post.excerpt,
-    url: siteUrl(`/blog/${post.slug}`),
+    url: serverSiteUrl(`/blog/${post.slug}`),
     datePublished: post.publishedAt ?? post.updatedAt,
     dateModified: post.updatedAt,
     author: { "@type": "Organization", name: SITE_NAME },
@@ -81,7 +108,7 @@ export function breadcrumbJsonLd(items: { name: string; path: string }[]) {
       "@type": "ListItem",
       position: i + 1,
       name: item.name,
-      item: siteUrl(item.path),
+      item: serverSiteUrl(item.path),
     })),
   };
 }

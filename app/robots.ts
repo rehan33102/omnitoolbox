@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/", "/api/admin/", "/api/analytics/", "/login", "/signup"],
       },
     ],
-    sitemap: siteUrl("/sitemap.xml"),
-    host: siteUrl().replace(/^https?:\/\//, ""),
+    sitemap: serverSiteUrl("/sitemap.xml"),
+    host: serverSiteUrl().replace(/^https?:\/\//, ""),
   };
 }

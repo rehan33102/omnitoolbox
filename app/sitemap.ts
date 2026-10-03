@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 import { TOOLS } from "@/lib/tools-registry";
 import { createAdminClient } from "@/lib/supabase/admin";
 
@@ -22,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   const urls: MetadataRoute.Sitemap = staticRoutes.map(({ route, priority, freq }) => ({
-    url: siteUrl(route || "/"),
+    url: serverSiteUrl(route || "/"),
     lastModified: new Date(),
     changeFrequency: freq,
     priority,
@@ -30,7 +30,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const tool of TOOLS.filter((t) => t.enabled)) {
     urls.push({
-      url: siteUrl(tool.href),
+      url: serverSiteUrl(tool.href),
       lastModified: new Date(tool.updatedAt),
       changeFrequency: "weekly",
       priority: 0.85,
@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ]);
     posts?.forEach((p) =>
       urls.push({
-        url: siteUrl(`/blog/${p.slug}`),
+        url: serverSiteUrl(`/blog/${p.slug}`),
         lastModified: new Date(p.updated_at),
         changeFrequency: "monthly",
         priority: 0.7,
@@ -54,7 +54,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     );
     listings?.forEach((l) =>
       urls.push({
-        url: siteUrl(`/ai-directory/${l.slug}`),
+        url: serverSiteUrl(`/ai-directory/${l.slug}`),
         lastModified: new Date(l.created_at),
         changeFrequency: "weekly",
         priority: 0.7,
