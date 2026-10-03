@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes } from "@/lib/utils";
+import { saveBlob } from "@/lib/db";
 
 type ProgressCb = (key: string, current: number, total: number) => void;
 type RemoveFn = (image: Blob, config?: Record<string, unknown>) => Promise<Blob>;
@@ -124,6 +125,16 @@ export default function BackgroundRemover() {
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
+  // Persist so the output survives refresh — best-effort, never blocks UX.
+  const persistResult = (blob: Blob) => {
+    try {
+      const base = file?.name.replace(/\.[^.]+$/, "") ?? "image";
+      void saveBlob("image", blob, `no-bg-${base}.png`, { tool: "bg-remover" });
+    } catch {
+      /* library save is non-critical */
+    }
+  };
+
   // Track overall download progress across the model's file chunks.
   const seen = useRef(new Map<string, { current: number; total: number }>());
   const reportProgress = (setter: (n: number) => void) => (key: string, current: number, total: number) => {
@@ -204,6 +215,7 @@ export default function BackgroundRemover() {
         if (buf.byteLength > 1000) {
           const blob = new Blob([buf], { type: "image/png" });
           setResult({ url: URL.createObjectURL(blob), size: blob.size });
+          persistResult(blob);
           toast({ title: "Background removed", variant: "success", description: "Your transparent PNG is ready." });
           setBusy(false);
           return;
@@ -231,6 +243,7 @@ export default function BackgroundRemover() {
       const small = await downscale(file, 1024);
       const blob = await removeFn.current(small);
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
+      persistResult(blob);
       toast({ title: "Background removed", variant: "success", description: "Your transparent PNG is ready." });
     } catch {
       setError("Couldn't process that photo. Try a different image or check your connection, then retry.");

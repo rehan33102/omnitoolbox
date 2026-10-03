@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { formatBytes } from "@/lib/utils";
+import { saveRecord } from "@/lib/db";
 
 function cleanSvg(input: string): string {
   return input
@@ -27,7 +28,16 @@ export default function SvgCleaner() {
   const [output, setOutput] = useState("");
   const { copy, copied } = useCopyToClipboard();
 
-  const run = () => setOutput(cleanSvg(input));
+  const run = () => {
+    const out = cleanSvg(input);
+    setOutput(out);
+    // Persist so the output survives refresh — best-effort, never blocks UX.
+    try {
+      void saveRecord("text", { input, output: out, tool: "svg-cleaner" });
+    } catch {
+      /* library save is non-critical */
+    }
+  };
   const saved = input && output ? Math.round((1 - output.length / input.length) * 100) : 0;
 
   return (

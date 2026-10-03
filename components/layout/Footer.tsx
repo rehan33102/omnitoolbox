@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Github, Instagram } from "lucide-react";
 import { TOOL_CATEGORIES } from "@/lib/constants";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { TikTokIcon, WhatsAppIcon } from "@/components/ui/BrandIcons";
 import { WHATSAPP_MESSAGE, normalizeWhatsapp } from "@/lib/site-settings";
+import LogoMark from "@/components/layout/LogoMark";
 
 const COMPANY_LINKS = [
   { href: "/blog", label: "Blog" },
@@ -40,17 +40,9 @@ export default function Footer() {
       <div className="container py-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         {/* Brand + social */}
         <div>
-          <Link href="/" className="flex items-center gap-2.5 mb-3">
-            <span className="relative grid h-10 w-10 place-items-center rounded-2xl overflow-hidden shadow-lg shadow-purple-500/25 ring-1 ring-black/10 dark:ring-white/20">
-              <Image
-                src="/images/logo.png"
-                alt="OmniToolBox logo"
-                width={40}
-                height={40}
-                className="object-cover"
-              />
-            </span>
-            <span className="font-display text-xl font-extrabold text-gradient drop-shadow-[0_1px_8px_rgba(168,85,247,0.35)]">{settings.logoText}</span>
+          <Link href="/" className="flex items-center gap-3 mb-3">
+            <LogoMark size={40} />
+            <span className="brand-name">{settings.logoText}</span>
           </Link>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-xs leading-relaxed">{settings.tagline}</p>
           <div className="flex gap-2 mt-4">

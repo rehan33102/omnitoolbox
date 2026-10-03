@@ -6,7 +6,7 @@ export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
 export default async function Icon() {
-  // Embed the real origami-fox logo as the favicon
+  // Embed the real brand logo (transparent PNG) as the favicon
   const logoPath = join(process.cwd(), "public", "images", "logo.png");
   const buf = await readFile(logoPath);
   const dataUri = `data:image/png;base64,${buf.toString("base64")}`;
@@ -18,7 +18,7 @@ export default async function Icon() {
         src={dataUri}
         width={64}
         height={64}
-        style={{ borderRadius: "14px", objectFit: "cover" }}
+        style={{ objectFit: "contain" }}
         alt="OmniToolBox"
       />
     ),

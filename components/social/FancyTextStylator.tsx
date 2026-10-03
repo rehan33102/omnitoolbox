@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import { Textarea } from "@/components/ui/Input";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { FANCY_STYLES } from "@/data/fancy-text-maps";
+import { saveRecord } from "@/lib/db";
 
 export default function FancyTextStylator() {
   const [input, setInput] = useState("Make my bio pop ✨");
@@ -16,6 +17,12 @@ export default function FancyTextStylator() {
     await copy(text, "Style copied!");
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1500);
+    // Persist so the output survives refresh — best-effort, never blocks UX.
+    try {
+      void saveRecord("text", { input, style: id, output: text, createdAt: Date.now() });
+    } catch {
+      /* library save is non-critical */
+    }
   };
 
   return (

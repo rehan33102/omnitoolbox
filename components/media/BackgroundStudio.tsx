@@ -12,6 +12,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { loadBgEngine, removeBackgroundSmart, type ProgressCb, type RemoveFn } from "@/lib/bg-engine";
 import { formatBytes } from "@/lib/utils";
+import { saveBlob } from "@/lib/db";
 
 type BgKind = "transparent" | "color" | "gradient" | "blur" | "image" | "preset";
 
@@ -290,6 +291,15 @@ export default function BackgroundStudio() {
 
       const blob = await new Promise<Blob | null>(res => out.toBlob(res, "image/png"));
       if (!blob) throw new Error("encode");
+      // Persist so the output survives refresh — best-effort, never blocks UX.
+      try {
+        void saveBlob("image", blob, hd ? "background-studio-hd.png" : "background-studio.png", {
+          tool: "bg-studio",
+          background: bgKind,
+        });
+      } catch {
+        /* library save is non-critical */
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

@@ -7,6 +7,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes, cn } from "@/lib/utils";
+import { saveBlob } from "@/lib/db";
 
 const MAX_FILES = 20;
 const MAX_SIZE = 25 * 1024 * 1024;
@@ -91,6 +92,11 @@ export default function PdfMerger() {
       const bytes = await merged.save();
       const blob = new Blob([bytes as unknown as BlobPart], { type: "application/pdf" });
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
+      try {
+        void saveBlob("pdf", blob, "merged.pdf", { tool: "pdf-merge" });
+      } catch {
+        /* library save is non-critical */
+      }
       toast({ title: "PDFs merged", variant: "success", description: `${files.length} files combined.` });
     } catch {
       toast({ title: "Merge failed", variant: "error", description: "One of the files may be corrupted or password-protected." });
@@ -174,14 +180,20 @@ export default function PdfMerger() {
           )}
 
           {result && (
-            <div className="glass rounded-xl p-4 flex items-center justify-between animate-fade-up">
-              <div className="text-sm">
-                <p className="font-medium text-emerald-700 dark:text-emerald-300">Merged PDF ready</p>
-                <p className="text-zinc-500 text-xs">{formatBytes(result.size)}</p>
+            <div className="space-y-3 animate-fade-up">
+              <div>
+                <p className="text-xs text-zinc-500 mb-2 uppercase tracking-widest">Preview — merged PDF</p>
+                <iframe src={result.url} title="Merged PDF preview" className="w-full h-96 rounded-xl border border-black/10 dark:border-white/10 bg-white" />
               </div>
-              <a href={result.url} download="merged.pdf">
-                <Button size="sm"><Download size={14} /> Download PDF</Button>
-              </a>
+              <div className="glass rounded-xl p-4 flex items-center justify-between">
+                <div className="text-sm">
+                  <p className="font-medium text-emerald-700 dark:text-emerald-300">Merged PDF ready</p>
+                  <p className="text-zinc-500 text-xs">{formatBytes(result.size)}</p>
+                </div>
+                <a href={result.url} download="merged.pdf">
+                  <Button size="sm"><Download size={14} /> Download PDF</Button>
+                </a>
+              </div>
             </div>
           )}
         </>

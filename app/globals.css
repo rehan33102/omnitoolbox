@@ -198,3 +198,42 @@
 @media (max-width: 640px) {
   .tool-glow { animation: none; opacity: 0.3; }
 }
+
+/*
+ * LOGO LIGHTING — soft blinking glow halo around the brand mark.
+ * GPU-friendly (opacity only), subtle and premium.
+ */
+@keyframes logo-halo-blink {
+  0%, 100% { opacity: 0.35; transform: scale(0.92); }
+  50% { opacity: 0.85; transform: scale(1.08); }
+}
+.logo-glow-wrap { isolation: isolate; }
+.logo-glow {
+  position: absolute;
+  inset: -35%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(236,72,153,0.5) 0%, rgba(168,85,247,0.35) 40%, rgba(34,211,238,0.18) 65%, transparent 75%);
+  filter: blur(6px);
+  animation: logo-halo-blink 3.2s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* BRAND NAME — stylish colorful gradient with letter spacing */
+.brand-name {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 1.05rem;
+  background: linear-gradient(100deg, #f472b6 0%, #a855f7 35%, #6366f1 60%, #22d3ee 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 1px 10px rgba(168,85,247,0.4));
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-glow { animation: none; opacity: 0.5; }
+}

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -11,6 +10,7 @@ import { cn } from "@/lib/utils";
 import Drawer from "@/components/ui/Drawer";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import SmartSearch from "@/components/home/SmartSearch";
+import LogoMark from "@/components/layout/LogoMark";
 import type { Tool } from "@/types";
 
 export default function Header() {
@@ -30,18 +30,11 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 glass-strong border-b border-black/10 dark:border-white/10">
       <div className="container flex h-16 items-center gap-4">
-        <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-          <span className="relative grid h-10 w-10 place-items-center rounded-2xl overflow-hidden shadow-lg shadow-purple-500/25 ring-1 ring-black/10 dark:ring-white/20 transition-transform duration-300 group-hover:scale-105 group-hover:rotate-3">
-            <Image
-              src="/images/logo.png"
-              alt="OmniToolBox logo"
-              width={40}
-              height={40}
-              className="object-cover"
-              priority
-            />
+        <Link href="/" className="flex items-center gap-3 shrink-0 group">
+          <span className="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+            <LogoMark size={42} />
           </span>
-          <span className="font-display text-xl font-extrabold tracking-tight text-gradient drop-shadow-[0_1px_8px_rgba(168,85,247,0.35)]">
+          <span className="brand-name">
             {settings.logoText}
           </span>
         </Link>

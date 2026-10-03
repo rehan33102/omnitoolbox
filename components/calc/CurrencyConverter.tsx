@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/utils";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 const CURRENCIES = [
   { code: "USD", name: "US Dollar", flag: "$" },
@@ -36,9 +37,9 @@ const FALLBACK: Record<string, number> = {
 const QUICK = [1, 10, 50, 100, 500, 1000, 5000];
 
 export default function CurrencyConverter() {
-  const [amount, setAmount] = useState("100");
-  const [from, setFrom] = useState<Code>("USD");
-  const [to, setTo] = useState<Code>("PKR");
+  const [amount, setAmount] = usePersistentState("otb-currency-amount", "100");
+  const [from, setFrom] = usePersistentState<Code>("otb-currency-from", "USD");
+  const [to, setTo] = usePersistentState<Code>("otb-currency-to", "PKR");
   const [rates, setRates] = useState<Record<string, number>>(FALLBACK);
   const [live, setLive] = useState(false);
   const [loading, setLoading] = useState(true);

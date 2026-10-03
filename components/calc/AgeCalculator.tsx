@@ -1,13 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Cake, CalendarDays, Clock3 } from "lucide-react";
 import Card from "@/components/ui/Card";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export default function AgeCalculator() {
-  const [dob, setDob] = useState("2000-01-01");
+  const [dob, setDob] = usePersistentState("otb-age-calc", "2000-01-01");
 
   const calc = useMemo(() => {
     if (!dob) return null;

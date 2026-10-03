@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Activity, Flame, HeartPulse } from "lucide-react";
 import Card from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 const ACTIVITY = [
   { key: "sedentary", label: "Sedentary", desc: "Little/no exercise", factor: 1.2 },
@@ -21,11 +22,11 @@ function bmiCategory(bmi: number) {
 }
 
 export default function BmiCalculator() {
-  const [height, setHeight] = useState("170"); // cm
-  const [weight, setWeight] = useState("70"); // kg
-  const [age, setAge] = useState("25");
-  const [sex, setSex] = useState<"male" | "female">("male");
-  const [activity, setActivity] = useState<string>("moderate");
+  const [height, setHeight] = usePersistentState("otb-bmi-height", "170"); // cm
+  const [weight, setWeight] = usePersistentState("otb-bmi-weight", "70"); // kg
+  const [age, setAge] = usePersistentState("otb-bmi-age", "25");
+  const [sex, setSex] = usePersistentState<"male" | "female">("otb-bmi-sex", "male");
+  const [activity, setActivity] = usePersistentState("otb-bmi-activity", "moderate");
 
   const calc = useMemo(() => {
     const h = parseFloat(height), w = parseFloat(weight), a = parseFloat(age);

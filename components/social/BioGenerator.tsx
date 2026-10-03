@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { cn } from "@/lib/utils";
+import { saveRecord } from "@/lib/db";
 
 const VIBES = ["Professional", "Bold", "Funny", "Minimal"] as const;
 const NICHES = ["Creator", "Fitness", "Finance", "Travel", "Food", "Fashion", "Tech", "Photography"] as const;
@@ -47,8 +48,19 @@ export default function BioGenerator() {
   const { copy } = useCopyToClipboard();
 
   const generate = () => {
-    setBios(buildBios(name, niche, vibe));
+    const list = buildBios(name, niche, vibe);
+    setBios(list);
     setCopiedIdx(null);
+    // Persist so the output survives refresh — best-effort, never blocks UX.
+    try {
+      void saveRecord("text", {
+        inputs: { name, niche, vibe },
+        bio: list,
+        createdAt: Date.now(),
+      });
+    } catch {
+      /* library save is non-critical */
+    }
   };
 
   const copyBio = async (bio: string, i: number) => {

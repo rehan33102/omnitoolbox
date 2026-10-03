@@ -7,6 +7,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes } from "@/lib/utils";
+import { saveBlob } from "@/lib/db";
 
 const MAX_SIZE = 25 * 1024 * 1024;
 
@@ -81,6 +82,11 @@ export default function PdfSplitter() {
       const bytes = await out.save();
       const blob = new Blob([bytes as unknown as BlobPart], { type: "application/pdf" });
       setResult({ url: URL.createObjectURL(blob), size: blob.size, pages: pages.length });
+      try {
+        void saveBlob("pdf", blob, "extracted-pages.pdf", { tool: "pdf-split", pages: pages.length });
+      } catch {
+        /* library save is non-critical */
+      }
       toast({ title: "Pages extracted", variant: "success", description: `${pages.length} page${pages.length > 1 ? "s" : ""} saved to a new PDF.` });
     } catch {
       toast({ title: "Extraction failed", variant: "error", description: "Try again with a different file." });
@@ -141,14 +147,20 @@ export default function PdfSplitter() {
           </Button>
 
           {result && (
-            <div className="glass rounded-xl p-4 flex items-center justify-between animate-fade-up">
-              <div className="text-sm">
-                <p className="font-medium text-emerald-700 dark:text-emerald-300">{result.pages} page{result.pages > 1 ? "s" : ""} extracted</p>
-                <p className="text-zinc-500 text-xs">{formatBytes(result.size)} · new PDF</p>
+            <div className="space-y-3 animate-fade-up">
+              <div>
+                <p className="text-xs text-zinc-500 mb-2 uppercase tracking-widest">Preview — extracted pages</p>
+                <iframe src={result.url} title="Extracted PDF preview" className="w-full h-96 rounded-xl border border-black/10 dark:border-white/10 bg-white" />
               </div>
-              <a href={result.url} download={`extracted-pages.pdf`}>
-                <Button size="sm"><Download size={14} /> Download PDF</Button>
-              </a>
+              <div className="glass rounded-xl p-4 flex items-center justify-between">
+                <div className="text-sm">
+                  <p className="font-medium text-emerald-700 dark:text-emerald-300">{result.pages} page{result.pages > 1 ? "s" : ""} extracted</p>
+                  <p className="text-zinc-500 text-xs">{formatBytes(result.size)} · new PDF</p>
+                </div>
+                <a href={result.url} download={`extracted-pages.pdf`}>
+                  <Button size="sm"><Download size={14} /> Download PDF</Button>
+                </a>
+              </div>
             </div>
           )}
         </>

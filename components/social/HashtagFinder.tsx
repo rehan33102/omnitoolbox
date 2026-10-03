@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Check, Copy, Hash } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -8,11 +8,13 @@ import Badge from "@/components/ui/Badge";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { HASHTAG_NICHES, HASHTAG_PACKS, type HashtagNiche } from "@/data/hashtag-packs";
 import { cn } from "@/lib/utils";
+import { saveRecord } from "@/lib/db";
 
 export default function HashtagFinder() {
   const [niche, setNiche] = useState<HashtagNiche>("fitness");
   const [count, setCount] = useState(20);
   const { copy, copied } = useCopyToClipboard();
+  const lastSavedRef = useRef("");
 
   const tags = useMemo(() => {
     const pack = HASHTAG_PACKS[niche];
@@ -21,6 +23,21 @@ export default function HashtagFinder() {
     const h = Math.round(count * 0.3), l = Math.round(count * 0.3), m = count - h - l;
     return [...take(pack.high, h), ...take(pack.mid, m), ...take(pack.low, l)].map((t) => `#${t}`);
   }, [niche, count]);
+
+  const copyAll = async () => {
+    await copy(tags.join(" "), "All hashtags copied!");
+    // Persist so the output survives refresh — best-effort, never blocks UX.
+    // Dedup: don't store an identical set twice in a row.
+    const key = `${niche}:${tags.join(" ")}`;
+    if (lastSavedRef.current !== key) {
+      lastSavedRef.current = key;
+      try {
+        void saveRecord("text", { niche, hashtags: tags, createdAt: Date.now() });
+      } catch {
+        /* library save is non-critical */
+      }
+    }
+  };
 
   return (
     <Card className="space-y-5">
@@ -60,7 +77,7 @@ export default function HashtagFinder() {
 
       <div className="flex items-center justify-between">
         <Badge variant="image">{tags.length} hashtags · balanced reach</Badge>
-        <Button size="sm" onClick={() => copy(tags.join(" "), "All hashtags copied!")}>
+        <Button size="sm" onClick={copyAll}>
           {copied ? <Check size={14} /> : <Copy size={14} />}
           {copied ? "Copied" : "Copy all"}
         </Button>

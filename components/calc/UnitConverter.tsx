@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ArrowLeftRight, Ruler } from "lucide-react";
 import Card from "@/components/ui/Card";
 import { cn } from "@/lib/utils";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 type CategoryKey = "length" | "weight" | "temperature" | "volume" | "speed" | "data";
 
@@ -92,10 +93,10 @@ const DEFAULTS: Record<CategoryKey, [string, string]> = {
 };
 
 export default function UnitConverter() {
-  const [cat, setCat] = useState<CategoryKey>("length");
-  const [value, setValue] = useState("1");
-  const [from, setFrom] = useState("km");
-  const [to, setTo] = useState("mi");
+  const [cat, setCat] = usePersistentState<CategoryKey>("otb-unit-cat", "length");
+  const [value, setValue] = usePersistentState("otb-unit-value", "1");
+  const [from, setFrom] = usePersistentState("otb-unit-from", "km");
+  const [to, setTo] = usePersistentState("otb-unit-to", "mi");
 
   const units = CATEGORIES[cat].units;
 

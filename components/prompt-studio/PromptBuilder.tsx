@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { useToast } from "@/components/ui/Toast";
+import { saveRecord } from "@/lib/db";
 import {
   MODEL_META, PRESET_STYLES, NEGATIVE_BANK, MJ_ASPECTS, type ModelId, type PresetStyle,
 } from "@/data/prompt-presets";
@@ -92,6 +93,19 @@ export default function PromptBuilder() {
   const saveToHistory = () => {
     if (!finalPrompt) return;
     setHistory((h) => [finalPrompt, ...h].slice(0, 20));
+    // Also persist via the central records store (IndexedDB + localStorage
+    // fallback) — best-effort, never blocks UX.
+    try {
+      void saveRecord("text", {
+        tool: "prompt-builder",
+        model,
+        subject,
+        prompt: finalPrompt,
+        createdAt: Date.now(),
+      });
+    } catch {
+      /* library save is non-critical */
+    }
     toast({ title: "Saved to history", variant: "success" });
   };
 

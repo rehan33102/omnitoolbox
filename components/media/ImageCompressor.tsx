@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes, cn } from "@/lib/utils";
+import { saveBlob } from "@/lib/db";
 
 type OutFormat = "webp" | "jpeg" | "png";
 const FORMATS: { id: OutFormat; label: string; hint: string }[] = [
@@ -84,6 +85,13 @@ export default function ImageCompressor() {
       );
       if (!blob) throw new Error("encode failed");
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
+      // Persist so the output survives refresh — best-effort, never blocks UX.
+      try {
+        const name = `compressed-${file.name.replace(/\.[^.]+$/, "")}.${format === "jpeg" ? "jpg" : format}`;
+        void saveBlob("image", blob, name, { tool: "compressor" });
+      } catch {
+        /* library save is non-critical */
+      }
       if (autoScaled) setNote(`Auto-scaled for safety (${bitmap.width}×${bitmap.height} → ${width}×${height})`);
       const saved = Math.round((1 - blob.size / file.size) * 100);
       toast({ title: "Compressed", variant: "success", description: saved > 0 ? `${saved}% smaller` : "Done" });
@@ -153,16 +161,24 @@ export default function ImageCompressor() {
           </Button>
           {note && <p className="text-xs text-amber-700 dark:text-amber-300/80">{note}</p>}
           {result && (
-            <div className="glass rounded-xl p-4 flex items-center justify-between animate-fade-up">
-              <div className="text-sm">
-                <p className="font-medium text-emerald-700 dark:text-emerald-300">
-                  {Math.round((1 - result.size / file.size) * 100)}% smaller
-                </p>
-                <p className="text-zinc-500 text-xs">{formatBytes(file.size)} → {formatBytes(result.size)}</p>
+            <div className="space-y-3 animate-fade-up">
+              <div>
+                <p className="text-xs text-zinc-500 mb-2 uppercase tracking-widest">Preview — compressed result</p>
+                <div className="rounded-xl overflow-hidden border border-black/10 dark:border-white/10 grid place-items-center bg-black/[0.03] dark:bg-white/5 p-4">
+                  <img src={result.url} alt="Compressed result" className="max-h-64 rounded-lg" />
+                </div>
               </div>
-              <a href={result.url} download={`compressed-${file.name.replace(/\.[^.]+$/, "")}.${format === "jpeg" ? "jpg" : format}`}>
-                <Button size="sm"><Download size={14} /> Download</Button>
-              </a>
+              <div className="glass rounded-xl p-4 flex items-center justify-between">
+                <div className="text-sm">
+                  <p className="font-medium text-emerald-700 dark:text-emerald-300">
+                    {Math.round((1 - result.size / file.size) * 100)}% smaller
+                  </p>
+                  <p className="text-zinc-500 text-xs">{formatBytes(file.size)} → {formatBytes(result.size)}</p>
+                </div>
+                <a href={result.url} download={`compressed-${file.name.replace(/\.[^.]+$/, "")}.${format === "jpeg" ? "jpg" : format}`}>
+                  <Button size="sm"><Download size={14} /> Download</Button>
+                </a>
+              </div>
             </div>
           )}
         </>

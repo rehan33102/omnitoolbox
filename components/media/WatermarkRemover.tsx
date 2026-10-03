@@ -19,6 +19,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { autoRemoveGeminiWatermark, getAlphaMap, removeWatermarkReverseAlpha } from "@/lib/gemini-watermark";
+import { saveBlob } from "@/lib/db";
 
 /* ---------------- manual inpainting fallback (non-Gemini marks) -------- */
 
@@ -165,6 +166,15 @@ export default function WatermarkRemover() {
   const lastPos = useRef<{ x: number; y: number } | null>(null);
   const { toast } = useToast();
 
+  // Persist so the output survives refresh — best-effort, never blocks UX.
+  const persistResult = (kind: string, blob: Blob, name: string) => {
+    try {
+      void saveBlob(kind, blob, name, { tool: "watermark" });
+    } catch {
+      /* library save is non-critical */
+    }
+  };
+
   useEffect(() => () => {
     if (afterUrl) URL.revokeObjectURL(afterUrl);
     if (videoUrl) URL.revokeObjectURL(videoUrl);
@@ -232,6 +242,7 @@ export default function WatermarkRemover() {
       setAfterUrl(c.toDataURL("image/png"));
       setSlider(50);
       setProgress(100); setStatus("");
+      c.toBlob((b) => { if (b) persistResult("image", b, "watermark-removed.png"); }, "image/png");
       toast({
         title: `Watermark removed — ${size}×${size} mark at bottom-right (${Math.round(conf * 100)}% match).`,
         variant: "success"
@@ -290,6 +301,7 @@ export default function WatermarkRemover() {
       const out = inpaintImage(src, mask);
       ctx.putImageData(out, 0, 0);
       setAfterUrl(c.toDataURL("image/png"));
+      c.toBlob((b) => { if (b) persistResult("image", b, "watermark-removed.png"); }, "image/png");
       setConfidence(null);
       setSlider(50);
       setProgress(100); setStatus("");
@@ -389,6 +401,7 @@ export default function WatermarkRemover() {
       const blob = await done;
       const url = URL.createObjectURL(blob);
       setVideoUrl(url);
+      persistResult("video", blob, "watermark-removed.webm");
       setProgress(100); setStatus("");
       toast({
         title: conf > 0.6 ? "Video watermark removed." : "Video processed — check the preview.",

@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { cn } from "@/lib/utils";
+import { saveRecord } from "@/lib/db";
 
 const SETS = {
   lower: "abcdefghijklmnopqrstuvwxyz",
@@ -97,10 +98,28 @@ export default function PasswordGenerator() {
 
   const regenerate = useCallback(() => {
     if (!pool) return;
-    setPassword(securePassword(length, pool));
+    const pw = securePassword(length, pool);
+    setPassword(pw);
     setBulk(Array.from({ length: BULK_COUNT }, () => securePassword(length, pool)));
     setCopiedBulk(null);
+    return pw;
   }, [length, pool]);
+
+  // Save a record of each explicitly generated password (not auto-regenerates from slider drags).
+  const generateAndSave = () => {
+    const pw = regenerate();
+    if (!pw) return;
+    try {
+      void saveRecord("password", {
+        password: pw,
+        length,
+        options: { ...enabled, excludeAmbiguous },
+        createdAt: Date.now(),
+      });
+    } catch {
+      /* library save is non-critical */
+    }
+  };
 
   // Auto-generate whenever options change
   useEffect(() => {
@@ -158,7 +177,7 @@ export default function PasswordGenerator() {
           onChange={setExcludeAmbiguous}
         />
 
-        <Button onClick={regenerate} className="w-full" disabled={!pool}>
+        <Button onClick={generateAndSave} className="w-full" disabled={!pool}>
           <RefreshCw size={16} /> Generate new password
         </Button>
       </Card>
@@ -209,7 +228,7 @@ export default function PasswordGenerator() {
               <h3 className="font-semibold">Bulk — pick your favorite</h3>
             </div>
             <button
-              onClick={regenerate}
+              onClick={generateAndSave}
               className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1 transition"
             >
               <RefreshCw size={13} /> Reroll all
