@@ -7,7 +7,7 @@ import Button from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 
-const MAX_CHARS = 5000;
+const MAX_CHARS = 20000; // ~15-18 minutes of speech — no small limits
 const PART_CHARS = 500; // per server request; server chunks further internally
 const HISTORY_KEY = "omnitoolbox-voiceover-history";
 const HISTORY_LIMIT = 20;
@@ -294,6 +294,8 @@ export default function VoiceoverStudio() {
   };
 
   const overLimit = text.length > MAX_CHARS;
+  // Rough estimate: ~850 characters per minute of speech.
+  const estMinutes = text.trim() ? Math.max(1, Math.round((text.length / 850) * 10) / 10) : 0;
 
   return (
     <div className="space-y-6">
@@ -303,6 +305,7 @@ export default function VoiceoverStudio() {
             <p className="text-sm font-medium text-zinc-300">Your script</p>
             <p className={`text-xs font-medium ${overLimit ? "text-red-400" : "text-zinc-500"}`}>
               {text.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
+              {estMinutes > 0 && <span className="text-brand-300/80"> · ~{estMinutes} min audio</span>}
             </p>
           </div>
           <Textarea
