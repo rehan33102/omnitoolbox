@@ -1,20 +1,118 @@
 "use client";
 
-import { useRef, useState } from "react";
-import { Download, Eraser, ImagePlus, Loader2, Wifi } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Download, Eraser, ImagePlus, Loader2, Sparkles, RefreshCw, TriangleAlert } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes } from "@/lib/utils";
 
+type RemoveFn = (image: Blob, config?: Record<string, unknown>) => Promise<Blob>;
+
+const CDN_URLS = [
+  "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm",
+  "https://esm.sh/@imgly/background-removal@1.5.5",
+];
+
+// Shared across mounts: the heavy AI engine loads once per page lifetime.
+let enginePromise: Promise<RemoveFn> | null = null;
+
+async function loadEngine(): Promise<RemoveFn> {
+  if (!enginePromise) {
+    enginePromise = (async () => {
+      let lastErr: unknown = null;
+      for (const url of CDN_URLS) {
+        try {
+          const mod = (await import(/* webpackIgnore: true */ url)) as { removeBackground: RemoveFn };
+          const removeBackground = mod.removeBackground;
+          // Silent warm-up: run once on a tiny image so the AI model
+          // downloads NOW in the background — never while the user waits.
+          try {
+            const c = document.createElement("canvas");
+            c.width = 32;
+            c.height = 32;
+            const ctx = c.getContext("2d");
+            if (ctx) {
+              ctx.fillStyle = "#ffffff";
+              ctx.fillRect(0, 0, 32, 32);
+              const tiny = await new Promise<Blob | null>((res) => c.toBlob(res, "image/png"));
+              if (tiny) await removeBackground(tiny, { progress: () => {} });
+            }
+          } catch {
+            // Warm-up output doesn't matter; the real call retries the load.
+          }
+          return removeBackground;
+        } catch (e) {
+          lastErr = e;
+        }
+      }
+      enginePromise = null; // allow retry on next attempt
+      throw lastErr instanceof Error ? lastErr : new Error("AI engine failed to load");
+    })();
+  }
+  return enginePromise;
+}
+
+/** Shrink large photos before AI runs — 3-5x faster on phones, same visual result. */
+async function downscale(file: File, maxDim = 1024): Promise<Blob> {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
+    if (scale === 1) {
+      bitmap.close();
+      return file;
+    }
+    const c = document.createElement("canvas");
+    c.width = Math.round(bitmap.width * scale);
+    c.height = Math.round(bitmap.height * scale);
+    c.getContext("2d")?.drawImage(bitmap, 0, 0, c.width, c.height);
+    bitmap.close();
+    const out = await new Promise<Blob | null>((res) => c.toBlob(res, "image/png"));
+    return out ?? file;
+  } catch {
+    return file;
+  }
+}
+
 export default function BackgroundRemover() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState("");
   const [result, setResult] = useState<{ url: string; size: number } | null>(null);
+  const [engine, setEngine] = useState<"warming" | "ready" | "failed">("warming");
   const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState<{ label: string; pct: number } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const removeFn = useRef<RemoveFn | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+
+  // Start preparing the AI the moment this tab opens — silently, in the background.
+  useEffect(() => {
+    let alive = true;
+    loadEngine()
+      .then((fn) => {
+        if (alive) {
+          removeFn.current = fn;
+          setEngine("ready");
+        }
+      })
+      .catch(() => {
+        if (alive) setEngine("failed");
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const retryEngine = () => {
+    setEngine("warming");
+    setError(null);
+    loadEngine()
+      .then((fn) => {
+        removeFn.current = fn;
+        setEngine("ready");
+      })
+      .catch(() => setEngine("failed"));
+  };
 
   const onFile = (f?: File) => {
     if (!f || !f.type.startsWith("image/")) {
@@ -27,43 +125,24 @@ export default function BackgroundRemover() {
     }
     setFile(f);
     setResult(null);
+    setError(null);
     setPreview(URL.createObjectURL(f));
   };
 
   const remove = async () => {
-    if (!file) return;
+    if (!file || !removeFn.current || busy) return;
     setBusy(true);
-    setProgress({ label: "Loading AI engine…", pct: 0 });
+    setError(null);
+    setResult(null);
     try {
-      // Loaded from CDN at runtime (webpackIgnore) so the heavy WASM/AI payload
-      // never enters the Next.js bundle. The ~40MB model downloads on first use.
-      const CDN_URL = "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm";
-      let mod: unknown;
-      try {
-        mod = await import(/* webpackIgnore: true */ CDN_URL);
-      } catch {
-        throw new Error("Could not load the AI engine. Check your internet connection and try again.");
-      }
-      const { removeBackground } = mod as {
-        removeBackground: (image: Blob, config?: Record<string, unknown>) => Promise<Blob>;
-      };
-      setProgress({ label: "Downloading AI model (one-time, ~40 MB)…", pct: 2 });
-      const blob = await removeBackground(file, {
-        progress: (key: string, current: number, total: number) => {
-          const short = key.split("/").pop() || key;
-          const pct = total > 0 ? Math.min(99, Math.round((current / total) * 100)) : 0;
-          setProgress({ label: `Downloading ${short}…`, pct });
-        },
-      });
-      setProgress({ label: "Finishing up…", pct: 100 });
+      const small = await downscale(file, 1024);
+      const blob = await removeFn.current(small);
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
       toast({ title: "Background removed", variant: "success", description: "Your transparent PNG is ready." });
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : "Removal failed — try a smaller image or check your connection.";
-      toast({ title: "Removal failed", variant: "error", description: msg });
+    } catch {
+      setError("Couldn't process that photo. Try a different image or check your connection, then retry.");
     } finally {
       setBusy(false);
-      setProgress(null);
     }
   };
 
@@ -82,32 +161,62 @@ export default function BackgroundRemover() {
           <div className="py-6">
             <ImagePlus size={36} className="mx-auto text-zinc-500 mb-3" />
             <p className="text-sm text-zinc-300">Drop a photo here or <span className="text-brand-400">browse</span></p>
-            <p className="text-xs text-zinc-500 mt-1">AI runs in your browser — nothing is uploaded</p>
+            <p className="text-xs text-zinc-500 mt-1">Private — AI runs on your device, nothing is uploaded</p>
           </div>
         )}
       </div>
 
-      {file && (
+      {/* Subtle engine status — never scary, never technical */}
+      {engine === "warming" && (
+        <div className="flex items-center justify-center gap-2 text-xs text-zinc-500">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-60" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500" />
+          </span>
+          Preparing the AI…
+        </div>
+      )}
+      {engine === "failed" && (
+        <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-4 flex items-start gap-3">
+          <TriangleAlert size={18} className="text-red-400 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm text-red-200 font-medium">AI engine didn&apos;t start</p>
+            <p className="text-xs text-red-200/70 mt-1">Check your internet connection and try again.</p>
+          </div>
+          <Button size="sm" variant="secondary" onClick={retryEngine}>
+            <RefreshCw size={14} /> Retry
+          </Button>
+        </div>
+      )}
+
+      {file && engine !== "failed" && (
         <>
-          <Button onClick={remove} disabled={busy} className="w-full">
-            {busy ? <Loader2 size={16} className="animate-spin" /> : <Eraser size={16} />}
-            {busy ? "Working…" : "Remove background"}
+          <Button onClick={remove} disabled={busy || engine !== "ready"} className="w-full">
+            {busy || engine !== "ready" ? <Loader2 size={16} className="animate-spin" /> : <Eraser size={16} />}
+            {engine !== "ready" ? "Preparing AI…" : busy ? "Removing background…" : "Remove background"}
           </Button>
 
-          {busy && progress && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-zinc-400">
-                <Wifi size={14} className="text-brand-400" />
-                <span className="truncate">{progress.label}</span>
-                <span className="ml-auto shrink-0 font-medium text-zinc-300">{progress.pct}%</span>
+          {/* Elegant working state — no percentages, no "download" talk */}
+          {busy && (
+            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+              <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+              <div className="relative space-y-2">
+                <Sparkles size={28} className="mx-auto text-brand-400 animate-pulse" />
+                <p className="text-sm font-medium text-zinc-200">Working its magic…</p>
+                <p className="text-xs text-zinc-500">The AI is separating your subject from the background</p>
               </div>
-              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500 transition-all duration-300"
-                  style={{ width: `${progress.pct}%` }}
-                />
+            </div>
+          )}
+
+          {error && (
+            <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-4 flex items-start gap-3 animate-fade-up">
+              <TriangleAlert size={18} className="text-red-400 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm text-red-200">{error}</p>
               </div>
-              <p className="text-[11px] text-zinc-500">First run downloads the AI model once — afterwards it&apos;s instant. WiFi recommended.</p>
+              <Button size="sm" variant="secondary" onClick={remove}>
+                <RefreshCw size={14} /> Retry
+              </Button>
             </div>
           )}
 

@@ -31,6 +31,7 @@ const config: Config = {
       animation: {
         "fade-up": "fade-up 0.6s cubic-bezier(0.16,1,0.3,1) both",
         float: "float 6s ease-in-out infinite",
+        shimmer: "shimmer 2.2s linear infinite",
       },
       keyframes: {
         "fade-up": {
@@ -40,6 +41,10 @@ const config: Config = {
         float: {
           "0%,100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-12px)" },
+        },
+        shimmer: {
+          from: { transform: "translateX(-100%)" },
+          to: { transform: "translateX(100%)" },
         },
       },
     },
