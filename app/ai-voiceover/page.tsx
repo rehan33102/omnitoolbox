@@ -9,7 +9,7 @@ import Badge from "@/components/ui/Badge";
 
 export const metadata = buildMetadata({
   title: "Free AI Voiceover Studio — Text to Speech Online",
-  description: "Turn text into natural voiceovers free with 300+ AI voices in 140+ languages. Generate real MP3 audio — play, download, and keep history. No signup.",
+  description: "Turn text into natural voiceovers free in 38 languages. Generate real MP3 audio — play, download, and keep history. No signup.",
   path: "/ai-voiceover",
   keywords: ["text to speech", "ai voiceover", "tts free", "voiceover generator", "text to voice online", "mp3 voiceover"],
 });
@@ -32,7 +32,7 @@ export default function AIVoiceoverPage() {
           AI Voiceover <span className="text-gradient">Studio</span>
         </h1>
         <p className="text-zinc-400 mt-3">
-          Free text-to-speech with 300+ natural AI voices in 140+ languages — generate real MP3 audio, download it, and keep your history. No signup.
+          Free text-to-speech in 38 languages — generate real MP3 audio, download it, and keep your history. No signup.
         </p>
       </div>
 
