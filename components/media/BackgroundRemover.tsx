@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes } from "@/lib/utils";
 
+type ProgressCb = (key: string, current: number, total: number) => void;
 type RemoveFn = (image: Blob, config?: Record<string, unknown>) => Promise<Blob>;
 
 const CDN_URLS = [
@@ -14,19 +15,48 @@ const CDN_URLS = [
   "https://esm.sh/@imgly/background-removal@1.5.5",
 ];
 
+// Give slow mobile connections a fair chance, but NEVER hang forever.
+const ENGINE_TIMEOUT_MS = 150_000;
+
 // Shared across mounts: the heavy AI engine loads once per page lifetime.
 let enginePromise: Promise<RemoveFn> | null = null;
 
-async function loadEngine(): Promise<RemoveFn> {
+function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error("Engine load timed out")), ms);
+    p.then(
+      (v) => {
+        clearTimeout(t);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(t);
+        reject(e);
+      }
+    );
+  });
+}
+
+async function loadEngine(onProgress: ProgressCb): Promise<RemoveFn> {
   if (!enginePromise) {
     enginePromise = (async () => {
       let lastErr: unknown = null;
       for (const url of CDN_URLS) {
         try {
-          const mod = (await import(/* webpackIgnore: true */ url)) as { removeBackground: RemoveFn };
+          const mod = (await withTimeout(
+            import(/* webpackIgnore: true */ url),
+            45_000
+          )) as { removeBackground: RemoveFn };
           const removeBackground = mod.removeBackground;
-          // Silent warm-up: run once on a tiny image so the AI model
-          // downloads NOW in the background — never while the user waits.
+          // Warm-up on a tiny image so the AI model downloads NOW while the
+          // user picks a photo — with real progress and a hard timeout.
+          // NOTE: isnet_quint8 is ~44MB vs 176MB for the default model:
+          // 4x faster on phones with the same visual quality.
+          const config: Record<string, unknown> = {
+            model: "isnet_quint8",
+            output: { format: "image/png", quality: 0.9 },
+            progress: onProgress,
+          };
           try {
             const c = document.createElement("canvas");
             c.width = 32;
@@ -36,12 +66,19 @@ async function loadEngine(): Promise<RemoveFn> {
               ctx.fillStyle = "#ffffff";
               ctx.fillRect(0, 0, 32, 32);
               const tiny = await new Promise<Blob | null>((res) => c.toBlob(res, "image/png"));
-              if (tiny) await removeBackground(tiny, { progress: () => {} });
+              if (tiny) await withTimeout(removeBackground(tiny, config), ENGINE_TIMEOUT_MS);
             }
           } catch {
             // Warm-up output doesn't matter; the real call retries the load.
           }
-          return removeBackground;
+          // Wrap so every real call also carries the small-model config,
+          // progress reporting and a timeout (never hang forever).
+          const wrapped: RemoveFn = (image, extra) =>
+            withTimeout(
+              removeBackground(image, { ...config, progress: onProgress, ...(extra ?? {}) }),
+              ENGINE_TIMEOUT_MS
+            );
+          return wrapped;
         } catch (e) {
           lastErr = e;
         }
@@ -79,19 +116,36 @@ export default function BackgroundRemover() {
   const [preview, setPreview] = useState("");
   const [result, setResult] = useState<{ url: string; size: number } | null>(null);
   const [engine, setEngine] = useState<"warming" | "ready" | "failed">("warming");
+  const [loadPct, setLoadPct] = useState(0);
   const [busy, setBusy] = useState(false);
+  const [busyPct, setBusyPct] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const removeFn = useRef<RemoveFn | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
-  // Start preparing the AI the moment this tab opens — silently, in the background.
+  // Track overall download progress across the model's file chunks.
+  const seen = useRef(new Map<string, { current: number; total: number }>());
+  const reportProgress = (setter: (n: number) => void) => (key: string, current: number, total: number) => {
+    if (!key.startsWith("fetch:")) return;
+    seen.current.set(key, { current, total });
+    let done = 0;
+    let all = 0;
+    seen.current.forEach(({ current: c, total: t }) => {
+      done += c;
+      all += t;
+    });
+    setter(all > 0 ? Math.min(99, Math.round((done / all) * 100)) : 0);
+  };
+
+  // Start preparing the AI the moment this tab opens — with honest progress.
   useEffect(() => {
     let alive = true;
-    loadEngine()
+    loadEngine(reportProgress(setLoadPct))
       .then((fn) => {
         if (alive) {
           removeFn.current = fn;
+          setLoadPct(100);
           setEngine("ready");
         }
       })
@@ -101,14 +155,18 @@ export default function BackgroundRemover() {
     return () => {
       alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const retryEngine = () => {
+    seen.current.clear();
+    setLoadPct(0);
     setEngine("warming");
     setError(null);
-    loadEngine()
+    loadEngine(reportProgress(setLoadPct))
       .then((fn) => {
         removeFn.current = fn;
+        setLoadPct(100);
         setEngine("ready");
       })
       .catch(() => setEngine("failed"));
@@ -132,15 +190,25 @@ export default function BackgroundRemover() {
   const remove = async () => {
     if (!file || !removeFn.current || busy) return;
     setBusy(true);
+    setBusyPct(0);
     setError(null);
     setResult(null);
+    // Fresh progress tracking for this run (model is cached after warm-up,
+    // so this is usually instant — the bar is just honesty).
+    seen.current.clear();
+    const progress = reportProgress(setBusyPct);
     try {
       const small = await downscale(file, 1024);
-      const blob = await removeFn.current(small);
+      const blob = await removeFn.current(small, { progress } as Record<string, unknown>);
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
       toast({ title: "Background removed", variant: "success", description: "Your transparent PNG is ready." });
     } catch {
-      setError("Couldn't process that photo. Try a different image or check your connection, then retry.");
+      setError(
+        engine === "ready"
+          ? "Couldn't process that photo. Try a different image or check your connection, then retry."
+          : "The AI engine couldn't start. Check your internet connection and tap Retry."
+      );
+      if (engine !== "ready") setEngine("failed");
     } finally {
       setBusy(false);
     }
@@ -166,14 +234,22 @@ export default function BackgroundRemover() {
         )}
       </div>
 
-      {/* Subtle engine status — never scary, never technical */}
+      {/* Honest engine status — real progress, and a way out if it stalls */}
       {engine === "warming" && (
-        <div className="flex items-center justify-center gap-2 text-xs text-zinc-500">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-60" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500" />
-          </span>
-          Preparing the AI…
+        <div className="space-y-2">
+          <div className="flex items-center justify-center gap-2 text-xs text-zinc-400">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500" />
+            </span>
+            {loadPct > 0 ? `Loading AI model… ${loadPct}%` : "Preparing the AI…"}
+          </div>
+          {loadPct > 0 && (
+            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+              <div className="h-full rounded-full bg-brand-500 transition-all" style={{ width: `${loadPct}%` }} />
+            </div>
+          )}
+          <p className="text-center text-[11px] text-zinc-600">First load downloads the AI model (one time, ~44MB)</p>
         </div>
       )}
       {engine === "failed" && (
@@ -193,10 +269,16 @@ export default function BackgroundRemover() {
         <>
           <Button onClick={remove} disabled={busy || engine !== "ready"} className="w-full">
             {busy || engine !== "ready" ? <Loader2 size={16} className="animate-spin" /> : <Eraser size={16} />}
-            {engine !== "ready" ? "Preparing AI…" : busy ? "Removing background…" : "Remove background"}
+            {engine !== "ready"
+              ? loadPct > 0
+                ? `Loading AI… ${loadPct}%`
+                : "Preparing AI…"
+              : busy
+                ? "Removing background…"
+                : "Remove background"}
           </Button>
 
-          {/* Elegant working state — no percentages, no "download" talk */}
+          {/* Elegant working state — with honest progress */}
           {busy && (
             <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
               <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
@@ -204,6 +286,14 @@ export default function BackgroundRemover() {
                 <Sparkles size={28} className="mx-auto text-brand-400 animate-pulse" />
                 <p className="text-sm font-medium text-zinc-200">Working its magic…</p>
                 <p className="text-xs text-zinc-500">The AI is separating your subject from the background</p>
+                {busyPct > 0 && (
+                  <div className="pt-1">
+                    <div className="h-1.5 rounded-full bg-white/10 overflow-hidden max-w-xs mx-auto">
+                      <div className="h-full rounded-full bg-brand-500 transition-all" style={{ width: `${busyPct}%` }} />
+                    </div>
+                    <p className="text-[11px] text-zinc-600 mt-1">{busyPct}%</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -214,7 +304,7 @@ export default function BackgroundRemover() {
               <div className="flex-1">
                 <p className="text-sm text-red-200">{error}</p>
               </div>
-              <Button size="sm" variant="secondary" onClick={remove}>
+              <Button size="sm" variant="secondary" onClick={engine === "ready" ? remove : retryEngine}>
                 <RefreshCw size={14} /> Retry
               </Button>
             </div>
