@@ -58,9 +58,12 @@ type HistoryItem = {
   text: string;
   lang: string;
   langLabel: string;
+  voiceLabel?: string;
   createdAt: number;
   chars: number;
 };
+
+type ElevenVoice = { id: string; name: string; gender: string };
 
 const DEFAULT_TEXT =
   "Assalam o alaikum! Welcome to the OmniToolBox AI Voiceover Studio. Type or paste your script here, pick a language, then press Generate — you'll get real MP3 audio you can play, download, and reuse.";
@@ -129,6 +132,11 @@ export default function VoiceoverStudio() {
   const [audioUrl, setAudioUrl] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [playingId, setPlayingId] = useState<string | null>(null);
+  // Premium (ElevenLabs) controls — only shown when the server has a key.
+  const [premium, setPremium] = useState(false);
+  const [elevenVoices, setElevenVoices] = useState<ElevenVoice[]>([]);
+  const [voiceId, setVoiceId] = useState("");
+  const [speed, setSpeed] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stopRef = useRef(false);
   const { toast } = useToast();
@@ -140,6 +148,17 @@ export default function VoiceoverStudio() {
     } catch {
       /* ignore */
     }
+    // Check if premium voices are available on the server.
+    fetch("/api/voiceover/config")
+      .then((r) => r.json())
+      .then((c: { provider?: string; voices?: ElevenVoice[] }) => {
+        if (c.provider === "elevenlabs" && c.voices?.length) {
+          setPremium(true);
+          setElevenVoices(c.voices);
+          setVoiceId(c.voices[0].id);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const saveHistory = (items: HistoryItem[]) => {
@@ -173,7 +192,7 @@ export default function VoiceoverStudio() {
         const res = await fetch("/api/voiceover/synthesize", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: parts[i], lang }),
+          body: JSON.stringify({ text: parts[i], lang, voiceId: premium ? voiceId : undefined, speed }),
         });
         if (!res.ok) {
           const err = (await res.json().catch(() => ({}))) as { error?: string };
@@ -191,11 +210,13 @@ export default function VoiceoverStudio() {
       const url = URL.createObjectURL(blob);
       setAudioUrl(url);
       const langLabel = LANGUAGES.find((l) => l.code === lang)?.label ?? lang;
+      const vLabel = premium ? elevenVoices.find((v) => v.id === voiceId)?.name : undefined;
       const item: HistoryItem = {
         id,
         text: script.slice(0, 120) + (script.length > 120 ? "…" : ""),
         lang,
         langLabel,
+        voiceLabel: vLabel,
         createdAt: Date.now(),
         chars: script.length,
       };
@@ -212,7 +233,7 @@ export default function VoiceoverStudio() {
       setGenStep("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, lang, history, audioUrl, toast]);
+  }, [text, lang, history, audioUrl, toast, premium, voiceId, speed]);
 
   const cancelGenerate = () => {
     stopRef.current = true;
@@ -306,6 +327,37 @@ export default function VoiceoverStudio() {
           <p className="text-xs text-zinc-500 mt-1.5">{LANGUAGES.length} languages · free · MP3 download</p>
         </div>
 
+        {premium && (
+          <>
+            <div>
+              <label htmlFor="vo-voice" className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
+                <Mic size={15} className="text-brand-400" /> Voice
+              </label>
+              <select id="vo-voice" value={voiceId} onChange={(e) => setVoiceId(e.target.value)} className="input-base w-full">
+                <optgroup label="Female">
+                  {elevenVoices.filter((v) => v.gender === "Female").map((v) => (
+                    <option key={v.id} value={v.id}>{v.name} · Female</option>
+                  ))}
+                </optgroup>
+                <optgroup label="Male">
+                  {elevenVoices.filter((v) => v.gender === "Male").map((v) => (
+                    <option key={v.id} value={v.id}>{v.name} · Male</option>
+                  ))}
+                </optgroup>
+              </select>
+              <p className="text-xs text-zinc-500 mt-1.5">Premium natural voices</p>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-zinc-300 mb-2">
+                Speed: <span className="text-brand-300">{speed.toFixed(2)}×</span>
+              </p>
+              <input type="range" min={0.7} max={1.2} step={0.05} value={speed}
+                onChange={(e) => setSpeed(Number(e.target.value))}
+                className="w-full accent-brand-500" aria-label="Speech speed" />
+            </div>
+          </>
+        )}
+
         {!generating ? (
           <Button onClick={generate} className="w-full">
             <Mic size={16} /> Generate voiceover (MP3)
@@ -363,7 +415,7 @@ export default function VoiceoverStudio() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-zinc-200 truncate">{h.text}</p>
                   <p className="text-[11px] text-zinc-500">
-                    {h.langLabel} · {new Date(h.createdAt).toLocaleDateString()} · {h.chars.toLocaleString()} chars
+                    {h.langLabel}{h.voiceLabel ? ` · ${h.voiceLabel}` : ""} · {new Date(h.createdAt).toLocaleDateString()} · {h.chars.toLocaleString()} chars
                   </p>
                 </div>
                 <button onClick={() => downloadHistory(h)} className="p-2 text-zinc-400 hover:text-brand-300 transition" aria-label="Download MP3">

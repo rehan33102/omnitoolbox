@@ -188,27 +188,52 @@ export default function BackgroundRemover() {
   };
 
   const remove = async () => {
-    if (!file || !removeFn.current || busy) return;
+    if (!file || busy) return;
     setBusy(true);
     setBusyPct(0);
     setError(null);
     setResult(null);
-    // Fresh progress tracking for this run (model is cached after warm-up,
-    // so this is usually instant — the bar is just honesty).
-    seen.current.clear();
-    const progress = reportProgress(setBusyPct);
+    // 1) Try the fast server (no download on the phone, ~10 seconds).
+    try {
+      const small = await downscale(file, 1568);
+      const fd = new FormData();
+      fd.append("image", small, "image.png");
+      const res = await fetch("/api/bg-remove", { method: "POST", body: fd });
+      if (res.ok) {
+        const buf = await res.arrayBuffer();
+        if (buf.byteLength > 1000) {
+          const blob = new Blob([buf], { type: "image/png" });
+          setResult({ url: URL.createObjectURL(blob), size: blob.size });
+          toast({ title: "Background removed", variant: "success", description: "Your transparent PNG is ready." });
+          setBusy(false);
+          return;
+        }
+      }
+      // Server busy/limited — fall through to on-device AI.
+    } catch {
+      // Fall through to on-device AI.
+    }
+    // 2) On-device AI fallback (one-time model download, then instant forever).
+    if (!removeFn.current) {
+      try {
+        setBusyPct(0);
+        removeFn.current = await loadEngine(reportProgress(setBusyPct));
+        setLoadPct(100);
+        setEngine("ready");
+      } catch {
+        setEngine("failed");
+        setBusy(false);
+        setError("The AI engine couldn't start. Check your internet connection and tap Retry.");
+        return;
+      }
+    }
     try {
       const small = await downscale(file, 1024);
-      const blob = await removeFn.current(small, { progress } as Record<string, unknown>);
+      const blob = await removeFn.current(small);
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
       toast({ title: "Background removed", variant: "success", description: "Your transparent PNG is ready." });
     } catch {
-      setError(
-        engine === "ready"
-          ? "Couldn't process that photo. Try a different image or check your connection, then retry."
-          : "The AI engine couldn't start. Check your internet connection and tap Retry."
-      );
-      if (engine !== "ready") setEngine("failed");
+      setError("Couldn't process that photo. Try a different image or check your connection, then retry.");
     } finally {
       setBusy(false);
     }
@@ -267,15 +292,9 @@ export default function BackgroundRemover() {
 
       {file && engine !== "failed" && (
         <>
-          <Button onClick={remove} disabled={busy || engine !== "ready"} className="w-full">
-            {busy || engine !== "ready" ? <Loader2 size={16} className="animate-spin" /> : <Eraser size={16} />}
-            {engine !== "ready"
-              ? loadPct > 0
-                ? `Loading AI… ${loadPct}%`
-                : "Preparing AI…"
-              : busy
-                ? "Removing background…"
-                : "Remove background"}
+          <Button onClick={remove} disabled={busy} className="w-full">
+            {busy ? <Loader2 size={16} className="animate-spin" /> : <Eraser size={16} />}
+            {busy ? "Processing…" : "Remove background"}
           </Button>
 
           {/* Working state — simple "Processing" with honest progress */}
