@@ -9,16 +9,16 @@ import Badge from "@/components/ui/Badge";
 
 export const metadata = buildMetadata({
   title: "Free AI Voiceover Studio — Text to Speech Online",
-  description: "Turn text into natural voiceovers free with your device's built-in AI voices. Adjust rate, pitch and pick from dozens of voices — no signup, nothing uploaded.",
+  description: "Turn text into natural voiceovers free with 300+ AI voices in 140+ languages. Generate real MP3 audio — play, download, and keep history. No signup.",
   path: "/ai-voiceover",
-  keywords: ["text to speech", "ai voiceover", "tts free", "voiceover generator", "text to voice online"],
+  keywords: ["text to speech", "ai voiceover", "tts free", "voiceover generator", "text to voice online", "mp3 voiceover"],
 });
 
 export default function AIVoiceoverPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox AI Voiceover Studio", description: "Free client-side text-to-speech voiceover studio.", url: serverSiteUrl("/ai-voiceover"), category: "audio" }),
+        softwareAppJsonLd({ name: "OmniToolBox AI Voiceover Studio", description: "Free AI text-to-speech voiceover studio with MP3 download.", url: serverSiteUrl("/ai-voiceover"), category: "audio" }),
         breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Voiceover Studio", path: "/ai-voiceover" }]),
       ]} />
       <TrackUsage slug="ai-voiceover" />
@@ -26,13 +26,13 @@ export default function AIVoiceoverPage() {
       <div className="max-w-3xl mb-8">
         <div className="flex gap-2 mb-4">
           <Badge variant="ai">AI Tools</Badge>
-          <Badge variant="new">100% private</Badge>
+          <Badge variant="new">MP3 download</Badge>
         </div>
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           AI Voiceover <span className="text-gradient">Studio</span>
         </h1>
         <p className="text-zinc-400 mt-3">
-          Free text-to-speech using your device&apos;s built-in AI voices — no signup, nothing uploaded.
+          Free text-to-speech with 300+ natural AI voices in 140+ languages — generate real MP3 audio, download it, and keep your history. No signup.
         </p>
       </div>
 
