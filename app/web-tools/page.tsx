@@ -1,4 +1,3 @@
-import { QrCode, KeyRound } from "lucide-react";
 import Image from "next/image";
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { siteUrl } from "@/lib/utils";
@@ -54,8 +53,8 @@ export default function WebToolsPage() {
 
       <Tabs defaultValue="qr">
         <TabsList>
-          <TabsTrigger value="qr" icon={QrCode}>QR Generator</TabsTrigger>
-          <TabsTrigger value="password" icon={KeyRound}>Password Generator</TabsTrigger>
+          <TabsTrigger value="qr">QR Generator</TabsTrigger>
+          <TabsTrigger value="password">Password Generator</TabsTrigger>
         </TabsList>
         <TabsContent value="qr" id="qr"><QrGenerator /></TabsContent>
         <TabsContent value="password" id="password"><PasswordGenerator /></TabsContent>
