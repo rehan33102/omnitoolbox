@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AlertTriangle, Mic, Play, Square, Volume2 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -36,9 +36,27 @@ function pickDefaultVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice 
   return en ?? voices[0];
 }
 
-interface VoiceGroup {
-  label: string;
-  voices: SpeechSynthesisVoice[];
+/**
+ * Split long scripts into sentence-aware chunks.
+ * Mobile browsers (especially Chrome on Android) silently fail or cut off
+ * long utterances — short chunks play reliably end to end.
+ */
+function chunkText(text: string, maxLen = 180): string[] {
+  const sentences = text.match(/[^.!?;\n]+[.!?;\n]+["'”]?|\S[^.!?;\n]*$/g) ?? [text];
+  const chunks: string[] = [];
+  let current = "";
+  for (const s of sentences) {
+    const t = s.trim();
+    if (!t) continue;
+    if (current && `${current} ${t}`.length > maxLen) {
+      chunks.push(current);
+      current = t;
+    } else {
+      current = current ? `${current} ${t}` : t;
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks.length > 0 ? chunks : [text];
 }
 
 export default function VoiceoverStudio() {
@@ -51,8 +69,10 @@ export default function VoiceoverStudio() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [progress, setProgress] = useState(0);
   const { toast } = useToast();
+  const stopRef = useRef(false);
 
-  // Load voices (Chrome populates them asynchronously) + cancel speech on unmount.
+  // Load voices: Chrome/Android populate them asynchronously and sometimes
+  // need a few polls — don't rely on a single getVoices() call.
   useEffect(() => {
     const synth = getSynthesis();
     if (!synth) {
@@ -60,34 +80,31 @@ export default function VoiceoverStudio() {
       return;
     }
     setSupported(true);
-
+    let settled = false;
     const loadVoices = () => {
+      if (settled) return;
       const list = synth.getVoices();
       if (list.length === 0) return;
+      settled = true;
       setVoices(list);
       setVoiceURI((current) => current || pickDefaultVoice(list)?.voiceURI || "");
     };
-
     loadVoices();
+    const iv = setInterval(loadVoices, 500);
+    const to = setTimeout(() => clearInterval(iv), 8000);
     synth.addEventListener("voiceschanged", loadVoices);
     return () => {
+      stopRef.current = true;
+      clearInterval(iv);
+      clearTimeout(to);
       synth.removeEventListener("voiceschanged", loadVoices);
-      synth.cancel();
+      try {
+        synth.cancel();
+      } catch {
+        /* noop */
+      }
     };
   }, []);
-
-  const groups: VoiceGroup[] = useMemo(() => {
-    const map = new Map<string, SpeechSynthesisVoice[]>();
-    for (const v of voices) {
-      const key = v.lang || "unknown";
-      const bucket = map.get(key);
-      if (bucket) bucket.push(v);
-      else map.set(key, [v]);
-    }
-    return [...map.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([lang, list]) => ({ label: friendlyLang(lang), voices: list }));
-  }, [voices]);
 
   const selectedVoice = voices.find((v) => v.voiceURI === voiceURI) ?? null;
   const overLimit = text.length > MAX_CHARS;
@@ -96,35 +113,101 @@ export default function VoiceoverStudio() {
     (utterText: string) => {
       const synth = getSynthesis();
       if (!synth) return;
-      synth.cancel();
-      const utterance = new SpeechSynthesisUtterance(utterText);
-      const voice = voices.find((v) => v.voiceURI === voiceURI) ?? null;
-      if (voice) utterance.voice = voice;
-      utterance.rate = rate;
-      utterance.pitch = pitch;
-      utterance.onboundary = (event) => {
-        if (utterText.length > 0) {
-          setProgress(Math.min(100, Math.round((event.charIndex / utterText.length) * 100)));
+      stopRef.current = false;
+
+      try {
+        synth.cancel();
+        // Some mobile browsers leave the engine paused — resume it.
+        if (synth.paused) synth.resume();
+      } catch {
+        /* noop */
+      }
+
+      const chunks = chunkText(utterText);
+      const totalChars = utterText.length;
+      let doneChars = 0;
+      let idx = 0;
+      let failed = 0;
+      let started = false;
+
+      // Watchdog: never leave the user staring at silence.
+      const watchdog = setTimeout(() => {
+        if (!started && !stopRef.current) {
+          stopRef.current = true;
+          try {
+            synth.cancel();
+          } catch {
+            /* noop */
+          }
+          setIsSpeaking(false);
+          toast({
+            title: "Voice didn't start",
+            variant: "error",
+            description: "Your browser blocked the voice. Try Chrome, pick another voice, or use shorter text.",
+          });
         }
-      };
-      utterance.onend = () => {
+      }, 4000);
+
+      const finish = (ok: boolean) => {
+        clearTimeout(watchdog);
         setIsSpeaking(false);
-        setProgress(100);
-      };
-      utterance.onerror = (event) => {
-        // "canceled" fires when we intentionally stop — not a real error.
-        if (event.error !== "canceled") {
+        setProgress(ok ? 100 : 0);
+        if (!ok && !stopRef.current) {
           toast({
             title: "Playback error",
             variant: "error",
             description: "The voice could not speak this text. Try a different voice.",
           });
         }
-        setIsSpeaking(false);
       };
+
+      const speakNext = () => {
+        if (stopRef.current) {
+          clearTimeout(watchdog);
+          return;
+        }
+        if (idx >= chunks.length) {
+          finish(failed < chunks.length);
+          return;
+        }
+        const utterance = new SpeechSynthesisUtterance(chunks[idx]);
+        const voice = voices.find((v) => v.voiceURI === voiceURI) ?? null;
+        if (voice) utterance.voice = voice;
+        utterance.rate = rate;
+        utterance.pitch = pitch;
+        utterance.onstart = () => {
+          started = true;
+        };
+        utterance.onend = () => {
+          if (stopRef.current) return;
+          doneChars += chunks[idx].length;
+          idx += 1;
+          setProgress(Math.min(99, Math.round((doneChars / totalChars) * 100)));
+          // A breath between chunks keeps mobile engines from choking.
+          setTimeout(() => {
+            if (!stopRef.current) speakNext();
+          }, 150);
+        };
+        utterance.onerror = (event) => {
+          if (event.error === "canceled" || stopRef.current) return;
+          // Skip the bad chunk and keep going with the rest.
+          failed += 1;
+          doneChars += chunks[idx].length;
+          idx += 1;
+          speakNext();
+        };
+        try {
+          synth.speak(utterance);
+        } catch {
+          failed += 1;
+          idx += 1;
+          speakNext();
+        }
+      };
+
       setProgress(0);
       setIsSpeaking(true);
-      synth.speak(utterance);
+      speakNext();
     },
     [voices, voiceURI, rate, pitch, toast]
   );
@@ -142,17 +225,38 @@ export default function VoiceoverStudio() {
       });
       return;
     }
+    if (voices.length === 0) {
+      toast({
+        title: "Voices still loading",
+        variant: "error",
+        description: "Your device's voices aren't ready yet — wait a moment and try again.",
+      });
+      return;
+    }
     speak(text);
   };
 
   const handleStop = () => {
-    getSynthesis()?.cancel();
+    stopRef.current = true;
+    try {
+      getSynthesis()?.cancel();
+    } catch {
+      /* noop */
+    }
     setIsSpeaking(false);
     setProgress(0);
   };
 
   const handleTestVoice = () => {
     if (overLimit) return;
+    if (voices.length === 0) {
+      toast({
+        title: "Voices still loading",
+        variant: "error",
+        description: "Your device's voices aren't ready yet — wait a moment and try again.",
+      });
+      return;
+    }
     speak(TEST_SAMPLE);
   };
 
@@ -170,6 +274,19 @@ export default function VoiceoverStudio() {
       </Card>
     );
   }
+
+  const voiceGroups = (() => {
+    const map = new Map<string, SpeechSynthesisVoice[]>();
+    for (const v of voices) {
+      const key = v.lang || "unknown";
+      const bucket = map.get(key);
+      if (bucket) bucket.push(v);
+      else map.set(key, [v]);
+    }
+    return [...map.entries()]
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([lang, list]) => ({ label: friendlyLang(lang), voices: list }));
+  })();
 
   return (
     <Card className="space-y-6">
@@ -203,7 +320,7 @@ export default function VoiceoverStudio() {
             className="input-base w-full"
           >
             {voices.length === 0 && <option value="">Loading voices…</option>}
-            {groups.map((g) => (
+            {voiceGroups.map((g) => (
               <optgroup key={g.label} label={g.label}>
                 {g.voices.map((v) => (
                   <option key={v.voiceURI} value={v.voiceURI}>
@@ -214,9 +331,7 @@ export default function VoiceoverStudio() {
             ))}
           </select>
           <p className="text-xs text-zinc-500 mt-1.5">
-            {voices.length > 0
-              ? `${voices.length} voices found on this device`
-              : "Voices load from your device…"}
+            {voices.length > 0 ? `${voices.length} voices found on this device` : "Voices load from your device…"}
           </p>
         </div>
 
