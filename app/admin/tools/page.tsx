@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Pencil, Plus } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Switch from "@/components/ui/Switch";
@@ -11,6 +11,7 @@ import { Input, Textarea } from "@/components/ui/Input";
 import Skeleton from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import {
+  deleteToolOverride,
   getToolOverrides,
   saveToolOverride,
   type ToolOverride,
@@ -20,7 +21,7 @@ import type { Tool, ToolCategory } from "@/types";
 const emptyForm = {
   slug: "", title: "", tagline: "", description: "",
   category: "ai" as ToolCategory, href: "", icon: "Wand2",
-  badge: "", image: "", sortOrder: 99, enabled: true,
+  badge: "", image: "", keywords: "", sortOrder: 99, enabled: true,
 };
 
 type ToolForm = typeof emptyForm;
@@ -75,16 +76,35 @@ export default function AdminToolsPage() {
       form: {
         slug: t.slug, title: t.title, tagline: t.tagline, description: t.description,
         category: t.category, href: t.href, icon: t.icon,
-        badge: t.badge ?? "", image: t.image ?? "", sortOrder: t.sortOrder, enabled: t.enabled,
+        badge: t.badge ?? "", image: t.image ?? "", keywords: (t.keywords ?? []).join(", "),
+        sortOrder: t.sortOrder, enabled: t.enabled,
       },
     });
+
+  const remove = async (t: Tool) => {
+    if (!confirm(`Delete "${t.title}"? It will disappear from the site. You can re-add it later with the same slug.`)) return;
+    const res = await fetch(`/api/admin/tools?slug=${encodeURIComponent(t.slug)}`, { method: "DELETE" });
+    if (!res.ok) {
+      toast({ title: "Delete failed", variant: "error" });
+      return;
+    }
+    // Clear any local override so a later re-add starts clean.
+    deleteToolOverride(t.slug).catch(() => {});
+    toast({ title: "Tool deleted", variant: "success" });
+    load();
+  };
 
   const save = async () => {
     if (!modal) return;
     setSaving(true);
     try {
       const { mode, form } = modal;
-      const payload = { ...form, badge: form.badge || null, sortOrder: Number(form.sortOrder) };
+      const payload = {
+        ...form,
+        badge: form.badge || null,
+        sortOrder: Number(form.sortOrder),
+        keywords: form.keywords.split(",").map((k) => k.trim()).filter(Boolean).slice(0, 30),
+      };
       const res = await fetch("/api/admin/tools", {
         method: mode === "add" ? "POST" : "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -103,6 +123,7 @@ export default function AdminToolsPage() {
         icon: form.icon,
         badge: (form.badge || undefined) as Tool["badge"],
         image: form.image.trim() || undefined,
+        keywords: payload.keywords,
         enabled: form.enabled,
         sortOrder: Number(form.sortOrder),
         updatedAt: new Date().toISOString(),
@@ -149,6 +170,10 @@ export default function AdminToolsPage() {
                   className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition">
                   <Pencil size={15} className="text-zinc-600 dark:text-zinc-400" />
                 </button>
+                <button onClick={() => remove(t)} aria-label={`Delete ${t.title}`}
+                  className="p-2 rounded-lg hover:bg-red-500/10 transition">
+                  <Trash2 size={15} className="text-red-600 dark:text-red-400" />
+                </button>
                 <Switch checked={t.enabled} onChange={(v) => toggle(t.slug, v)} label={`Toggle ${t.title}`} />
               </div>
             ))}
@@ -168,8 +193,11 @@ export default function AdminToolsPage() {
               onChange={(e) => set("slug", e.target.value)} hint="URL-safe, e.g. qr-generator" />
             <Input label="Title" value={modal.form.title} onChange={(e) => set("title", e.target.value)} />
             <Input label="Tagline" value={modal.form.tagline} onChange={(e) => set("tagline", e.target.value)} />
-            <Input label="Link (href)" value={modal.form.href} onChange={(e) => set("href", e.target.value)} hint="/media-tools#qr" />
+            <Input label="Link (href)" value={modal.form.href} onChange={(e) => set("href", e.target.value)} hint="/tools/my-tool" />
             <Input label="Image URL" value={modal.form.image} onChange={(e) => set("image", e.target.value)} hint="Card cover image (optional)" inputMode="url" />
+            <div className="sm:col-span-2">
+              <Input label="Keywords (comma separated)" value={modal.form.keywords} onChange={(e) => set("keywords", e.target.value)} hint="Search keywords — help users find this tool" />
+            </div>
             <div className="sm:col-span-2">
               <Textarea label="Description" value={modal.form.description} onChange={(e) => set("description", e.target.value)} />
             </div>

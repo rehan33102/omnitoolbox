@@ -17,16 +17,25 @@ function rowToPost(r: Record<string, unknown>): BlogPost {
 }
 
 export async function getPosts(): Promise<BlogPost[]> {
+  // Built-in seeds are the base; database rows (admin CMS) override them by
+  // slug. A DB row with published_at = null acts as a tombstone that hides
+  // the matching seed (used when the admin "deletes" a built-in post).
+  const bySlug = new Map<string, BlogPost>(BLOG_SEED.map((p) => [p.slug, p]));
   try {
     const supabase = createAdminClient();
     const { data } = await supabase
       .from("blog_posts")
       .select("*")
-      .not("published_at", "is", null)
       .order("published_at", { ascending: false });
-    if (data && data.length > 0) return data.map(rowToPost);
-  } catch { /* fall through */ }
-  return [...BLOG_SEED].sort((a, b) => +new Date(b.publishedAt!) - +new Date(a.publishedAt!));
+    for (const r of data ?? []) {
+      const post = rowToPost(r);
+      if (post.publishedAt || post.body) bySlug.set(post.slug, post);
+      else bySlug.delete(post.slug);
+    }
+  } catch { /* seeds only */ }
+  return [...bySlug.values()]
+    .filter((p) => p.publishedAt)
+    .sort((a, b) => +new Date(b.publishedAt!) - +new Date(a.publishedAt!));
 }
 
 export async function getPost(slug: string): Promise<BlogPost | null> {
