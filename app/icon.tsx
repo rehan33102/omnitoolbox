@@ -1,28 +1,26 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
-export default function Icon() {
+export default async function Icon() {
+  // Embed the real origami-fox logo as the favicon
+  const logoPath = join(process.cwd(), "public", "images", "logo.png");
+  const buf = await readFile(logoPath);
+  const dataUri = `data:image/png;base64,${buf.toString("base64")}`;
+
   return new ImageResponse(
     (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "linear-gradient(135deg,#7c3aed,#06b6d4)",
-          borderRadius: "16px",
-          color: "white",
-          fontSize: 36,
-          fontWeight: 800,
-          fontFamily: "sans-serif",
-        }}
-      >
-        O
-      </div>
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={dataUri}
+        width={64}
+        height={64}
+        style={{ borderRadius: "14px", objectFit: "cover" }}
+        alt="OmniToolBox"
+      />
     ),
     { ...size }
   );

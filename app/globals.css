@@ -150,3 +150,51 @@
   animation: marquee-x 28s linear infinite;
 }
 .marquee-track:hover { animation-play-state: paused; }
+
+/*
+ * TOOL CARD IMAGE ANIMATIONS — soft, living visuals (GPU-friendly: transform + opacity only)
+ * .tool-img-drift  : ultra-slow Ken Burns zoom on the tool image (12s loop)
+ * .tool-img-breathe: gentle scale "breathing" on the icon tile (5s loop)
+ * .tool-glow       : soft ambient glow overlay that pulses (7s loop)
+ * Stagger via --anim-delay custom property. Respects prefers-reduced-motion
+ * and disables the glow pulse on small screens to keep mobile smooth.
+ */
+@keyframes tool-img-drift {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.09); }
+}
+.tool-img-drift {
+  animation: tool-img-drift 12s ease-in-out infinite;
+  animation-delay: var(--anim-delay, 0s);
+  will-change: transform;
+}
+
+@keyframes tool-img-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+.tool-img-breathe {
+  animation: tool-img-breathe 5s ease-in-out infinite;
+  animation-delay: var(--anim-delay, 0s);
+}
+
+@keyframes tool-glow-pulse {
+  0%, 100% { opacity: 0.25; }
+  50% { opacity: 0.6; }
+}
+.tool-glow {
+  background: radial-gradient(ellipse 70% 60% at 50% 45%, rgba(168,85,247,0.35), rgba(6,182,212,0.12) 55%, transparent 75%);
+  animation: tool-glow-pulse 7s ease-in-out infinite;
+  animation-delay: var(--anim-delay, 0s);
+  pointer-events: none;
+}
+
+/* Accessibility: kill ambient motion for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .tool-img-drift, .tool-img-breathe, .tool-glow { animation: none; }
+}
+
+/* Mobile: keep the drift (cheap transform) but drop the glow pulse overlay */
+@media (max-width: 640px) {
+  .tool-glow { animation: none; opacity: 0.3; }
+}

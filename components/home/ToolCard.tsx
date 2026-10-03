@@ -94,6 +94,8 @@ export const CATEGORY_STYLE: Record<
 export default function ToolCard({ tool }: { tool: Tool }) {
   const { track } = useTrackToolUsage();
   const s = CATEGORY_STYLE[tool.category];
+  // Stagger ambient animations so cards don't pulse in sync (derived from sort order)
+  const animDelay = `${((tool.sortOrder ?? 0) % 6) * 1.1}s`;
 
   return (
     <Link href={tool.href} onClick={() => track(tool.slug, "use")} className="block h-full">
@@ -113,8 +115,11 @@ export default function ToolCard({ tool }: { tool: Tool }) {
                 alt=""
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+                className="object-cover tool-img-drift transition-transform duration-500 group-hover:scale-[1.06]"
+                style={{ ["--anim-delay" as string]: animDelay }}
               />
+              {/* soft ambient glow pulse over the image */}
+              <div className="absolute inset-0 tool-glow" style={{ ["--anim-delay" as string]: animDelay }} />
               {/* contrast wash so the icon tile + badge stay legible */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/25" />
             </>
@@ -137,10 +142,11 @@ export default function ToolCard({ tool }: { tool: Tool }) {
           <div className="absolute inset-0 flex items-center justify-center">
             <span
               className={cn(
-                "grid size-16 place-items-center rounded-2xl border backdrop-blur-sm",
+                "grid size-16 place-items-center rounded-2xl border backdrop-blur-sm tool-img-breathe",
                 "transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6",
                 s.tile
               )}
+              style={{ ["--anim-delay" as string]: animDelay }}
             >
               <ToolIcon name={tool.icon} size={30} className={s.icon} />
             </span>

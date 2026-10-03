@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Instagram, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { Github, Instagram } from "lucide-react";
 import { TOOL_CATEGORIES } from "@/lib/constants";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
 import { TikTokIcon, WhatsAppIcon } from "@/components/ui/BrandIcons";
@@ -40,10 +41,16 @@ export default function Footer() {
         {/* Brand + social */}
         <div>
           <Link href="/" className="flex items-center gap-2.5 mb-3">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand-600 to-accent-500">
-              <Sparkles size={18} className="text-zinc-900 dark:text-white" />
+            <span className="relative grid h-10 w-10 place-items-center rounded-2xl overflow-hidden shadow-lg shadow-purple-500/25 ring-1 ring-black/10 dark:ring-white/20">
+              <Image
+                src="/images/logo.png"
+                alt="OmniToolBox logo"
+                width={40}
+                height={40}
+                className="object-cover"
+              />
             </span>
-            <span className="font-display text-lg font-bold text-gradient">{settings.logoText}</span>
+            <span className="font-display text-xl font-extrabold text-gradient drop-shadow-[0_1px_8px_rgba(168,85,247,0.35)]">{settings.logoText}</span>
           </Link>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-xs leading-relaxed">{settings.tagline}</p>
           <div className="flex gap-2 mt-4">
