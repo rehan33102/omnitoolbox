@@ -104,7 +104,35 @@ export const TOOLS: Tool[] = [
     tagline: "Military-grade random passwords",
     description: "Cryptographically secure passwords with strength meter. Generated locally — never sent anywhere.",
     category: "web", href: "/web-tools", icon: "KeyRound",
-    enabled: true, sortOrder: 15, usageCount: 0, updatedAt: "2026-10-03",
+    enabled: true, sortOrder: 15, usageCount: 0, updatedAt: "2026-10-04",
+  },
+  {
+    id: "t16", slug: "currency-converter", title: "Currency Converter",
+    tagline: "Live USD, PKR, EUR, USDT & 15 currencies",
+    description: "Convert between 15 currencies with live mid-market rates (PKR, USD, EUR, GBP, AED, USDT…). 100% free.",
+    category: "web", href: "/calculators#currency", icon: "Banknote", badge: "new",
+    enabled: true, sortOrder: 16, usageCount: 0, updatedAt: "2026-10-04",
+  },
+  {
+    id: "t17", slug: "unit-converter", title: "Unit Converter",
+    tagline: "Length, weight, temperature, volume & more",
+    description: "Instant conversions across 6 unit categories with a full equivalents table. All client-side.",
+    category: "web", href: "/calculators#unit", icon: "Ruler", badge: "new",
+    enabled: true, sortOrder: 17, usageCount: 0, updatedAt: "2026-10-04",
+  },
+  {
+    id: "t18", slug: "bmi-calorie-calculator", title: "BMI & Calorie Calculator",
+    tagline: "BMI score + daily calorie targets",
+    description: "Body Mass Index with healthy-weight range plus BMR/TDEE calorie targets for losing, maintaining or gaining.",
+    category: "web", href: "/calculators#bmi", icon: "Flame", badge: "new",
+    enabled: true, sortOrder: 18, usageCount: 0, updatedAt: "2026-10-04",
+  },
+  {
+    id: "t19", slug: "age-calculator", title: "Age Calculator",
+    tagline: "Exact age, total days & next birthday",
+    description: "Years, months, days, total hours lived and a countdown to your next birthday. Private — nothing uploaded.",
+    category: "web", href: "/calculators#age", icon: "Cake", badge: "new",
+    enabled: true, sortOrder: 19, usageCount: 0, updatedAt: "2026-10-04",
   },
 ];
 
