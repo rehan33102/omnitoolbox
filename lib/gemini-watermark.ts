@@ -167,10 +167,16 @@ export function scoreCandidate(
  * Full auto pipeline: detect size → local anchor search over a small
  * offset grid → exact reverse-alpha removal on the best candidate.
  * Returns the rect used and a confidence 0–1.
+ *
+ * CRITICAL FIX: removal is ONLY applied when confidence exceeds 0.5.
+ * Below that, the image is left UNTOUCHED (detected=false) — previously
+ * the inverse was applied unconditionally, which CORRUPTED the
+ * bottom-right corner of images without a Gemini watermark
+ * (mean ~61/255 pixel shift on clean images).
  */
 export function autoRemoveGeminiWatermark(
   imageData: ImageData,
-): { rect: WatermarkRect; confidence: number; size: 48 | 96 } {
+): { rect: WatermarkRect; confidence: number; size: 48 | 96; detected: boolean } {
   const { width: w, height: h, data } = imageData;
   const sizes: (48 | 96)[] = w > 1024 && h > 1024 ? [96, 48] : [48, 96];
 
@@ -203,7 +209,12 @@ export function autoRemoveGeminiWatermark(
     return { rect: calculateWatermarkPosition(w, h, cfg), score: 0, size: cfg.logoSize as 48 | 96 };
   })();
 
-  const alphaMap = getAlphaMap(winner.size);
-  removeWatermarkReverseAlpha(data, w, h, winner.rect, alphaMap);
-  return { rect: winner.rect, confidence: winner.score, size: winner.size };
+  // Confidence gate: true Gemini watermarks score ~1.0, clean images ~0.1.
+  // Never touch the image below 0.5 — the inverse would corrupt it.
+  const detected = winner.score > 0.5;
+  if (detected) {
+    const alphaMap = getAlphaMap(winner.size);
+    removeWatermarkReverseAlpha(data, w, h, winner.rect, alphaMap);
+  }
+  return { rect: winner.rect, confidence: winner.score, size: winner.size, detected };
 }

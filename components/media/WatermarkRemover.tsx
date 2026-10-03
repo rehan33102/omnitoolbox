@@ -18,7 +18,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
-import { autoRemoveGeminiWatermark, detectWatermarkConfig, calculateWatermarkPosition, getAlphaMap, removeWatermarkReverseAlpha } from "@/lib/gemini-watermark";
+import { autoRemoveGeminiWatermark, getAlphaMap, removeWatermarkReverseAlpha } from "@/lib/gemini-watermark";
 
 /* ---------------- manual inpainting fallback (non-Gemini marks) -------- */
 
@@ -218,16 +218,22 @@ export default function WatermarkRemover() {
       const imageData = ctx.getImageData(0, 0, c.width, c.height);
       setProgress(35); setStatus("Applying reverse alpha blending…");
       await new Promise(r => setTimeout(r, 30));
-      const { rect, confidence: conf, size } = autoRemoveGeminiWatermark(imageData);
+      const { rect, confidence: conf, size, detected } = autoRemoveGeminiWatermark(imageData);
       ctx.putImageData(imageData, 0, 0);
       setConfidence(conf);
+      if (!detected) {
+        setProgress(100); setStatus("");
+        toast({
+          title: "No Gemini watermark detected — image left untouched. Try Manual brush mode for other marks.",
+          variant: "error",
+        });
+        return;
+      }
       setAfterUrl(c.toDataURL("image/png"));
       setSlider(50);
       setProgress(100); setStatus("");
       toast({
-        title: conf > 0.6
-          ? `Watermark removed — ${size}×${size} mark at bottom-right (${Math.round(conf * 100)}% match).`
-          : "Processed. If a mark remains, try Manual brush mode.",
+        title: `Watermark removed — ${size}×${size} mark at bottom-right (${Math.round(conf * 100)}% match).`,
         variant: "success"
       });
     } catch (e) {
@@ -340,12 +346,16 @@ export default function WatermarkRemover() {
       await new Promise<void>(res => { v.onseeked = () => res(); });
       wctx.drawImage(v, 0, 0, w, h);
       const first = wctx.getImageData(0, 0, w, h);
-      const { confidence: conf } = autoRemoveGeminiWatermark(first);
+      const { confidence: conf, detected, rect: detectedRect, size: detectedSize } = autoRemoveGeminiWatermark(first);
       setConfidence(conf);
-      // reuse the detected config for every frame (fast path — no re-search)
-      const cfg = detectWatermarkConfig(w, h);
-      const r = calculateWatermarkPosition(w, h, cfg);
-      const alphaMap = getAlphaMap(cfg.logoSize);
+      if (!detected) {
+        setBusy(false); setProgress(0); setStatus("");
+        toast({ title: "No Gemini watermark detected in video — left untouched.", variant: "error" });
+        return;
+      }
+      // reuse the detected rect for every frame (fast path — no re-search)
+      const r = detectedRect;
+      const alphaMap = getAlphaMap(detectedSize);
 
       const stream = work.captureStream(30);
       const mime = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
