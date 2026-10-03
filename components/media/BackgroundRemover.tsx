@@ -278,14 +278,13 @@ export default function BackgroundRemover() {
                 : "Remove background"}
           </Button>
 
-          {/* Elegant working state — with honest progress */}
+          {/* Working state — simple "Processing" with honest progress */}
           {busy && (
             <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
               <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               <div className="relative space-y-2">
-                <Sparkles size={28} className="mx-auto text-brand-400 animate-pulse" />
-                <p className="text-sm font-medium text-zinc-200">Working its magic…</p>
-                <p className="text-xs text-zinc-500">The AI is separating your subject from the background</p>
+                <Loader2 size={28} className="mx-auto text-brand-400 animate-spin" />
+                <p className="text-sm font-medium text-zinc-200">Processing…</p>
                 {busyPct > 0 && (
                   <div className="pt-1">
                     <div className="h-1.5 rounded-full bg-white/10 overflow-hidden max-w-xs mx-auto">
