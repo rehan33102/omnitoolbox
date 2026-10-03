@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import { saveBlob } from "@/lib/db";
 
 type OutFormat = "png" | "jpeg" | "webp";
 const FORMATS: { id: OutFormat; label: string }[] = [
@@ -23,6 +24,7 @@ export default function ImageConverter() {
   const [result, setResult] = useState<{ url: string; size: number } | null>(null);
   const [busy, setBusy] = useState(false);
   const [drag, setDrag] = useState(false);
+  const [savedNote, setSavedNote] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -34,6 +36,7 @@ export default function ImageConverter() {
     }
     setFile(f);
     setResult(null);
+    setSavedNote(false);
     setPreview(URL.createObjectURL(f));
   };
 
@@ -66,6 +69,13 @@ export default function ImageConverter() {
       );
       if (!blob) throw new Error("encode failed");
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
+      // Auto-save to My Library — best-effort.
+      try {
+        const id = await saveBlob("image", blob, `${file.name.replace(/\.[^.]+$/, "")}.${format}`, { format });
+        if (id) setSavedNote(true);
+      } catch {
+        /* library save is non-critical */
+      }
       toast({ title: "Converted", variant: "success", description: `${file.name} → ${format.toUpperCase()}` });
     } catch {
       toast({ title: "Conversion failed", variant: "error", description: "Try a smaller image" });
@@ -147,6 +157,7 @@ export default function ImageConverter() {
               <div className="text-sm">
                 <p className="font-medium">Ready to download</p>
                 <p className="text-zinc-500 text-xs">{formatBytes(file.size)} → {formatBytes(result.size)}</p>
+                {savedNote && <p className="text-emerald-400 text-xs mt-1">Saved to Library ✓</p>}
               </div>
               <a href={result.url} download={`${file.name.replace(/\.[^.]+$/, "")}.${format}`}>
                 <Button size="sm"><Download size={14} /> Download</Button>

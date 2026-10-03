@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
+import { deleteBlob, getBlob, saveBlob } from "@/lib/db";
 
 const MAX_CHARS = 20000; // ~15-18 minutes of speech — no small limits
 const PART_CHARS = 500; // per server request; server chunks further internally
@@ -83,42 +84,17 @@ type SpeechCue = { start: number; end: number; text: string };
 const DEFAULT_TEXT =
   "Assalam o alaikum! Welcome to the OmniToolBox AI Voiceover Studio. Type or paste your script here, pick a language, then press Generate — you'll get real MP3 audio you can play, download, and reuse.";
 
-/* ---------------- IndexedDB: persists generated MP3s on the device ---------------- */
-function idb(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const req = indexedDB.open("omnitoolbox-voiceover", 1);
-    req.onupgradeneeded = () => req.result.createObjectStore("audio");
-    req.onsuccess = () => resolve(req.result);
-    req.onerror = () => reject(req.error);
-  });
-}
-async function idbPut(id: string, blob: Blob): Promise<void> {
-  const db = await idb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction("audio", "readwrite");
-    tx.objectStore("audio").put(blob, id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => reject(tx.error);
-  });
-}
-async function idbGet(id: string): Promise<Blob | null> {
-  const db = await idb();
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction("audio", "readonly");
-    const rq = tx.objectStore("audio").get(id);
-    rq.onsuccess = () => resolve((rq.result as Blob) ?? null);
-    rq.onerror = () => reject(rq.error);
-  });
-}
-async function idbDel(id: string): Promise<void> {
-  const db = await idb();
-  return new Promise((resolve) => {
-    const tx = db.transaction("audio", "readwrite");
-    tx.objectStore("audio").delete(id);
-    tx.oncomplete = () => resolve();
-    tx.onerror = () => resolve();
-  });
-}
+/* Localized preview samples — one short line per neural-voice language. */
+const PREVIEW_SAMPLES: Record<string, string> = {
+  en: "Hello! This is a preview of the selected voice.",
+  es: "¡Hola! Esta es una vista previa de la voz seleccionada.",
+  ur: "السلام علیکم! یہ منتخب آواز کا پیش نظارہ ہے۔",
+  de: "Hallo! Dies ist eine Vorschau der ausgewählten Stimme.",
+  ja: "こんにちは！選択した音声のプレビューです。",
+  fr: "Bonjour ! Ceci est un aperçu de la voix sélectionnée.",
+};
+
+type TtsEngine = "edge" | "elevenlabs" | "google" | "google-fallback" | "";
 
 /** Split long scripts into sentence-aware parts for sequential server requests. */
 function chunkText(text: string, maxLen = PART_CHARS): string[] {
@@ -225,6 +201,9 @@ export default function VoiceoverStudio() {
   const [useCustomPitch, setUseCustomPitch] = useState(false);
   const [pauseSec, setPauseSec] = useState(0.5);
   const [useCustomPause, setUseCustomPause] = useState(false);
+  const [engine, setEngine] = useState<TtsEngine>("");
+  const [previewing, setPreviewing] = useState(false);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stopRef = useRef(false);
   const { toast } = useToast();
@@ -265,6 +244,41 @@ export default function VoiceoverStudio() {
   const langLabel = (code: string) =>
     edgeLangs.find((l) => l.code === code)?.label ??
     BASIC_LANGUAGES.find((l) => l.code === code)?.label ?? code;
+
+  /** Preview the selected voice/style with a short localized sample — not saved to history. */
+  const previewVoice = useCallback(async () => {
+    if (previewing) {
+      previewAudioRef.current?.pause();
+      setPreviewing(false);
+      return;
+    }
+    setPreviewing(true);
+    try {
+      const res = await fetch("/api/voiceover/synthesize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: PREVIEW_SAMPLES[lang] ?? PREVIEW_SAMPLES.en,
+          lang,
+          voice: edgeVoice,
+          style: edgeStyle,
+        }),
+      });
+      if (!res.ok) throw new Error("preview failed");
+      const url = URL.createObjectURL(new Blob([await res.arrayBuffer()], { type: "audio/mpeg" }));
+      const el = previewAudioRef.current;
+      if (!el) throw new Error("no audio element");
+      el.src = url;
+      el.onended = () => {
+        setPreviewing(false);
+        URL.revokeObjectURL(url);
+      };
+      await el.play();
+    } catch {
+      setPreviewing(false);
+      toast({ title: "Preview failed", variant: "error", description: "Try again in a moment." });
+    }
+  }, [lang, edgeVoice, edgeStyle, previewing, toast]);
 
   const generate = useCallback(async () => {
     const script = text.trim();
@@ -310,6 +324,10 @@ export default function VoiceoverStudio() {
         }
         const buf = await res.arrayBuffer();
         if (buf.byteLength < 500) throw new Error("Empty audio");
+        if (i === 0) {
+          const h = res.headers.get("X-TTS-Engine");
+          setEngine(h === "edge" || h === "elevenlabs" || h === "google" || h === "google-fallback" ? h : "google");
+        }
         let cues: SpeechCue[] = [];
         const cuesHeader = res.headers.get("X-Speech-Cues");
         if (cuesHeader) {
@@ -326,8 +344,7 @@ export default function VoiceoverStudio() {
       }
       if (stopRef.current) return;
       const blob = new Blob(partData.map((p) => p.blob), { type: "audio/mpeg" });
-      const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      await idbPut(id, blob).catch(() => {});
+      const fileName = `voiceover-${lang}-${new Date().toISOString().slice(0, 10)}.mp3`;
       if (audioUrl) URL.revokeObjectURL(audioUrl);
       const url = URL.createObjectURL(blob);
       setAudioUrl(url);
@@ -344,6 +361,16 @@ export default function VoiceoverStudio() {
         : edgeLangs.some((l) => l.code === lang)
           ? `${edgeVoice === "male" ? "Male" : "Female"} · ${edgeStyles.find((s) => s.key === edgeStyle)?.label ?? edgeStyle}`
           : undefined;
+      // Persist the MP3 to the central library (kind "voiceover"), SRT in meta.
+      const blobId = await saveBlob("voiceover", blob, fileName, {
+        text: script.slice(0, 100) + (script.length > 100 ? "…" : ""),
+        lang,
+        langLabel: langLabel(lang),
+        voiceLabel: vLabel ?? "",
+        chars: script.length,
+        srt: srt || "",
+      });
+      const id = blobId ?? `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       const item: HistoryItem = {
         id,
         text: script.slice(0, 120) + (script.length > 120 ? "…" : ""),
@@ -355,7 +382,7 @@ export default function VoiceoverStudio() {
         srt: srt || undefined,
       };
       const next = [item, ...history].slice(0, HISTORY_LIMIT);
-      for (const old of history.slice(HISTORY_LIMIT - 1)) idbDel(old.id);
+      for (const old of history.slice(HISTORY_LIMIT - 1)) deleteBlob(old.id);
       saveHistory(next);
       toast({ title: "Voiceover ready", variant: "success", description: "Play it, or download the MP3 + SRT." });
     } catch (e) {
@@ -381,7 +408,8 @@ export default function VoiceoverStudio() {
       setPlayingId(null);
       return;
     }
-    const blob = await idbGet(item.id);
+    const entry = await getBlob(item.id);
+    const blob = entry?.blob;
     if (!blob) {
       toast({ title: "Audio not found", variant: "error", description: "This recording was cleared from the device." });
       return;
@@ -399,7 +427,8 @@ export default function VoiceoverStudio() {
   };
 
   const downloadHistory = async (item: HistoryItem) => {
-    const blob = await idbGet(item.id);
+    const entry = await getBlob(item.id);
+    const blob = entry?.blob;
     if (!blob) {
       toast({ title: "Audio not found", variant: "error", description: "This recording was cleared from the device." });
       return;
@@ -416,7 +445,7 @@ export default function VoiceoverStudio() {
   };
 
   const deleteHistory = async (id: string) => {
-    await idbDel(id);
+    await deleteBlob(id);
     saveHistory(history.filter((h) => h.id !== id));
     if (playingId === id) {
       audioRef.current?.pause();
@@ -425,7 +454,7 @@ export default function VoiceoverStudio() {
   };
 
   const clearHistory = async () => {
-    for (const h of history) await idbDel(h.id);
+    for (const h of history) await deleteBlob(h.id);
     saveHistory([]);
     audioRef.current?.pause();
     setPlayingId(null);
@@ -509,6 +538,19 @@ export default function VoiceoverStudio() {
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={previewVoice}
+                className="btn-base inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-brand-500/40 bg-brand-500/10 text-sm font-medium text-brand-200 hover:bg-brand-500/20 transition"
+              >
+                {previewing ? <Square size={14} /> : <Play size={14} />}
+                {previewing ? "Playing preview… (tap to stop)" : "🔊 Preview voice"}
+              </button>
+              <p className="text-[11px] text-zinc-500">Hear a short sample of this voice before generating.</p>
+              <audio ref={previewAudioRef} className="hidden" aria-hidden />
             </div>
 
             <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4">
@@ -611,6 +653,15 @@ export default function VoiceoverStudio() {
 
         {audioUrl && !generating && (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3 animate-fade-up">
+            {engine === "edge" || engine === "elevenlabs" ? (
+              <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1">
+                ✨ {engine === "edge" ? "Neural voice (Microsoft)" : "Premium neural voice (ElevenLabs)"}
+              </p>
+            ) : engine === "google-fallback" || engine === "google" ? (
+              <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1">
+                ⚠️ Basic voice — neural was unavailable, try again
+              </p>
+            ) : null}
             <audio controls src={audioUrl} className="w-full" />
             <div className="grid grid-cols-2 gap-3">
               <a href={audioUrl} download={`voiceover-${lang}-${Date.now()}.mp3`}>

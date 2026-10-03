@@ -1,6 +1,8 @@
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { serverSiteUrl } from "@/lib/seo";
 import Image from "next/image";
+import Link from "next/link";
+import { Sparkles, ArrowRight } from "lucide-react";
 import JsonLd from "@/components/seo/JsonLd";
 import VoiceoverStudio from "@/components/voice/VoiceoverStudio";
 import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
@@ -34,6 +36,12 @@ export default function AIVoiceoverPage() {
         <p className="text-zinc-400 mt-3">
           Free text-to-speech in 38 languages — generate real MP3 audio, download it, and keep your history. No signup.
         </p>
+        <Link
+          href="/spotlight/voiceover"
+          className="mt-4 inline-flex items-center gap-2 rounded-full border border-ember-500/40 bg-ember-500/10 px-4 py-2 text-sm font-medium text-ember-200 hover:bg-ember-500/20 transition"
+        >
+          <Sparkles size={15} /> ✨ View premium showcase <ArrowRight size={15} />
+        </Link>
       </div>
 
       <div className="relative rounded-2xl overflow-hidden mb-8 border border-white/10 max-w-3xl">

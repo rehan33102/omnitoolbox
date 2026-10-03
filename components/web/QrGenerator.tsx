@@ -7,6 +7,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
+import { saveBlob } from "@/lib/db";
 
 type ECLevel = "L" | "M" | "Q" | "H";
 
@@ -25,8 +26,10 @@ export default function QrGenerator() {
   const [ec, setEc] = useState<ECLevel>("M");
   const [dataUrl, setDataUrl] = useState("");
   const [busy, setBusy] = useState(false);
+  const [savedNote, setSavedNote] = useState(false);
   const { toast } = useToast();
   const timer = useRef<number | null>(null);
+  const savedForRef = useRef("");
 
   const generate = useCallback(async () => {
     const value = text.trim();
@@ -43,6 +46,19 @@ export default function QrGenerator() {
         color: { dark: fg, light: bg },
       });
       setDataUrl(url);
+      // Auto-save to My Library (once per distinct text) — best-effort.
+      if (savedForRef.current !== value) {
+        savedForRef.current = value;
+        try {
+          const blob = await (await fetch(url)).blob();
+          const id = await saveBlob("qr", blob, `qr-${Date.now()}.png`, {
+            text: value.slice(0, 100),
+          });
+          if (id) setSavedNote(true);
+        } catch {
+          /* library save is non-critical */
+        }
+      }
     } catch {
       toast({
         title: "Could not generate QR code",
@@ -201,6 +217,9 @@ export default function QrGenerator() {
           <QrCode size={18} className="text-brand-400" />
           <h3 className="font-semibold">Live preview</h3>
           {busy && <span className="text-xs text-zinc-500 ml-auto animate-pulse">Rendering…</span>}
+          {!busy && savedNote && dataUrl && (
+            <span className="text-xs text-emerald-400 ml-auto">Saved to Library ✓</span>
+          )}
         </div>
 
         <div className="flex-1 grid place-items-center rounded-2xl bg-white/[0.03] border border-white/10 p-6 min-h-[280px]">

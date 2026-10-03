@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { edgeTts, resolveEdgeParams, EDGE_LANGUAGES, type SpeechCue } from "@/lib/edge-tts";
+import { edgeTts, resolveEdgeParams, EDGE_LANGUAGES, type EdgeTtsOptions, type SpeechCue } from "@/lib/edge-tts";
 
 export const maxDuration = 60;
 
@@ -71,7 +71,6 @@ async function googleTTS(text: string, lang: string): Promise<Buffer> {
 }
 
 /* ---------------- ElevenLabs (premium, needs ELEVENLABS_API_KEY) ---------------- */
-
 async function elevenLabsTTS(text: string, voiceId: string, speed: number): Promise<Buffer> {
   const key = process.env.ELEVENLABS_API_KEY;
   if (!key) throw new Error("ElevenLabs not configured");
@@ -88,6 +87,35 @@ async function elevenLabsTTS(text: string, voiceId: string, speed: number): Prom
   const buf = Buffer.from(await res.arrayBuffer());
   if (buf.length < 1000) throw new Error("Empty audio");
   return buf;
+}
+
+/* ---------------- Edge TTS with retry (primary engine) ---------------- */
+
+const EDGE_RETRY_ATTEMPTS = 3;
+const EDGE_RETRY_BACKOFF_MS = 800;
+
+/**
+ * Microsoft Edge neural TTS, retried up to 3 times with ~800ms backoff.
+ * Google is strictly a last resort — the neural voice is the product.
+ */
+async function edgeTtsRetry(opts: EdgeTtsOptions): Promise<{ audio: Buffer; cues: SpeechCue[] }> {
+  let lastErr: unknown = null;
+  for (let attempt = 1; attempt <= EDGE_RETRY_ATTEMPTS; attempt++) {
+    try {
+      console.log(`[tts] Edge TTS attempt ${attempt}/${EDGE_RETRY_ATTEMPTS} voice=${opts.voice}`);
+      return await edgeTts(opts);
+    } catch (e) {
+      lastErr = e;
+      console.error(
+        `[tts] Edge TTS attempt ${attempt}/${EDGE_RETRY_ATTEMPTS} failed:`,
+        e instanceof Error ? e.message : e
+      );
+      if (attempt < EDGE_RETRY_ATTEMPTS) {
+        await new Promise((r) => setTimeout(r, EDGE_RETRY_BACKOFF_MS));
+      }
+    }
+  }
+  throw lastErr;
 }
 
 /* ---------------- Handler ---------------- */
@@ -143,10 +171,10 @@ export async function POST(req: NextRequest) {
       audio = await elevenLabsTTS(text, voiceId, speed);
       engine = "elevenlabs";
     } else if (EDGE_LANGUAGES[lang]) {
-      // Primary path: Microsoft Edge neural voices (free, no key).
+      // Primary path: Microsoft Edge neural voices (free, no key) — retried 3x.
       try {
         const p = resolveEdgeParams(lang, voice, style, ratePct, pitchHz, pauseSec);
-        const r = await edgeTts({
+        const r = await edgeTtsRetry({
           text,
           voice: p.voiceName,
           rate: p.rate,

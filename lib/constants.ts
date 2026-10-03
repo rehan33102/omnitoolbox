@@ -11,6 +11,7 @@ export const NAV_LINKS = [
   { href: "/web-tools", label: "Web Tools" },
   { href: "/ai-directory", label: "AI Directory" },
   { href: "/blog", label: "Blog" },
+  { href: "/library", label: "Library" },
 ] as const;
 
 export const TOOL_CATEGORIES = [
