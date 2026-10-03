@@ -1,5 +1,5 @@
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 import Image from "next/image";
 import JsonLd from "@/components/seo/JsonLd";
 import VoiceoverStudio from "@/components/voice/VoiceoverStudio";
@@ -18,7 +18,7 @@ export default function AIVoiceoverPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox AI Voiceover Studio", description: "Free client-side text-to-speech voiceover studio.", url: siteUrl("/ai-voiceover"), category: "audio" }),
+        softwareAppJsonLd({ name: "OmniToolBox AI Voiceover Studio", description: "Free client-side text-to-speech voiceover studio.", url: serverSiteUrl("/ai-voiceover"), category: "audio" }),
         breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Voiceover Studio", path: "/ai-voiceover" }]),
       ]} />
       <TrackUsage slug="ai-voiceover" />

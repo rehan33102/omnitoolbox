@@ -1,5 +1,5 @@
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import ImageConverter from "@/components/media/ImageConverter";
 import ImageCompressor from "@/components/media/ImageCompressor";
@@ -21,7 +21,7 @@ export default function MediaToolsPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox Media Tools", description: "Free client-side image utilities.", url: siteUrl("/media-tools"), category: "image" }),
+        softwareAppJsonLd({ name: "OmniToolBox Media Tools", description: "Free client-side image utilities.", url: serverSiteUrl("/media-tools"), category: "image" }),
         breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Media Tools", path: "/media-tools" }]),
       ]} />
       <TrackUsage slug="media-tools" />

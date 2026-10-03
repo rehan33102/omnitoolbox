@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import QrGenerator from "@/components/web/QrGenerator";
 import PasswordGenerator from "@/components/web/PasswordGenerator";
@@ -20,7 +20,7 @@ export default function WebToolsPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox Web Tools", description: "Free client-side QR generator and password generator.", url: siteUrl("/web-tools"), category: "web" }),
+        softwareAppJsonLd({ name: "OmniToolBox Web Tools", description: "Free client-side QR generator and password generator.", url: serverSiteUrl("/web-tools"), category: "web" }),
         breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Web Tools", path: "/web-tools" }]),
       ]} />
       <TrackUsage slug="web-tools" />

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, ExternalLink } from "lucide-react";
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
@@ -43,7 +43,7 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
   return (
     <div className="container py-10 max-w-4xl">
       <JsonLd data={[
-        softwareAppJsonLd({ name: tool.name, description: tool.description, url: siteUrl(`/ai-directory/${tool.slug}`), category: tool.category }),
+        softwareAppJsonLd({ name: tool.name, description: tool.description, url: serverSiteUrl(`/ai-directory/${tool.slug}`), category: tool.category }),
         breadcrumbJsonLd([
           { name: "Home", path: "/" },
           { name: "AI Directory", path: "/ai-directory" },

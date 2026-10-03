@@ -1,5 +1,5 @@
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import FancyTextStylator from "@/components/social/FancyTextStylator";
 import BioGenerator from "@/components/social/BioGenerator";
@@ -20,7 +20,7 @@ export default function SocialToolsPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox Social Tools", description: "Free social media growth utilities.", url: siteUrl("/social-tools"), category: "social" }),
+        softwareAppJsonLd({ name: "OmniToolBox Social Tools", description: "Free social media growth utilities.", url: serverSiteUrl("/social-tools"), category: "social" }),
         breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Social Tools", path: "/social-tools" }]),
       ]} />
       <TrackUsage slug="social-tools" />

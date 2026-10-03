@@ -1,5 +1,5 @@
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 import Image from "next/image";
 import JsonLd from "@/components/seo/JsonLd";
 import PdfMerger from "@/components/pdf/PdfMerger";
@@ -21,7 +21,7 @@ export default function PdfToolsPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox PDF Tools", description: "Free client-side PDF utilities.", url: siteUrl("/pdf-tools"), category: "pdf" }),
+        softwareAppJsonLd({ name: "OmniToolBox PDF Tools", description: "Free client-side PDF utilities.", url: serverSiteUrl("/pdf-tools"), category: "pdf" }),
         breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "PDF Tools", path: "/pdf-tools" }]),
       ]} />
       <TrackUsage slug="pdf-tools" />

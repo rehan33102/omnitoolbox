@@ -1,5 +1,5 @@
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import PromptBuilder from "@/components/prompt-studio/PromptBuilder";
 import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
@@ -24,7 +24,7 @@ export default function PromptStudioPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "AI Prompt Studio", description: "Free multi-model AI prompt generator and optimizer.", url: siteUrl("/ai-prompt-studio"), category: "ai" }),
+        softwareAppJsonLd({ name: "AI Prompt Studio", description: "Free multi-model AI prompt generator and optimizer.", url: serverSiteUrl("/ai-prompt-studio"), category: "ai" }),
         breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Prompt Studio", path: "/ai-prompt-studio" }]),
       ]} />
       <TrackUsage slug="ai-prompt-studio" />

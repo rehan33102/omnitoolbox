@@ -1,5 +1,5 @@
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
-import { siteUrl } from "@/lib/utils";
+import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import DirectoryExplorer from "@/components/directory/DirectoryExplorer";
 import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
@@ -22,7 +22,7 @@ export default async function DirectoryPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox AI Directory", description: "Community-voted directory of new AI tools.", url: siteUrl("/ai-directory"), category: "ai" }),
+        softwareAppJsonLd({ name: "OmniToolBox AI Directory", description: "Community-voted directory of new AI tools.", url: serverSiteUrl("/ai-directory"), category: "ai" }),
         breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Directory", path: "/ai-directory" }]),
       ]} />
       <TrackUsage slug="ai-directory" />

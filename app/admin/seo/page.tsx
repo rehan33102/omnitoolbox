@@ -5,7 +5,7 @@ import { CheckCircle2, ExternalLink, RefreshCw, XCircle } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Skeleton from "@/components/ui/Skeleton";
-import { siteUrl } from "@/lib/utils";
+const origin = () => (typeof window !== "undefined" ? window.location.origin : "");
 
 interface SeoState {
   lastGenerated: string | null;
@@ -72,7 +72,7 @@ export default function AdminSeoPage() {
       </Card>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        <a href={siteUrl("/sitemap.xml")} target="_blank" rel="noopener">
+        <a href={`${origin()}/sitemap.xml`} target="_blank" rel="noopener">
           <Card hover className="flex items-center justify-between">
             <div>
               <p className="font-medium text-sm">View sitemap.xml</p>
@@ -81,7 +81,7 @@ export default function AdminSeoPage() {
             <ExternalLink size={16} className="text-zinc-500" />
           </Card>
         </a>
-        <a href={siteUrl("/robots.txt")} target="_blank" rel="noopener">
+        <a href={`${origin()}/robots.txt`} target="_blank" rel="noopener">
           <Card hover className="flex items-center justify-between">
             <div>
               <p className="font-medium text-sm">View robots.txt</p>
