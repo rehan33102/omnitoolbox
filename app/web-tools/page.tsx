@@ -2,12 +2,10 @@ import Image from "next/image";
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
-import QrGenerator from "@/components/web/QrGenerator";
-import PasswordGenerator from "@/components/web/PasswordGenerator";
+import WebToolTabs from "@/components/web/WebToolTabs";
 import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 
 export const metadata = buildMetadata({
   title: "Free Web Tools — QR Generator & Password Generator",
@@ -51,14 +49,7 @@ export default function WebToolsPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#08080f] via-transparent to-transparent" />
       </div>
 
-      <Tabs defaultValue="qr">
-        <TabsList>
-          <TabsTrigger value="qr">QR Generator</TabsTrigger>
-          <TabsTrigger value="password">Password Generator</TabsTrigger>
-        </TabsList>
-        <TabsContent value="qr" id="qr"><QrGenerator /></TabsContent>
-        <TabsContent value="password" id="password"><PasswordGenerator /></TabsContent>
-      </Tabs>
+      <WebToolTabs />
 
       <DynamicAdSlot placement="web-tools-bottom" format="horizontal" className="mt-10" />
     </div>

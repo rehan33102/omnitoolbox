@@ -61,7 +61,7 @@ export default function Header() {
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search tools…"
-              className="input-base !py-2 !pl-9 w-48 focus:w-64 transition-all"
+              className="input-base !py-2 !pl-9 w-48 focus:w-64 transition-[width]"
             />
           </form>
           {mounted && (

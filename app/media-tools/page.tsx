@@ -1,14 +1,10 @@
 import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { serverSiteUrl } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
-import ImageConverter from "@/components/media/ImageConverter";
-import ImageCompressor from "@/components/media/ImageCompressor";
-import SvgCleaner from "@/components/media/SvgCleaner";
-import BackgroundRemover from "@/components/media/BackgroundRemover";
+import MediaToolTabs from "@/components/media/MediaToolTabs";
 import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 
 export const metadata = buildMetadata({
   title: "Free Image Tools — Converter, Compressor, SVG Cleaner & Background Remover",
@@ -40,18 +36,7 @@ export default function MediaToolsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="converter">
-        <TabsList>
-          <TabsTrigger value="converter">Converter</TabsTrigger>
-          <TabsTrigger value="compressor">Compressor</TabsTrigger>
-          <TabsTrigger value="svg">SVG Cleaner</TabsTrigger>
-          <TabsTrigger value="bg">BG Remover</TabsTrigger>
-        </TabsList>
-        <TabsContent value="converter" id="converter"><ImageConverter /></TabsContent>
-        <TabsContent value="compressor" id="compressor"><ImageCompressor /></TabsContent>
-        <TabsContent value="svg" id="svg-cleaner"><SvgCleaner /></TabsContent>
-        <TabsContent value="bg" id="bg-remover"><BackgroundRemover /></TabsContent>
-      </Tabs>
+      <MediaToolTabs />
 
       <DynamicAdSlot placement="media-tools-bottom" format="horizontal" className="mt-10" />
     </div>

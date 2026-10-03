@@ -2,13 +2,10 @@ import { buildMetadata, softwareAppJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import { serverSiteUrl } from "@/lib/seo";
 import Image from "next/image";
 import JsonLd from "@/components/seo/JsonLd";
-import PdfMerger from "@/components/pdf/PdfMerger";
-import PdfSplitter from "@/components/pdf/PdfSplitter";
-import ImagesToPdf from "@/components/pdf/ImagesToPdf";
+import PdfToolTabs from "@/components/pdf/PdfToolTabs";
 import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 
 export const metadata = buildMetadata({
   title: "Free PDF Tools — Merge, Split & Images to PDF",
@@ -52,16 +49,7 @@ export default function PdfToolsPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-[#08080f] via-transparent to-transparent" />
       </div>
 
-      <Tabs defaultValue="merger">
-        <TabsList>
-          <TabsTrigger value="merger">Merge PDF</TabsTrigger>
-          <TabsTrigger value="splitter">Split PDF</TabsTrigger>
-          <TabsTrigger value="images">Images to PDF</TabsTrigger>
-        </TabsList>
-        <TabsContent value="merger" id="merger"><PdfMerger /></TabsContent>
-        <TabsContent value="splitter" id="splitter"><PdfSplitter /></TabsContent>
-        <TabsContent value="images" id="images-to-pdf"><ImagesToPdf /></TabsContent>
-      </Tabs>
+      <PdfToolTabs />
 
       <DynamicAdSlot placement="pdf-tools-bottom" format="horizontal" className="mt-10" />
     </div>

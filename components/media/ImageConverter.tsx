@@ -42,15 +42,25 @@ export default function ImageConverter() {
     setBusy(true);
     try {
       const bitmap = await createImageBitmap(file);
+      let { width, height } = bitmap;
+      // Safety: cap gigantic images (e.g. 50MP phone photos) so mobile browsers don't crash.
+      const MAX_PIXELS = 16_000_000;
+      const pixels = width * height;
+      if (pixels > MAX_PIXELS) {
+        const scale = Math.sqrt(MAX_PIXELS / pixels);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
       const canvas = document.createElement("canvas");
-      canvas.width = bitmap.width;
-      canvas.height = bitmap.height;
+      canvas.width = width;
+      canvas.height = height;
       const ctx = canvas.getContext("2d")!;
       if (format === "jpeg") {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
-      ctx.drawImage(bitmap, 0, 0);
+      ctx.drawImage(bitmap, 0, 0, width, height);
+      bitmap.close();
       const blob = await new Promise<Blob | null>((res) =>
         canvas.toBlob(res, `image/${format}`, quality / 100)
       );
@@ -58,7 +68,7 @@ export default function ImageConverter() {
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
       toast({ title: "Converted", variant: "success", description: `${file.name} → ${format.toUpperCase()}` });
     } catch {
-      toast({ title: "Conversion failed", variant: "error" });
+      toast({ title: "Conversion failed", variant: "error", description: "Try a smaller image" });
     } finally {
       setBusy(false);
     }
