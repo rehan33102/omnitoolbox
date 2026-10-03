@@ -57,15 +57,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Footer />
             <Toaster />
           </ToastProvider>
-          {process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID && (
-            <Script
-              id="adsense-script"
-              async
-              strategy="afterInteractive"
-              src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
-              crossOrigin="anonymous"
-            />
-          )}
+          {(() => {
+            // Publisher ID is public by design (also in ads.txt); env var takes precedence.
+            const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-2122433170269090";
+            return (
+              <Script
+                id="adsense-script"
+                async
+                strategy="afterInteractive"
+                src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
+                crossOrigin="anonymous"
+              />
+            );
+          })()}
         </ThemeProvider>
       </body>
     </html>
