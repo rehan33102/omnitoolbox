@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import { Search, SearchX } from "lucide-react";
 import ToolCard from "./ToolCard";
+import SectionHeader from "./SectionHeader";
 import Badge from "@/components/ui/Badge";
+import { Reveal } from "@/hooks/useReveal";
 import { TOOL_CATEGORIES, type ToolCategoryId } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { Tool } from "@/types";
@@ -23,26 +25,30 @@ export default function ToolExplorer({ tools }: { tools: Tool[] }) {
 
   return (
     <section id="tools" className="container scroll-mt-24">
-      <div className="text-center mb-8">
-        <h2 className="font-display text-2xl md:text-3xl font-bold">Find your tool</h2>
-        <p className="text-zinc-500 text-sm mt-2">Search across all {tools.length} utilities</p>
-      </div>
+      <SectionHeader
+        eyebrow="The collection"
+        title={<>Find your <span className="text-gradient-warm">tool</span></>}
+        sub={`Search across all ${tools.length} utilities — free forever, no signup.`}
+      />
 
-      <div className="max-w-xl mx-auto relative mb-6">
-        <Search size={17} className="absolute left-4 top-3.5 text-zinc-500" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search tools… (e.g. prompt, compress, hashtag)"
-          className="input-base !pl-11 !py-3.5 !rounded-2xl !text-base"
-        />
-      </div>
+      <Reveal delay={100}>
+        <div className="max-w-xl mx-auto relative mb-6">
+          <Search size={17} className="absolute left-4 top-3.5 text-zinc-500" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search tools… (e.g. prompt, compress, hashtag)"
+            className="input-base !pl-11 !py-3.5 !rounded-2xl !text-base"
+          />
+        </div>
+      </Reveal>
 
-      <div className="flex flex-wrap justify-center gap-2 mb-10">
+      <Reveal delay={160}>
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
         <button
           onClick={() => setCat("all")}
           className={cn("btn-base px-4 py-2 text-sm rounded-full border",
-            cat === "all" ? "bg-brand-600 text-white border-brand-500 shadow-glow" : "glass text-zinc-400 hover:text-white")}
+            cat === "all" ? "bg-gradient-to-r from-ember-500 to-magent-500 text-white border-transparent shadow-glow-warm" : "glass text-zinc-400 hover:text-white")}
         >
           All <Badge variant="default" className="ml-1">{tools.length}</Badge>
         </button>
@@ -54,13 +60,14 @@ export default function ToolExplorer({ tools }: { tools: Tool[] }) {
               key={c.id}
               onClick={() => setCat(c.id)}
               className={cn("btn-base px-4 py-2 text-sm rounded-full border",
-                cat === c.id ? "bg-brand-600 text-white border-brand-500 shadow-glow" : "glass text-zinc-400 hover:text-white")}
+                cat === c.id ? "bg-gradient-to-r from-ember-500 to-magent-500 text-white border-transparent shadow-glow-warm" : "glass text-zinc-400 hover:text-white")}
             >
               {c.label} <Badge variant="default" className="ml-1">{n}</Badge>
             </button>
           );
         })}
-      </div>
+        </div>
+      </Reveal>
 
       {filtered.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 cv-auto">

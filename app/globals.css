@@ -32,6 +32,18 @@
   .text-gradient {
     @apply bg-gradient-to-r from-brand-500 via-fuchsia-500 to-accent-400 bg-clip-text text-transparent;
   }
+  /* ORYZO-style warm gradient: ember orange → magenta → purple */
+  .text-gradient-warm {
+    @apply bg-gradient-to-r from-ember-400 via-magent-500 to-brand-500 bg-clip-text text-transparent;
+  }
+  /* Magazine-style eyebrow label */
+  .eyebrow {
+    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-ember-400;
+  }
+  .eyebrow::before {
+    content: "";
+    @apply inline-block h-px w-8 bg-gradient-to-r from-ember-500 to-magent-500;
+  }
   .card-hover {
     @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-glow;
   }
@@ -66,3 +78,68 @@
 
 /* Long grids: let the browser skip off-screen rows entirely (all screens) */
 .cv-auto { content-visibility: auto; contain-intrinsic-size: auto 320px; }
+
+/*
+ * PREMIUM SCROLL-REVEAL SYSTEM (GPU-friendly: transform + opacity only)
+ * Usage: <div className="reveal" data-reveal> ... </div> with useReveal hook,
+ * or add .is-visible manually. Stagger via inline transition-delay.
+ */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  will-change: auto;
+}
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.96) translateY(16px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal-scale.is-visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+/* Premium glow-border card: gradient border that ignites on hover */
+.glow-card {
+  position: relative;
+  isolation: isolate;
+}
+.glow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,122,26,0.0), rgba(255,45,120,0.0), rgba(139,92,246,0.0));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  transition: background 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+.glow-card:hover::before {
+  background: linear-gradient(135deg, rgba(255,122,26,0.55), rgba(255,45,120,0.4), rgba(139,92,246,0.55));
+}
+.glow-card:hover {
+  box-shadow: 0 12px 40px -8px rgba(255, 122, 26, 0.25), 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+  transform: translateY(-4px);
+}
+
+/* Marquee strip */
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-x 28s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }

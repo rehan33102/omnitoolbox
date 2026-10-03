@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk, Anton } from "next/font/google";
 import Script from "next/script";
 import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/Header";
@@ -11,6 +11,7 @@ import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
 const display = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", display: "swap" });
+const condensed = Anton({ subsets: ["latin"], variable: "--font-condensed", display: "swap", weight: "400" });
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -49,7 +50,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${display.variable} min-h-screen flex flex-col`}>
+      <body className={`${inter.variable} ${display.variable} ${condensed.variable} min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ToastProvider>
             <Header />

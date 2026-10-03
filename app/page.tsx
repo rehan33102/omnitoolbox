@@ -5,10 +5,12 @@ import JsonLd from "@/components/seo/JsonLd";
 import Hero from "@/components/home/Hero";
 import ToolExplorer from "@/components/home/ToolExplorer";
 import UsageCounter from "@/components/home/UsageCounter";
+import SectionHeader from "@/components/home/SectionHeader";
 import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import TrackUsage from "@/components/analytics/TrackUsage";
+import { Reveal } from "@/hooks/useReveal";
 import { getPublicTools } from "@/lib/get-tools";
 
 export const revalidate = 300;
@@ -47,52 +49,77 @@ export default async function HomePage() {
 
       <DynamicAdSlot placement="homepage-top" format="horizontal" className="container mt-4" />
 
-      <div className="mt-14">
+      <div className="mt-14 md:mt-20">
         <ToolExplorer tools={tools} />
       </div>
 
-      <div className="mt-14">
+      <div className="mt-14 md:mt-20">
         <UsageCounter toolCount={tools.length} />
       </div>
 
-      <section className="container mt-20">
-        <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-10">Why creators pick OmniToolBox</h2>
+      <section className="container mt-20 md:mt-28">
+        <SectionHeader
+          eyebrow="Why OmniToolBox"
+          title={<>Built for <span className="text-gradient-warm">creators</span></>}
+          sub="One fast, private toolbox that respects your time, your data and your wallet."
+        />
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {FEATURES.map((f) => (
-            <Card key={f.title} hover>
-              <f.icon size={22} className="text-brand-400 mb-3" />
-              <h3 className="font-display font-semibold mb-1.5">{f.title}</h3>
-              <p className="text-sm text-zinc-400">{f.text}</p>
-            </Card>
+          {FEATURES.map((f, i) => (
+            <Reveal key={f.title} delay={i * 90} variant="scale">
+              <Card className="h-full glow-card relative group">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-ember-500/20 to-magent-500/15 border border-white/10 mb-4">
+                  <f.icon size={20} className="text-ember-300" />
+                </span>
+                <h3 className="font-display font-semibold mb-1.5 tracking-tight">{f.title}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{f.text}</p>
+              </Card>
+            </Reveal>
           ))}
         </div>
       </section>
 
       <DynamicAdSlot placement="homepage-mid" format="horizontal" className="container mt-16" />
 
-      <section className="container mt-20 max-w-3xl">
-        <h2 className="font-display text-2xl md:text-3xl font-bold text-center mb-8">Frequently asked questions</h2>
+      <section className="container mt-20 md:mt-28 max-w-3xl">
+        <SectionHeader
+          eyebrow="Good to know"
+          title={<>Questions, <span className="text-gradient-warm">answered</span></>}
+        />
         <div className="space-y-3">
-          {FAQS.map((f) => (
-            <Card key={f.question}>
-              <h3 className="font-display font-semibold mb-1.5">{f.question}</h3>
-              <p className="text-sm text-zinc-400">{f.answer}</p>
-            </Card>
+          {FAQS.map((f, i) => (
+            <Reveal key={f.question} delay={Math.min(i * 70, 280)}>
+              <Card className="glow-card relative">
+                <h3 className="font-display font-semibold mb-1.5 tracking-tight">{f.question}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{f.answer}</p>
+              </Card>
+            </Reveal>
           ))}
         </div>
       </section>
 
-      <section className="container mt-20">
-        <div className="relative overflow-hidden rounded-3xl glass p-10 md:p-14 text-center">
-          <div className="absolute -top-24 left-1/2 -translate-x-1/2 h-64 w-[500px] rounded-full bg-brand-600/25 blur-[100px] -z-0" />
-          <div className="relative">
-            <h2 className="font-display text-2xl md:text-4xl font-bold">Stop juggling 20 bookmarked tools.</h2>
-            <p className="text-zinc-400 mt-3 max-w-xl mx-auto">One fast, free toolbox for everything you create, post and ship.</p>
-            <Link href="/ai-prompt-studio" className="inline-block mt-7">
-              <Button size="lg">Start creating free <ArrowRight size={17} /></Button>
-            </Link>
+      <section className="container mt-20 md:mt-28">
+        <Reveal variant="scale">
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-ink-900 p-10 md:p-16 text-center">
+            {/* warm glow field */}
+            <div className="absolute inset-0 -z-0" aria-hidden>
+              <div className="absolute -top-32 left-1/4 h-64 w-64 rounded-full bg-ember-500/25 blur-[110px] animate-glow-drift" />
+              <div className="absolute -bottom-32 right-1/4 h-64 w-64 rounded-full bg-magent-500/20 blur-[110px] animate-glow-drift [animation-delay:-5s]" />
+            </div>
+            <div className="relative">
+              <p className="eyebrow justify-center mb-4">One toolbox</p>
+              <h2 className="font-condensed uppercase leading-[0.95] tracking-tight text-white text-4xl sm:text-5xl md:text-6xl">
+                Stop juggling 20<br />
+                <span className="text-gradient-warm">bookmarked tools.</span>
+              </h2>
+              <p className="text-zinc-400 mt-4 max-w-xl mx-auto">One fast, free toolbox for everything you create, post and ship.</p>
+              <Link href="/ai-prompt-studio" className="inline-block mt-8">
+                <Button size="lg" className="!bg-gradient-to-r !from-ember-500 !to-magent-500 hover:!shadow-glow-warm !border-0">
+                  Start creating free <ArrowRight size={17} />
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       <DynamicAdSlot placement="homepage-bottom" format="horizontal" className="container mt-14" />
