@@ -108,13 +108,13 @@ export default function PdfMerger() {
         onClick={() => inputRef.current?.click()}
         onDrop={(e) => (e.preventDefault(), e.dataTransfer.files.length && addFiles(e.dataTransfer.files))}
         onDragOver={(e) => e.preventDefault()}
-        className="border-2 border-dashed border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
+        className="border-2 border-dashed border-black/15 dark:border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
       >
         <input ref={inputRef} type="file" accept=".pdf,application/pdf" multiple className="hidden"
           onChange={(e) => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = ""; }} />
         <div className="py-6">
           <FilePlus2 size={36} className="mx-auto text-zinc-500 mb-3" />
-          <p className="text-sm text-zinc-300">Drop PDFs here or <span className="text-brand-400">browse</span></p>
+          <p className="text-sm text-zinc-700 dark:text-zinc-300">Drop PDFs here or <span className="text-brand-700 dark:text-brand-400">browse</span></p>
           <p className="text-xs text-zinc-500 mt-1">Up to {MAX_FILES} files · 25 MB each · 100% client-side</p>
         </div>
       </div>
@@ -124,25 +124,25 @@ export default function PdfMerger() {
           <div className="space-y-2">
             {files.map((f, i) => (
               <div key={f.id} className="glass rounded-xl p-3 flex items-center gap-3">
-                <span className="shrink-0 w-7 h-7 rounded-lg bg-brand-600/20 border border-brand-500/30 grid place-items-center text-xs font-bold text-brand-300">
+                <span className="shrink-0 w-7 h-7 rounded-lg bg-brand-600/20 border border-brand-500/30 grid place-items-center text-xs font-bold text-brand-700 dark:text-brand-300">
                   {i + 1}
                 </span>
-                <FileText size={18} className="shrink-0 text-red-400" />
+                <FileText size={18} className="shrink-0 text-red-600 dark:text-red-400" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm truncate">{f.file.name}</p>
                   <p className="text-xs text-zinc-500">{formatBytes(f.file.size)}</p>
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move up"
-                    className={cn("p-2 rounded-lg border transition", i === 0 ? "opacity-30 border-white/10" : "border-white/15 hover:border-brand-500/60 hover:text-white text-zinc-400")}>
+                    className={cn("p-2 rounded-lg border transition", i === 0 ? "opacity-30 border-black/10 dark:border-white/10" : "border-black/15 dark:border-white/15 hover:border-brand-500/60 hover:text-zinc-900 dark:hover:text-white text-zinc-600 dark:text-zinc-400")}>
                     <ArrowUp size={14} />
                   </button>
                   <button onClick={() => move(i, 1)} disabled={i === files.length - 1} aria-label="Move down"
-                    className={cn("p-2 rounded-lg border transition", i === files.length - 1 ? "opacity-30 border-white/10" : "border-white/15 hover:border-brand-500/60 hover:text-white text-zinc-400")}>
+                    className={cn("p-2 rounded-lg border transition", i === files.length - 1 ? "opacity-30 border-black/10 dark:border-white/10" : "border-black/15 dark:border-white/15 hover:border-brand-500/60 hover:text-zinc-900 dark:hover:text-white text-zinc-600 dark:text-zinc-400")}>
                     <ArrowDown size={14} />
                   </button>
                   <button onClick={() => removeAt(i)} aria-label="Remove file"
-                    className="p-2 rounded-lg border border-white/15 text-zinc-400 hover:border-red-500/60 hover:text-red-400 transition">
+                    className="p-2 rounded-lg border border-black/15 dark:border-white/15 text-zinc-600 dark:text-zinc-400 hover:border-red-500/60 hover:text-red-600 dark:hover:text-red-400 transition">
                     <X size={14} />
                   </button>
                 </div>
@@ -151,8 +151,8 @@ export default function PdfMerger() {
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <p className="text-zinc-400">{files.length} file{files.length > 1 ? "s" : ""} · {formatBytes(totalSize)}</p>
-            <button onClick={clearAll} className="text-zinc-500 hover:text-red-400 text-xs flex items-center gap-1 transition">
+            <p className="text-zinc-600 dark:text-zinc-400">{files.length} file{files.length > 1 ? "s" : ""} · {formatBytes(totalSize)}</p>
+            <button onClick={clearAll} className="text-zinc-500 hover:text-red-600 dark:hover:text-red-400 text-xs flex items-center gap-1 transition">
               <Trash2 size={13} /> Clear all
             </button>
           </div>
@@ -165,7 +165,7 @@ export default function PdfMerger() {
           </Button>
 
           {busy && progress && (
-            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500 transition-all duration-300"
                 style={{ width: `${Math.round((progress.current / progress.total) * 100)}%` }}
@@ -176,7 +176,7 @@ export default function PdfMerger() {
           {result && (
             <div className="glass rounded-xl p-4 flex items-center justify-between animate-fade-up">
               <div className="text-sm">
-                <p className="font-medium text-emerald-300">Merged PDF ready</p>
+                <p className="font-medium text-emerald-700 dark:text-emerald-300">Merged PDF ready</p>
                 <p className="text-zinc-500 text-xs">{formatBytes(result.size)}</p>
               </div>
               <a href={result.url} download="merged.pdf">

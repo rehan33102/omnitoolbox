@@ -474,10 +474,10 @@ export default function VoiceoverStudio() {
       <Card className="space-y-6">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-medium text-zinc-300">Your script</p>
-            <p className={`text-xs font-medium ${overLimit ? "text-red-400" : "text-zinc-500"}`}>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Your script</p>
+            <p className={`text-xs font-medium ${overLimit ? "text-red-600 dark:text-red-400" : "text-zinc-500"}`}>
               {text.length.toLocaleString()} / {MAX_CHARS.toLocaleString()}
-              {estMinutes > 0 && <span className="text-brand-300/80"> · ~{estMinutes} min audio</span>}
+              {estMinutes > 0 && <span className="text-brand-700 dark:text-brand-300/80"> · ~{estMinutes} min audio</span>}
             </p>
           </div>
           <Textarea
@@ -490,8 +490,8 @@ export default function VoiceoverStudio() {
         </div>
 
         <div>
-          <label htmlFor="vo-lang" className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
-            <Languages size={15} className="text-brand-400" /> Language
+          <label htmlFor="vo-lang" className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
+            <Languages size={15} className="text-brand-700 dark:text-brand-400" /> Language
           </label>
           <select id="vo-lang" value={lang} onChange={(e) => setLang(e.target.value)} className="input-base w-full">
             <optgroup label="✨ Neural voices (Microsoft · free)">
@@ -511,7 +511,7 @@ export default function VoiceoverStudio() {
           </select>
           <p className="text-xs text-zinc-500 mt-1.5 flex items-center gap-1.5">
             {isEdgeLang ? (
-              <><Sparkles size={12} className="text-brand-400" /> Microsoft neural voice · male/female · styles · free</>
+              <><Sparkles size={12} className="text-brand-700 dark:text-brand-400" /> Microsoft neural voice · male/female · styles · free</>
             ) : (
               <>Basic free voice · MP3 download</>
             )}
@@ -522,8 +522,8 @@ export default function VoiceoverStudio() {
           <>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="vo-evoice" className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
-                  <Mic size={15} className="text-brand-400" /> Voice
+                <label htmlFor="vo-evoice" className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
+                  <Mic size={15} className="text-brand-700 dark:text-brand-400" /> Voice
                 </label>
                 <select id="vo-evoice" value={edgeVoice} onChange={(e) => setEdgeVoice(e.target.value as "male" | "female")} className="input-base w-full">
                   <option value="male">👨 Male</option>
@@ -531,7 +531,7 @@ export default function VoiceoverStudio() {
                 </select>
               </div>
               <div>
-                <label htmlFor="vo-style" className="text-sm font-medium text-zinc-300 mb-2 block">Style</label>
+                <label htmlFor="vo-style" className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">Style</label>
                 <select id="vo-style" value={edgeStyle} onChange={(e) => setEdgeStyle(e.target.value)} className="input-base w-full">
                   {edgeStyles.map((s) => (
                     <option key={s.key} value={s.key}>{s.label}</option>
@@ -544,7 +544,7 @@ export default function VoiceoverStudio() {
               <button
                 type="button"
                 onClick={previewVoice}
-                className="btn-base inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-brand-500/40 bg-brand-500/10 text-sm font-medium text-brand-200 hover:bg-brand-500/20 transition"
+                className="btn-base inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-brand-500/40 bg-brand-500/10 text-sm font-medium text-brand-800 dark:text-brand-200 hover:bg-brand-500/20 transition"
               >
                 {previewing ? <Square size={14} /> : <Play size={14} />}
                 {previewing ? "Playing preview… (tap to stop)" : "🔊 Preview voice"}
@@ -553,11 +553,11 @@ export default function VoiceoverStudio() {
               <audio ref={previewAudioRef} className="hidden" aria-hidden />
             </div>
 
-            <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="space-y-4 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-sm font-medium text-zinc-300">
-                    Speed: <span className="text-brand-300">{useCustomRate ? `${ratePct > 0 ? "+" : ""}${ratePct}%` : "style default"}</span>
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Speed: <span className="text-brand-700 dark:text-brand-300">{useCustomRate ? `${ratePct > 0 ? "+" : ""}${ratePct}%` : "style default"}</span>
                   </p>
                   <label className="flex items-center gap-1.5 text-[11px] text-zinc-500">
                     <input type="checkbox" checked={useCustomRate} onChange={(e) => setUseCustomRate(e.target.checked)} className="accent-brand-500" />
@@ -571,8 +571,8 @@ export default function VoiceoverStudio() {
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-sm font-medium text-zinc-300">
-                    Pitch: <span className="text-brand-300">{useCustomPitch ? `${pitchHz > 0 ? "+" : ""}${pitchHz} Hz` : "style default"}</span>
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Pitch: <span className="text-brand-700 dark:text-brand-300">{useCustomPitch ? `${pitchHz > 0 ? "+" : ""}${pitchHz} Hz` : "style default"}</span>
                   </p>
                   <label className="flex items-center gap-1.5 text-[11px] text-zinc-500">
                     <input type="checkbox" checked={useCustomPitch} onChange={(e) => setUseCustomPitch(e.target.checked)} className="accent-brand-500" />
@@ -586,8 +586,8 @@ export default function VoiceoverStudio() {
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <p className="text-sm font-medium text-zinc-300">
-                    Paragraph pause: <span className="text-brand-300">{useCustomPause ? `${pauseSec.toFixed(1)}s` : "style default"}</span>
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                    Paragraph pause: <span className="text-brand-700 dark:text-brand-300">{useCustomPause ? `${pauseSec.toFixed(1)}s` : "style default"}</span>
                   </p>
                   <label className="flex items-center gap-1.5 text-[11px] text-zinc-500">
                     <input type="checkbox" checked={useCustomPause} onChange={(e) => setUseCustomPause(e.target.checked)} className="accent-brand-500" />
@@ -606,8 +606,8 @@ export default function VoiceoverStudio() {
         {premium && (
           <>
             <div>
-              <label htmlFor="vo-voice" className="text-sm font-medium text-zinc-300 mb-2 flex items-center gap-2">
-                <Mic size={15} className="text-brand-400" /> Voice
+              <label htmlFor="vo-voice" className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
+                <Mic size={15} className="text-brand-700 dark:text-brand-400" /> Voice
               </label>
               <select id="vo-voice" value={voiceId} onChange={(e) => setVoiceId(e.target.value)} className="input-base w-full">
                 <optgroup label="Female">
@@ -624,8 +624,8 @@ export default function VoiceoverStudio() {
               <p className="text-xs text-zinc-500 mt-1.5">Premium natural voices</p>
             </div>
             <div>
-              <p className="text-sm font-medium text-zinc-300 mb-2">
-                Speed: <span className="text-brand-300">{speed.toFixed(2)}×</span>
+              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                Speed: <span className="text-brand-700 dark:text-brand-300">{speed.toFixed(2)}×</span>
               </p>
               <input type="range" min={0.7} max={1.2} step={0.05} value={speed}
                 onChange={(e) => setSpeed(Number(e.target.value))}
@@ -645,20 +645,20 @@ export default function VoiceoverStudio() {
         )}
 
         {generating && (
-          <div className="flex items-center justify-center gap-2 text-sm text-zinc-400" aria-live="polite">
-            <Loader2 size={16} className="animate-spin text-brand-400" />
+          <div className="flex items-center justify-center gap-2 text-sm text-zinc-600 dark:text-zinc-400" aria-live="polite">
+            <Loader2 size={16} className="animate-spin text-brand-700 dark:text-brand-400" />
             {genStep || "Generating voice…"}
           </div>
         )}
 
         {audioUrl && !generating && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-4 space-y-3 animate-fade-up">
+          <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4 space-y-3 animate-fade-up">
             {engine === "edge" || engine === "elevenlabs" ? (
-              <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1">
+              <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1">
                 ✨ {engine === "edge" ? "Neural voice (Microsoft)" : "Premium neural voice (ElevenLabs)"}
               </p>
             ) : engine === "google-fallback" || engine === "google" ? (
-              <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1">
+              <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1">
                 ⚠️ Basic voice — neural was unavailable, try again
               </p>
             ) : null}
@@ -686,37 +686,37 @@ export default function VoiceoverStudio() {
         <Card className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="font-display font-bold flex items-center gap-2">
-              <History size={16} className="text-brand-400" /> Your voiceovers
+              <History size={16} className="text-brand-700 dark:text-brand-400" /> Your voiceovers
             </h3>
-            <button onClick={clearHistory} className="text-xs text-zinc-500 hover:text-red-400 transition">
+            <button onClick={clearHistory} className="text-xs text-zinc-500 hover:text-red-600 dark:hover:text-red-400 transition">
               Clear all
             </button>
           </div>
           <div className="space-y-2">
             {history.map((h) => (
-              <div key={h.id} className="rounded-xl border border-white/10 bg-white/5 p-3 flex items-center gap-3">
+              <div key={h.id} className="rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-3 flex items-center gap-3">
                 <button
                   onClick={() => playHistory(h)}
                   className="grid place-items-center size-9 rounded-full bg-brand-500/20 border border-brand-500/30 shrink-0"
                   aria-label={playingId === h.id ? "Pause" : "Play"}
                 >
-                  {playingId === h.id ? <Square size={14} className="text-brand-300" /> : <Play size={14} className="text-brand-300" />}
+                  {playingId === h.id ? <Square size={14} className="text-brand-700 dark:text-brand-300" /> : <Play size={14} className="text-brand-700 dark:text-brand-300" />}
                 </button>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-zinc-200 truncate">{h.text}</p>
+                  <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{h.text}</p>
                   <p className="text-[11px] text-zinc-500">
                     {h.langLabel}{h.voiceLabel ? ` · ${h.voiceLabel}` : ""} · {new Date(h.createdAt).toLocaleDateString()} · {h.chars.toLocaleString()} chars
                   </p>
                 </div>
-                <button onClick={() => downloadHistory(h)} className="p-2 text-zinc-400 hover:text-brand-300 transition" aria-label="Download MP3">
+                <button onClick={() => downloadHistory(h)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-brand-700 dark:hover:text-brand-300 transition" aria-label="Download MP3">
                   <Download size={15} />
                 </button>
                 {h.srt && (
-                  <button onClick={() => downloadHistorySrt(h)} className="p-2 text-zinc-400 hover:text-brand-300 transition" aria-label="Download SRT">
+                  <button onClick={() => downloadHistorySrt(h)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-brand-700 dark:hover:text-brand-300 transition" aria-label="Download SRT">
                     <FileText size={15} />
                   </button>
                 )}
-                <button onClick={() => deleteHistory(h.id)} className="p-2 text-zinc-400 hover:text-red-400 transition" aria-label="Delete">
+                <button onClick={() => deleteHistory(h.id)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 transition" aria-label="Delete">
                   <Trash2 size={15} />
                 </button>
               </div>

@@ -18,7 +18,7 @@ export default function LibraryPage() {
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           My <span className="text-gradient">Library</span>
         </h1>
-        <p className="text-zinc-400 mt-3">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Everything you&rsquo;ve generated across the tools — voiceovers, QR codes,
           converted images. Stored privately in your browser, never uploaded.
         </p>

@@ -22,7 +22,7 @@ export const useToast = () => useContext(ToastCtx);
 
 let nextId = 0;
 const icons = { success: CheckCircle2, error: AlertCircle, info: Info };
-const iconColor = { success: "text-emerald-400", error: "text-red-400", info: "text-accent-400" };
+const iconColor = { success: "text-emerald-700 dark:text-emerald-400", error: "text-red-600 dark:text-red-400", info: "text-accent-600 dark:text-accent-400" };
 
 /** Wraps the app so every useToast() call actually displays a toast. */
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -73,10 +73,10 @@ function ToastCard({ t, dismiss }: { t: ToastItem; dismiss: (id: number) => void
       <Icon size={20} className={iconColor[t.variant]} />
       <div className="flex-1 text-sm">
         <p className="font-medium">{t.title}</p>
-        {t.description && <p className="text-zinc-400 text-xs mt-0.5">{t.description}</p>}
+        {t.description && <p className="text-zinc-600 dark:text-zinc-400 text-xs mt-0.5">{t.description}</p>}
       </div>
       <button onClick={() => dismiss(t.id)} aria-label="Dismiss notification">
-        <X size={16} className="text-zinc-500 hover:text-white" />
+        <X size={16} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-white" />
       </button>
     </div>
   );

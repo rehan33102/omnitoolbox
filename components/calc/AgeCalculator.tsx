@@ -46,7 +46,7 @@ export default function AgeCalculator() {
 
   const stat = (label: string, value: string) => (
     <div className="glass rounded-xl px-4 py-3 text-center">
-      <p className="font-mono text-xl font-bold text-white">{value}</p>
+      <p className="font-mono text-xl font-bold text-zinc-900 dark:text-white">{value}</p>
       <p className="text-[11px] text-zinc-500 mt-0.5">{label}</p>
     </div>
   );
@@ -55,7 +55,7 @@ export default function AgeCalculator() {
     <div className="grid lg:grid-cols-2 gap-5">
       <Card className="space-y-5">
         <div className="flex items-center gap-2">
-          <CalendarDays size={18} className="text-brand-400" />
+          <CalendarDays size={18} className="text-brand-700 dark:text-brand-400" />
           <h3 className="font-semibold">Date of birth</h3>
         </div>
         <input
@@ -71,14 +71,14 @@ export default function AgeCalculator() {
 
         {calc && (
           <div className="glass rounded-2xl p-5 text-center bg-gradient-to-b from-brand-600/10 to-transparent">
-            <p className="text-xs text-zinc-400 uppercase tracking-widest mb-2">You are</p>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mb-2">You are</p>
             <p className="font-display text-4xl font-extrabold">
               <span className="text-gradient">{calc.years}</span>
-              <span className="text-lg text-zinc-400 font-semibold"> yrs </span>
+              <span className="text-lg text-zinc-600 dark:text-zinc-400 font-semibold"> yrs </span>
               <span className="text-gradient">{calc.months}</span>
-              <span className="text-lg text-zinc-400 font-semibold"> mo </span>
+              <span className="text-lg text-zinc-600 dark:text-zinc-400 font-semibold"> mo </span>
               <span className="text-gradient">{calc.days}</span>
-              <span className="text-lg text-zinc-400 font-semibold"> days</span>
+              <span className="text-lg text-zinc-600 dark:text-zinc-400 font-semibold"> days</span>
             </p>
             <p className="text-xs text-zinc-500 mt-2">Born on a {calc.bornOn} 🎂</p>
           </div>
@@ -88,7 +88,7 @@ export default function AgeCalculator() {
       <div className="space-y-5">
         <Card>
           <div className="flex items-center gap-2 mb-3">
-            <Clock3 size={18} className="text-accent-400" />
+            <Clock3 size={18} className="text-accent-600 dark:text-accent-400" />
             <h3 className="font-semibold">In total</h3>
           </div>
           {calc ? (
@@ -104,7 +104,7 @@ export default function AgeCalculator() {
 
         <Card>
           <div className="flex items-center gap-2 mb-3">
-            <Cake size={18} className="text-brand-400" />
+            <Cake size={18} className="text-brand-700 dark:text-brand-400" />
             <h3 className="font-semibold">Next birthday</h3>
           </div>
           {calc ? (
@@ -114,7 +114,7 @@ export default function AgeCalculator() {
               ) : (
                 <>
                   <p className="font-display text-4xl font-extrabold text-gradient">{calc.daysToBday}</p>
-                  <p className="text-sm text-zinc-400 mt-1">days until you turn {calc.turning}</p>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">days until you turn {calc.turning}</p>
                 </>
               )}
               <p className="text-xs text-zinc-500 mt-2">

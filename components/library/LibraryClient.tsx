@@ -138,12 +138,12 @@ function GroupSection({ group, onCount }: { group: GroupDef; onCount?: (kind: st
     <Card className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-display font-bold flex items-center gap-2">
-          <Icon size={17} className="text-brand-400" />
+          <Icon size={17} className="text-brand-700 dark:text-brand-400" />
           {group.title}
           <span className="text-xs font-normal text-zinc-500">({items.length})</span>
         </h3>
         {items.length > 0 && (
-          <button onClick={clearAll} className="text-xs text-zinc-500 hover:text-red-400 transition">
+          <button onClick={clearAll} className="text-xs text-zinc-500 hover:text-red-600 dark:hover:text-red-400 transition">
             Clear all
           </button>
         )}
@@ -157,14 +157,14 @@ function GroupSection({ group, onCount }: { group: GroupDef; onCount?: (kind: st
         <div className="text-center py-8 text-zinc-500">
           <FolderOpen size={30} className="mx-auto mb-2 text-zinc-600" />
           <p className="text-sm">Nothing saved yet</p>
-          <Link href={group.toolHref} className="text-xs text-brand-400 hover:text-brand-300 mt-1 inline-block">
+          <Link href={group.toolHref} className="text-xs text-brand-700 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 mt-1 inline-block">
             {group.toolLabel} →
           </Link>
         </div>
       ) : (
         <div className="space-y-2">
           {items.map((it) => (
-            <div key={it.id} className="rounded-xl border border-white/10 bg-white/5 p-3 flex items-center gap-3">
+            <div key={it.id} className="rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-3 flex items-center gap-3">
               {group.audio ? (
                 <button
                   onClick={() => togglePlay(it)}
@@ -172,27 +172,27 @@ function GroupSection({ group, onCount }: { group: GroupDef; onCount?: (kind: st
                   aria-label={playingId === it.id ? "Pause" : "Play"}
                 >
                   {playingId === it.id
-                    ? <Square size={14} className="text-brand-300" />
-                    : <Play size={14} className="text-brand-300" />}
+                    ? <Square size={14} className="text-brand-700 dark:text-brand-300" />
+                    : <Play size={14} className="text-brand-700 dark:text-brand-300" />}
                 </button>
               ) : group.thumb && thumbs[it.id] ? (
-                <img src={thumbs[it.id]} alt="" className="size-11 rounded-lg object-cover shrink-0 border border-white/10" />
+                <img src={thumbs[it.id]} alt="" className="size-11 rounded-lg object-cover shrink-0 border border-black/10 dark:border-white/10" />
               ) : (
-                <span className="grid place-items-center size-9 rounded-xl bg-white/5 border border-white/10 shrink-0">
-                  <Icon size={16} className="text-zinc-400" />
+                <span className="grid place-items-center size-9 rounded-xl bg-black/[0.03] dark:bg-white/5 border border-black/10 dark:border-white/10 shrink-0">
+                  <Icon size={16} className="text-zinc-600 dark:text-zinc-400" />
                 </span>
               )}
               <div className="flex-1 min-w-0">
-                <p className="text-sm text-zinc-200 truncate">{it.name || it.id}</p>
+                <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{it.name || it.id}</p>
                 <p className="text-[11px] text-zinc-500">
                   {new Date(it.createdAt).toLocaleDateString()} · {new Date(it.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                   {it.meta && typeof it.meta.text === "string" ? ` · ${it.meta.text}` : ""}
                 </p>
               </div>
-              <button onClick={() => download(it)} className="p-2 text-zinc-400 hover:text-brand-300 transition" aria-label="Download">
+              <button onClick={() => download(it)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-brand-700 dark:hover:text-brand-300 transition" aria-label="Download">
                 <Download size={15} />
               </button>
-              <button onClick={() => remove(it)} className="p-2 text-zinc-400 hover:text-red-400 transition" aria-label="Delete">
+              <button onClick={() => remove(it)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 transition" aria-label="Delete">
                 <Trash2 size={15} />
               </button>
             </div>
@@ -245,9 +245,9 @@ export default function LibraryClient() {
         ))}
 
       {loaded && total === 0 && (
-        <div className="rounded-2xl border border-dashed border-white/15 p-8 text-center">
-          <Sparkles size={26} className="mx-auto mb-3 text-brand-400" />
-          <p className="text-sm text-zinc-300 font-medium">Your library fills up as you create</p>
+        <div className="rounded-2xl border border-dashed border-black/15 dark:border-white/15 p-8 text-center">
+          <Sparkles size={26} className="mx-auto mb-3 text-brand-700 dark:text-brand-400" />
+          <p className="text-sm text-zinc-700 dark:text-zinc-300 font-medium">Your library fills up as you create</p>
           <p className="text-xs text-zinc-500 mt-1 mb-4">
             Generate a voiceover, a QR code, or convert an image — it lands here automatically.
           </p>

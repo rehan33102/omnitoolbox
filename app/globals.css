@@ -38,7 +38,7 @@
   }
   /* Magazine-style eyebrow label */
   .eyebrow {
-    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-ember-400;
+    @apply inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.3em] text-ember-600 dark:text-ember-400;
   }
   .eyebrow::before {
     content: "";
@@ -78,6 +78,13 @@
 
 /* Long grids: let the browser skip off-screen rows entirely (all screens) */
 .cv-auto { content-visibility: auto; contain-intrinsic-size: auto 320px; }
+
+/* Theme toggle: twinkling stars for night mode */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+.animate-twinkle { animation: twinkle 2.6s ease-in-out infinite; }
 
 /*
  * PREMIUM SCROLL-REVEAL SYSTEM (GPU-friendly: transform + opacity only)

@@ -146,7 +146,7 @@ export default function QrGenerator() {
 
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-sm font-medium text-zinc-300">Size</span>
+            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Size</span>
             <span className="text-xs text-zinc-500">{size} × {size} px</span>
           </div>
           <input
@@ -163,7 +163,7 @@ export default function QrGenerator() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <span className="block text-sm font-medium mb-1.5 text-zinc-300">Foreground</span>
+            <span className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">Foreground</span>
             <label className="flex items-center gap-2 glass rounded-xl p-2 cursor-pointer">
               <input
                 type="color"
@@ -172,11 +172,11 @@ export default function QrGenerator() {
                 className="w-9 h-9 rounded-lg cursor-pointer bg-transparent border-0 p-0"
                 aria-label="QR foreground color"
               />
-              <span className="text-xs font-mono text-zinc-400 uppercase">{fg}</span>
+              <span className="text-xs font-mono text-zinc-600 dark:text-zinc-400 uppercase">{fg}</span>
             </label>
           </div>
           <div>
-            <span className="block text-sm font-medium mb-1.5 text-zinc-300">Background</span>
+            <span className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">Background</span>
             <label className="flex items-center gap-2 glass rounded-xl p-2 cursor-pointer">
               <input
                 type="color"
@@ -185,13 +185,13 @@ export default function QrGenerator() {
                 className="w-9 h-9 rounded-lg cursor-pointer bg-transparent border-0 p-0"
                 aria-label="QR background color"
               />
-              <span className="text-xs font-mono text-zinc-400 uppercase">{bg}</span>
+              <span className="text-xs font-mono text-zinc-600 dark:text-zinc-400 uppercase">{bg}</span>
             </label>
           </div>
         </div>
 
         <div>
-          <span className="block text-sm font-medium mb-1.5 text-zinc-300">Error correction</span>
+          <span className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">Error correction</span>
           <div className="grid grid-cols-4 gap-2">
             {EC_OPTIONS.map((o) => (
               <button
@@ -200,8 +200,8 @@ export default function QrGenerator() {
                 onClick={() => setEc(o.value)}
                 className={`rounded-xl px-2 py-2.5 text-xs font-medium border transition ${
                   ec === o.value
-                    ? "bg-brand-600/25 border-brand-500/60 text-white"
-                    : "glass text-zinc-400 hover:text-white border-transparent"
+                    ? "bg-brand-600/25 border-brand-500/60 text-zinc-900 dark:text-white"
+                    : "glass text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white border-transparent"
                 }`}
               >
                 {o.label}
@@ -214,15 +214,15 @@ export default function QrGenerator() {
 
       <Card className="flex flex-col">
         <div className="flex items-center gap-2 mb-4">
-          <QrCode size={18} className="text-brand-400" />
+          <QrCode size={18} className="text-brand-700 dark:text-brand-400" />
           <h3 className="font-semibold">Live preview</h3>
           {busy && <span className="text-xs text-zinc-500 ml-auto animate-pulse">Rendering…</span>}
           {!busy && savedNote && dataUrl && (
-            <span className="text-xs text-emerald-400 ml-auto">Saved to Library ✓</span>
+            <span className="text-xs text-emerald-700 dark:text-emerald-400 ml-auto">Saved to Library ✓</span>
           )}
         </div>
 
-        <div className="flex-1 grid place-items-center rounded-2xl bg-white/[0.03] border border-white/10 p-6 min-h-[280px]">
+        <div className="flex-1 grid place-items-center rounded-2xl bg-white/[0.03] border border-black/10 dark:border-white/10 p-6 min-h-[280px]">
           {dataUrl ? (
             <img src={dataUrl} alt="Generated QR code" className="rounded-xl max-w-full h-auto" style={{ width: Math.min(size, 320) }} />
           ) : (

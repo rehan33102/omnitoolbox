@@ -9,6 +9,10 @@ export interface Tool {
   category: ToolCategory;
   href: string;
   icon: string;
+  /** Optional custom image URL (set from /admin/tools) shown on the card. */
+  image?: string;
+  /** Search aliases — user-style phrases that should surface this tool. */
+  keywords: string[];
   badge?: "new" | "popular" | "pro";
   enabled: boolean;
   sortOrder: number;

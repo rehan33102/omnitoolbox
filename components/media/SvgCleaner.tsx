@@ -47,9 +47,9 @@ export default function SvgCleaner() {
       {output && (
         <div className="space-y-3 animate-fade-up">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-zinc-400">
+            <span className="text-zinc-600 dark:text-zinc-400">
               {formatBytes(input.length)} → {formatBytes(output.length)}
-              <span className="text-emerald-300 font-medium ml-2">{saved}% smaller</span>
+              <span className="text-emerald-700 dark:text-emerald-300 font-medium ml-2">{saved}% smaller</span>
             </span>
             <Button size="sm" variant="secondary" onClick={() => copy(output, "Clean SVG copied")}>
               {copied ? <Check size={14} /> : <Copy size={14} />}

@@ -10,15 +10,28 @@ import Modal from "@/components/ui/Modal";
 import { Input, Textarea } from "@/components/ui/Input";
 import Skeleton from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
+import {
+  getToolOverrides,
+  saveToolOverride,
+  type ToolOverride,
+} from "@/lib/tool-overrides";
 import type { Tool, ToolCategory } from "@/types";
 
 const emptyForm = {
   slug: "", title: "", tagline: "", description: "",
   category: "ai" as ToolCategory, href: "", icon: "Wand2",
-  badge: "", sortOrder: 99, enabled: true,
+  badge: "", image: "", sortOrder: 99, enabled: true,
 };
 
 type ToolForm = typeof emptyForm;
+
+/** Merge API tools with local overrides (overrides win per-field). */
+function mergeWithOverrides(tools: Tool[], overrides: Record<string, ToolOverride>): Tool[] {
+  return tools.map((t) => {
+    const o = overrides[t.slug];
+    return o ? ({ ...t, ...o, slug: t.slug } as Tool) : t;
+  });
+}
 
 export default function AdminToolsPage() {
   const [tools, setTools] = useState<Tool[]>([]);
@@ -32,7 +45,9 @@ export default function AdminToolsPage() {
     try {
       const res = await fetch("/api/admin/tools");
       const json = await res.json();
-      setTools(json.tools ?? []);
+      const apiTools: Tool[] = json.tools ?? [];
+      const overrides = await getToolOverrides();
+      setTools(mergeWithOverrides(apiTools, overrides));
     } finally {
       setLoading(false);
     }
@@ -41,6 +56,8 @@ export default function AdminToolsPage() {
 
   const toggle = async (slug: string, enabled: boolean) => {
     setTools((ts) => ts.map((t) => (t.slug === slug ? { ...t, enabled } : t)));
+    // Local override so the homepage hides/shows the tool instantly.
+    saveToolOverride(slug, { slug, enabled, updatedAt: new Date().toISOString() }).catch(() => {});
     const res = await fetch("/api/admin/tools", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -58,7 +75,7 @@ export default function AdminToolsPage() {
       form: {
         slug: t.slug, title: t.title, tagline: t.tagline, description: t.description,
         category: t.category, href: t.href, icon: t.icon,
-        badge: t.badge ?? "", sortOrder: t.sortOrder, enabled: t.enabled,
+        badge: t.badge ?? "", image: t.image ?? "", sortOrder: t.sortOrder, enabled: t.enabled,
       },
     });
 
@@ -74,6 +91,22 @@ export default function AdminToolsPage() {
         body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
+      // Persist to IndexedDB + localStorage so the change shows on the site instantly,
+      // even before the server cache refreshes.
+      await saveToolOverride(form.slug, {
+        slug: form.slug,
+        title: form.title,
+        tagline: form.tagline,
+        description: form.description,
+        category: form.category,
+        href: form.href,
+        icon: form.icon,
+        badge: (form.badge || undefined) as Tool["badge"],
+        image: form.image.trim() || undefined,
+        enabled: form.enabled,
+        sortOrder: Number(form.sortOrder),
+        updatedAt: new Date().toISOString(),
+      });
       toast({ title: mode === "add" ? "Tool added" : "Tool updated", variant: "success" });
       setModal(null);
       load();
@@ -100,7 +133,7 @@ export default function AdminToolsPage() {
         {loading ? (
           <div className="p-4 space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-14" />)}</div>
         ) : (
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-black/5 dark:divide-white/5">
             {tools.map((t) => (
               <div key={t.slug} className="flex items-center gap-4 p-4">
                 <div className="flex-1 min-w-0">
@@ -113,8 +146,8 @@ export default function AdminToolsPage() {
                 </div>
                 <span className="text-xs text-zinc-500 font-mono hidden sm:block">#{t.sortOrder}</span>
                 <button onClick={() => openEdit(t)} aria-label={`Edit ${t.title}`}
-                  className="p-2 rounded-lg hover:bg-white/10 transition">
-                  <Pencil size={15} className="text-zinc-400" />
+                  className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition">
+                  <Pencil size={15} className="text-zinc-600 dark:text-zinc-400" />
                 </button>
                 <Switch checked={t.enabled} onChange={(v) => toggle(t.slug, v)} label={`Toggle ${t.title}`} />
               </div>
@@ -136,11 +169,12 @@ export default function AdminToolsPage() {
             <Input label="Title" value={modal.form.title} onChange={(e) => set("title", e.target.value)} />
             <Input label="Tagline" value={modal.form.tagline} onChange={(e) => set("tagline", e.target.value)} />
             <Input label="Link (href)" value={modal.form.href} onChange={(e) => set("href", e.target.value)} hint="/media-tools#qr" />
+            <Input label="Image URL" value={modal.form.image} onChange={(e) => set("image", e.target.value)} hint="Card cover image (optional)" inputMode="url" />
             <div className="sm:col-span-2">
               <Textarea label="Description" value={modal.form.description} onChange={(e) => set("description", e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-zinc-300">Category</label>
+              <label className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">Category</label>
               <select value={modal.form.category} onChange={(e) => set("category", e.target.value as ToolCategory)}
                 className="input-base">
                 {(["ai", "image", "social", "web", "text"] as ToolCategory[]).map((c) => (
@@ -153,7 +187,7 @@ export default function AdminToolsPage() {
               onChange={(e) => set("sortOrder", Number(e.target.value))} />
             <div className="flex items-center gap-3">
               <Switch checked={modal.form.enabled} onChange={(v) => set("enabled", v)} label="Enabled" />
-              <span className="text-sm text-zinc-400">Enabled</span>
+              <span className="text-sm text-zinc-600 dark:text-zinc-400">Enabled</span>
             </div>
             <div className="sm:col-span-2 flex justify-end gap-2 mt-2">
               <Button variant="ghost" onClick={() => setModal(null)}>Cancel</Button>

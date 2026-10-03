@@ -31,13 +31,13 @@ export default function PdfToolsPage() {
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           PDF <span className="text-gradient">Tools</span>
         </h1>
-        <p className="text-zinc-400 mt-3">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Professional PDF utilities that run entirely in your browser.
           Zero uploads, zero lag, zero cost.
         </p>
       </div>
 
-      <div className="relative rounded-2xl overflow-hidden mb-8 border border-white/10">
+      <div className="relative rounded-2xl overflow-hidden mb-8 border border-black/10 dark:border-white/10">
         <Image
           src="/images/pdf-tools-hero.webp"
           alt="Merge, split and convert PDF files — free online PDF tools"

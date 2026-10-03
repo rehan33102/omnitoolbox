@@ -35,13 +35,13 @@ export default function CalculatorsPage() {
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           Everyday <span className="text-gradient">Calculators</span>
         </h1>
-        <p className="text-zinc-400 mt-3">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Live currency rates, instant unit conversions, BMI & calorie targets,
           and exact age breakdowns — all calculated right in your browser.
         </p>
       </div>
 
-      <div className="relative rounded-2xl overflow-hidden mb-8 border border-white/10">
+      <div className="relative rounded-2xl overflow-hidden mb-8 border border-black/10 dark:border-white/10">
         <Image
           src="/images/web-tools-hero.webp"
           alt="Free online calculators — currency, unit, BMI and age"

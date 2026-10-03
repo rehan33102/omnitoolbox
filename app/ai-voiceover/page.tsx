@@ -33,18 +33,18 @@ export default function AIVoiceoverPage() {
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           AI Voiceover <span className="text-gradient">Studio</span>
         </h1>
-        <p className="text-zinc-400 mt-3">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Free text-to-speech in 38 languages — generate real MP3 audio, download it, and keep your history. No signup.
         </p>
         <Link
           href="/spotlight/voiceover"
-          className="mt-4 inline-flex items-center gap-2 rounded-full border border-ember-500/40 bg-ember-500/10 px-4 py-2 text-sm font-medium text-ember-200 hover:bg-ember-500/20 transition"
+          className="mt-4 inline-flex items-center gap-2 rounded-full border border-ember-500/40 bg-ember-500/10 px-4 py-2 text-sm font-medium text-ember-700 dark:text-ember-200 hover:bg-ember-500/20 transition"
         >
           <Sparkles size={15} /> ✨ View premium showcase <ArrowRight size={15} />
         </Link>
       </div>
 
-      <div className="relative rounded-2xl overflow-hidden mb-8 border border-white/10 max-w-3xl">
+      <div className="relative rounded-2xl overflow-hidden mb-8 border border-black/10 dark:border-white/10 max-w-3xl">
         <Image
           src="/images/voiceover-hero.webp"
           alt="AI voiceover studio — turn text into natural speech online free"

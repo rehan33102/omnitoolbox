@@ -349,3 +349,112 @@ export async function listRecords<T = unknown>(kind: string): Promise<RecordEntr
   out.sort((a, b) => b.createdAt - a.createdAt);
   return out;
 }
+
+/* ---------------- Named records (settings, overrides, admin blog) ----------------
+ * Small JSON documents addressed by (kind, id) with a localStorage mirror so
+ * admin changes survive and apply instantly even if IndexedDB is blocked.
+ * Never throws.
+ */
+
+const LS_NAMED_PREFIX = "otb:named:";
+
+function lsNamedKey(kind: string, id: string): string {
+  return `${LS_NAMED_PREFIX}${kind}:${id}`;
+}
+
+/** Persist a named JSON record. Writes IDB (records store) + localStorage backup. */
+export async function saveNamedRecord<T>(kind: string, id: string, data: T): Promise<void> {
+  try {
+    localStorage.setItem(lsNamedKey(kind, id), JSON.stringify({ id, kind, data, createdAt: Date.now() }));
+  } catch {
+    /* storage unavailable — IDB may still work */
+  }
+  if (!idbAvailable()) return;
+  try {
+    const entry: RecordEntry<T> = { id, kind, data, createdAt: Date.now() };
+    await run<unknown>("records", "readwrite", (s) => s.put(entry));
+  } catch {
+    /* IDB write failed — localStorage backup already written */
+  }
+}
+
+/** Read a named JSON record. Checks IDB first, then localStorage. Never throws. */
+export async function getNamedRecord<T>(kind: string, id: string): Promise<T | null> {
+  if (idbAvailable()) {
+    try {
+      const row = await run<RecordEntry<T> | undefined>("records", "readonly", (s) => s.get(id));
+      if (row && row.kind === kind) return row.data;
+    } catch {
+      /* fall through to localStorage */
+    }
+  }
+  try {
+    const raw = localStorage.getItem(lsNamedKey(kind, id));
+    if (raw) return (JSON.parse(raw) as RecordEntry<T>).data;
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+/** Delete a named JSON record from IDB + localStorage. Never throws. */
+export async function deleteNamedRecord(kind: string, id: string): Promise<void> {
+  try {
+    localStorage.removeItem(lsNamedKey(kind, id));
+  } catch {
+    /* ignore */
+  }
+  if (!idbAvailable()) return;
+  try {
+    await run<unknown>("records", "readwrite", (s) => s.delete(id));
+  } catch {
+    /* no-op */
+  }
+}
+
+/** All named records of one kind (IDB + localStorage mirrors merged). Never throws. */
+export async function listNamedRecords<T>(kind: string): Promise<RecordEntry<T>[]> {
+  const map = new Map<string, RecordEntry<T>>();
+  if (idbAvailable()) {
+    try {
+      const db = await openDb();
+      await new Promise<void>((resolve, reject) => {
+        const t = db.transaction("records", "readonly");
+        const cursorReq = t.objectStore("records").openCursor();
+        cursorReq.onsuccess = () => {
+          const c = cursorReq.result;
+          if (!c) {
+            resolve();
+            return;
+          }
+          const row = c.value as RecordEntry<T>;
+          if (row.kind === kind && !map.has(row.id)) map.set(row.id, row);
+          c.continue();
+        };
+        cursorReq.onerror = () => reject(cursorReq.error);
+      });
+    } catch {
+      /* fall through */
+    }
+  }
+  try {
+    const prefix = `${LS_NAMED_PREFIX}${kind}:`;
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(prefix)) {
+        const raw = localStorage.getItem(k);
+        if (raw) {
+          try {
+            const entry = JSON.parse(raw) as RecordEntry<T>;
+            if (!map.has(entry.id)) map.set(entry.id, entry);
+          } catch {
+            /* skip corrupt entry */
+          }
+        }
+      }
+    }
+  } catch {
+    /* ignore */
+  }
+  return [...map.values()].sort((a, b) => b.createdAt - a.createdAt);
+}

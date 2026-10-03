@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -62,7 +63,7 @@ export const CATEGORY_STYLE: Record<
     dots: "rgba(252,211,77,0.5)",
     tile: "bg-amber-500/20 border-amber-400/30 shadow-[0_0_24px_rgba(245,158,11,0.35)]",
     icon: "text-amber-200",
-    chip: "text-amber-300 border-amber-500/30 bg-amber-500/10",
+    chip: "text-amber-700 dark:text-amber-300 border-amber-500/30 bg-amber-500/10",
     chipDot: "bg-amber-400",
   },
   text: {
@@ -102,19 +103,36 @@ export default function ToolCard({ tool }: { tool: Tool }) {
           "transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
         )}
       >
-        {/* Visual band header */}
-        <div className={cn("relative h-32 shrink-0 bg-gradient-to-br", s.band)} aria-hidden>
-          {/* dot texture */}
-          <div
-            className="absolute inset-0 opacity-25"
-            style={{
-              backgroundImage: `radial-gradient(${s.dots} 1px, transparent 1.5px)`,
-              backgroundSize: "18px 18px",
-              maskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
-              WebkitMaskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
-            }}
-          />
-          {/* big glowing icon, centered-left */}
+        {/* Visual band header — AI image when set, else the category gradient + icon tile */}
+        <div className="relative h-32 shrink-0 bg-zinc-900" aria-hidden>
+          {tool.image ? (
+            <>
+              <Image
+                src={tool.image}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className="object-cover transition-transform duration-500 group-hover:scale-[1.06]"
+              />
+              {/* contrast wash so the icon tile + badge stay legible */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/25" />
+            </>
+          ) : (
+            <>
+              <div className={cn("absolute inset-0 bg-gradient-to-br", s.band)} />
+              {/* dot texture */}
+              <div
+                className="absolute inset-0 opacity-25"
+                style={{
+                  backgroundImage: `radial-gradient(${s.dots} 1px, transparent 1.5px)`,
+                  backgroundSize: "18px 18px",
+                  maskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
+                  WebkitMaskImage: "linear-gradient(to bottom, black 30%, transparent 100%)",
+                }}
+              />
+            </>
+          )}
+          {/* big glowing icon, centered — floats above the image too */}
           <div className="absolute inset-0 flex items-center justify-center">
             <span
               className={cn(
@@ -133,17 +151,17 @@ export default function ToolCard({ tool }: { tool: Tool }) {
             </div>
           )}
           {/* open arrow top-left, appears on hover */}
-          <span className="absolute top-3 left-3 grid size-8 place-items-center rounded-full bg-black/30 border border-white/10 text-white/70 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+          <span className="absolute top-3 left-3 grid size-8 place-items-center rounded-full bg-black/30 border border-black/10 dark:border-white/10 text-white/70 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
             <ArrowUpRight size={15} />
           </span>
         </div>
 
         {/* Body */}
         <div className="flex-1 flex flex-col p-5 pt-4">
-          <h3 className="font-display text-lg font-bold tracking-tight leading-snug group-hover:text-white transition-colors">
+          <h3 className="font-display text-lg font-bold tracking-tight leading-snug group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
             {tool.title}
           </h3>
-          <p className="text-sm text-zinc-400 line-clamp-2 leading-relaxed mt-1.5">{tool.tagline}</p>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 leading-relaxed mt-1.5">{tool.tagline}</p>
 
           {/* Footer row */}
           <div className="mt-auto pt-4 flex items-center justify-between">
@@ -151,7 +169,7 @@ export default function ToolCard({ tool }: { tool: Tool }) {
               <span className={cn("size-1.5 rounded-full", s.chipDot)} />
               {s.label}
             </span>
-            <span className="inline-flex items-center gap-1 text-xs font-medium text-zinc-500 group-hover:text-white group-hover:gap-2 transition-all">
+            <span className="inline-flex items-center gap-1 text-xs font-medium text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white group-hover:gap-2 transition-all">
               Open <ArrowRight size={14} />
             </span>
           </div>

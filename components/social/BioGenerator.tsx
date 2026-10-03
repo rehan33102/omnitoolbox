@@ -62,13 +62,13 @@ export default function BioGenerator() {
       <div className="grid sm:grid-cols-3 gap-3">
         <Input label="Name / handle" placeholder="yourname" value={name} onChange={(e) => setName(e.target.value)} />
         <div>
-          <label className="block text-sm font-medium mb-1.5 text-zinc-300">Niche</label>
+          <label className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">Niche</label>
           <select value={niche} onChange={(e) => setNiche(e.target.value as (typeof NICHES)[number])} className="input-base">
             {NICHES.map((x) => <option key={x} value={x}>{x}</option>)}
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1.5 text-zinc-300">Vibe</label>
+          <label className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">Vibe</label>
           <select value={vibe} onChange={(e) => setVibe(e.target.value as (typeof VIBES)[number])} className="input-base">
             {VIBES.map((x) => <option key={x} value={x}>{x}</option>)}
           </select>
@@ -82,7 +82,7 @@ export default function BioGenerator() {
           <div key={i} className={cn("glass rounded-xl p-4 flex flex-col", copiedIdx === i && "ring-2 ring-emerald-500/50")}>
             <pre className="whitespace-pre-wrap font-sans text-sm flex-1">{bio}</pre>
             <div className="flex items-center justify-between mt-3">
-              <span className={cn("text-xs", bio.length > 150 ? "text-red-400" : "text-zinc-500")}>
+              <span className={cn("text-xs", bio.length > 150 ? "text-red-600 dark:text-red-400" : "text-zinc-500")}>
                 {bio.length}/150
               </span>
               <button
@@ -90,7 +90,7 @@ export default function BioGenerator() {
                 className="p-2 rounded-lg bg-brand-600/20 hover:bg-brand-600/40 border border-brand-500/30 transition"
                 aria-label="Copy bio"
               >
-                {copiedIdx === i ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} />}
+                {copiedIdx === i ? <Check size={14} className="text-emerald-700 dark:text-emerald-400" /> : <Copy size={14} />}
               </button>
             </div>
           </div>

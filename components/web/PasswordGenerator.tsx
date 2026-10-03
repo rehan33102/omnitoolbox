@@ -45,17 +45,17 @@ function Toggle({ label, sample, checked, onChange }: { label: string; sample: s
       onClick={() => onChange(!checked)}
       className={cn(
         "flex items-center justify-between gap-3 rounded-xl px-3.5 py-3 border text-left transition w-full",
-        checked ? "bg-brand-600/15 border-brand-500/50" : "glass border-transparent hover:border-white/15"
+        checked ? "bg-brand-600/15 border-brand-500/50" : "glass border-transparent hover:border-black/15 dark:border-white/15"
       )}
     >
       <span>
-        <span className={cn("block text-sm font-medium", checked ? "text-white" : "text-zinc-300")}>{label}</span>
+        <span className={cn("block text-sm font-medium", checked ? "text-zinc-900 dark:text-white" : "text-zinc-700 dark:text-zinc-300")}>{label}</span>
         <span className="block text-xs font-mono text-zinc-500">{sample}</span>
       </span>
       <span
         className={cn(
           "relative w-10 h-6 rounded-full transition shrink-0",
-          checked ? "bg-brand-500" : "bg-white/10"
+          checked ? "bg-brand-500" : "bg-black/5 dark:bg-white/10"
         )}
       >
         <span
@@ -71,7 +71,7 @@ function Toggle({ label, sample, checked, onChange }: { label: string; sample: s
 
 function strengthOf(bits: number): { label: string; color: string; bar: string } {
   if (bits < 50) return { label: "Weak", color: "text-red-400", bar: "bg-red-500" };
-  if (bits < 80) return { label: "Fair", color: "text-amber-400", bar: "bg-amber-500" };
+  if (bits < 80) return { label: "Fair", color: "text-amber-700 dark:text-amber-400", bar: "bg-amber-500" };
   if (bits < 110) return { label: "Strong", color: "text-emerald-400", bar: "bg-emerald-500" };
   return { label: "Elite", color: "text-fuchsia-400", bar: "bg-fuchsia-500" };
 }
@@ -127,7 +127,7 @@ export default function PasswordGenerator() {
       <Card className="space-y-5">
         <div>
           <div className="flex items-center justify-between mb-1.5">
-            <span className="text-sm font-medium text-zinc-300">Length</span>
+            <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Length</span>
             <span className="text-xs font-mono text-zinc-500">{length} characters</span>
           </div>
           <input
@@ -166,7 +166,7 @@ export default function PasswordGenerator() {
       <div className="space-y-5">
         <Card>
           <div className="flex items-center gap-2 mb-3">
-            <KeyRound size={18} className="text-brand-400" />
+            <KeyRound size={18} className="text-brand-700 dark:text-brand-400" />
             <h3 className="font-semibold">Your password</h3>
           </div>
 
@@ -190,7 +190,7 @@ export default function PasswordGenerator() {
               <span className={cn("font-semibold uppercase tracking-widest", strength.color)}>{strength.label}</span>
               <span className="text-zinc-500 font-mono">{Math.round(bits)} bits of entropy</span>
             </div>
-            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
               <div
                 className={cn("h-full rounded-full transition-all duration-500", strength.bar)}
                 style={{ width: `${Math.min(100, Math.round((bits / 128) * 100))}%` }}
@@ -205,12 +205,12 @@ export default function PasswordGenerator() {
         <Card>
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Dices size={18} className="text-accent-400" />
+              <Dices size={18} className="text-accent-600 dark:text-accent-400" />
               <h3 className="font-semibold">Bulk — pick your favorite</h3>
             </div>
             <button
               onClick={regenerate}
-              className="text-xs text-zinc-400 hover:text-white flex items-center gap-1 transition"
+              className="text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white flex items-center gap-1 transition"
             >
               <RefreshCw size={13} /> Reroll all
             </button>
@@ -222,9 +222,9 @@ export default function PasswordGenerator() {
                 <button
                   onClick={() => copyBulk(pw, i)}
                   aria-label={`Copy password ${i + 1}`}
-                  className="p-2 rounded-lg hover:bg-white/10 transition shrink-0"
+                  className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition shrink-0"
                 >
-                  {copiedBulk === i ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} className="text-zinc-400" />}
+                  {copiedBulk === i ? <Check size={15} className="text-emerald-700 dark:text-emerald-400" /> : <Copy size={15} className="text-zinc-600 dark:text-zinc-400" />}
                 </button>
               </div>
             ))}

@@ -40,7 +40,7 @@ export default function FancyTextStylator() {
                 aria-label={`Copy ${s.label} style`}
                 className="p-2.5 rounded-lg bg-brand-600/20 hover:bg-brand-600/40 border border-brand-500/30 transition shrink-0"
               >
-                {copiedId === s.id ? <Check size={15} className="text-emerald-400" /> : <Copy size={15} />}
+                {copiedId === s.id ? <Check size={15} className="text-emerald-700 dark:text-emerald-400" /> : <Copy size={15} />}
               </button>
             </div>
           );

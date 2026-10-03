@@ -1,10 +1,10 @@
-import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Calendar, Clock } from "lucide-react";
 import { buildMetadata, articleJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
 import ArticleBody from "@/components/blog/ArticleBody";
 import ArticleCard from "@/components/blog/ArticleCard";
+import AdminArticleFallback from "@/components/blog/AdminArticleFallback";
 import DynamicAdSlot from "@/components/layout/DynamicAdSlot";
 import Badge from "@/components/ui/Badge";
 import { getPost, getPosts } from "@/lib/blog";
@@ -30,7 +30,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
 
 export default async function ArticlePage({ params }: { params: { slug: string } }) {
   const post = await getPost(params.slug);
-  if (!post) notFound();
+  // Admin-created posts live in IndexedDB/localStorage — render client-side.
+  if (!post) return <AdminArticleFallback slug={params.slug} />;
 
   const all = await getPosts();
   const related = all.filter((p) => p.slug !== post.slug).slice(0, 3);
@@ -47,7 +48,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       ]} />
 
       <div className="max-w-3xl mx-auto">
-        <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-white mb-6 transition">
+        <Link href="/blog" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-white mb-6 transition">
           <ArrowLeft size={15} /> All articles
         </Link>
 
@@ -57,8 +58,8 @@ export default async function ArticlePage({ params }: { params: { slug: string }
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight leading-tight">
           {post.title}
         </h1>
-        <p className="text-zinc-400 mt-3 text-lg">{post.excerpt}</p>
-        <div className="flex items-center gap-4 text-xs text-zinc-500 mt-4 pb-6 border-b border-white/10">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-3 text-lg">{post.excerpt}</p>
+        <div className="flex items-center gap-4 text-xs text-zinc-500 mt-4 pb-6 border-b border-black/10 dark:border-white/10">
           <span className="flex items-center gap-1.5">
             <Calendar size={13} />
             {new Date(post.publishedAt ?? post.updatedAt).toLocaleDateString("en", { year: "numeric", month: "long", day: "numeric" })}

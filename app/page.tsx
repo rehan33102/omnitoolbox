@@ -67,11 +67,11 @@ export default async function HomePage() {
           {FEATURES.map((f, i) => (
             <Reveal key={f.title} delay={i * 90} variant="scale">
               <Card className="h-full glow-card relative group">
-                <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-ember-500/20 to-magent-500/15 border border-white/10 mb-4">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br from-ember-500/20 to-magent-500/15 border border-black/10 dark:border-white/10 mb-4">
                   <f.icon size={20} className="text-ember-300" />
                 </span>
                 <h3 className="font-display font-semibold mb-1.5 tracking-tight">{f.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{f.text}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{f.text}</p>
               </Card>
             </Reveal>
           ))}
@@ -90,7 +90,7 @@ export default async function HomePage() {
             <Reveal key={f.question} delay={Math.min(i * 70, 280)}>
               <Card className="glow-card relative">
                 <h3 className="font-display font-semibold mb-1.5 tracking-tight">{f.question}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{f.answer}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{f.answer}</p>
               </Card>
             </Reveal>
           ))}

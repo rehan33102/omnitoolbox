@@ -14,12 +14,12 @@ export default function ArticleCard({ post }: { post: BlogPost }) {
           ))}
         </div>
         <h3 className="font-display font-semibold text-lg leading-snug mb-2">{post.title}</h3>
-        <p className="text-sm text-zinc-400 line-clamp-2 flex-1">{post.excerpt}</p>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 flex-1">{post.excerpt}</p>
         <div className="flex items-center justify-between mt-4 text-xs text-zinc-500">
           <span className="flex items-center gap-1.5">
             <Clock size={12} /> {post.readingMinutes} min read
           </span>
-          <span className="flex items-center gap-1 text-brand-400">
+          <span className="flex items-center gap-1 text-brand-700 dark:text-brand-400">
             Read <ArrowRight size={13} />
           </span>
         </div>

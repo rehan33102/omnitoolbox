@@ -30,7 +30,7 @@ export default function MediaToolsPage() {
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           Media <span className="text-gradient">Tools</span>
         </h1>
-        <p className="text-zinc-400 mt-3">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Professional image utilities that run entirely in your browser.
           Zero uploads, zero lag, zero cost.
         </p>

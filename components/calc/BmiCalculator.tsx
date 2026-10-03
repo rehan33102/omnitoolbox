@@ -16,7 +16,7 @@ const ACTIVITY = [
 function bmiCategory(bmi: number) {
   if (bmi < 18.5) return { label: "Underweight", color: "text-sky-400", bar: "bg-sky-500", width: 12 };
   if (bmi < 25) return { label: "Healthy", color: "text-emerald-400", bar: "bg-emerald-500", width: 38 };
-  if (bmi < 30) return { label: "Overweight", color: "text-amber-400", bar: "bg-amber-500", width: 62 };
+  if (bmi < 30) return { label: "Overweight", color: "text-amber-700 dark:text-amber-400", bar: "bg-amber-500", width: 62 };
   return { label: "Obese", color: "text-red-400", bar: "bg-red-500", width: 88 };
 }
 
@@ -45,13 +45,13 @@ export default function BmiCalculator() {
 
   const inputCls =
     "w-full glass rounded-xl px-4 py-3 text-lg font-mono outline-none focus:border-brand-500/60";
-  const labelCls = "text-sm font-medium text-zinc-300 block mb-1.5";
+  const labelCls = "text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5";
 
   return (
     <div className="grid lg:grid-cols-2 gap-5">
       <Card className="space-y-5">
         <div className="flex items-center gap-2">
-          <HeartPulse size={18} className="text-brand-400" />
+          <HeartPulse size={18} className="text-brand-700 dark:text-brand-400" />
           <h3 className="font-semibold">Your measurements</h3>
         </div>
 
@@ -77,7 +77,7 @@ export default function BmiCalculator() {
                   onClick={() => setSex(s)}
                   className={cn(
                     "py-3 rounded-xl text-sm font-medium border transition capitalize",
-                    sex === s ? "bg-brand-600 text-white border-brand-500 shadow-glow" : "glass border-transparent text-zinc-400 hover:text-white"
+                    sex === s ? "bg-brand-600 text-white border-brand-500 shadow-glow" : "glass border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                   )}
                 >
                   {s}
@@ -98,10 +98,10 @@ export default function BmiCalculator() {
                   "rounded-xl px-3 py-2.5 border text-left transition",
                   activity === a.key
                     ? "bg-brand-600/15 border-brand-500/50"
-                    : "glass border-transparent hover:border-white/15"
+                    : "glass border-transparent hover:border-black/15 dark:border-white/15"
                 )}
               >
-                <span className={cn("block text-sm font-medium", activity === a.key ? "text-white" : "text-zinc-300")}>{a.label}</span>
+                <span className={cn("block text-sm font-medium", activity === a.key ? "text-zinc-900 dark:text-white" : "text-zinc-700 dark:text-zinc-300")}>{a.label}</span>
                 <span className="block text-[11px] text-zinc-500">{a.desc}</span>
               </button>
             ))}
@@ -118,14 +118,14 @@ export default function BmiCalculator() {
           {calc ? (
             <>
               <p className="font-display text-5xl font-extrabold text-gradient">{calc.bmi.toFixed(1)}</p>
-              <div className="h-2.5 rounded-full bg-white/10 overflow-hidden mt-4 relative">
+              <div className="h-2.5 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden mt-4 relative">
                 <div className={cn("h-full rounded-full transition-all duration-500", calc.cat.bar)} style={{ width: `${calc.cat.width}%` }} />
               </div>
               <div className="flex justify-between text-[11px] text-zinc-500 mt-1.5">
                 <span>15</span><span>18.5</span><span>25</span><span>30</span><span>40</span>
               </div>
-              <p className="text-xs text-zinc-400 mt-3">
-                Healthy weight for your height: <span className="text-white font-semibold">{calc.healthyLow.toFixed(1)}–{calc.healthyHigh.toFixed(1)} kg</span>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-3">
+                Healthy weight for your height: <span className="text-zinc-900 dark:text-white font-semibold">{calc.healthyLow.toFixed(1)}–{calc.healthyHigh.toFixed(1)} kg</span>
               </p>
             </>
           ) : (
@@ -135,7 +135,7 @@ export default function BmiCalculator() {
 
         <Card>
           <div className="flex items-center gap-2 mb-3">
-            <Flame size={18} className="text-accent-400" />
+            <Flame size={18} className="text-accent-600 dark:text-accent-400" />
             <h3 className="font-semibold">Daily calories</h3>
           </div>
           {calc ? (
@@ -146,10 +146,10 @@ export default function BmiCalculator() {
                 { label: "Gain ~0.5 kg/week", val: calc.gain },
               ].map((r) => (
                 <div key={r.label} className={cn("flex items-center justify-between rounded-xl px-4 py-3", r.hot ? "bg-brand-600/15 border border-brand-500/40" : "glass")}>
-                  <span className="text-sm text-zinc-300 flex items-center gap-2">
+                  <span className="text-sm text-zinc-700 dark:text-zinc-300 flex items-center gap-2">
                     <Activity size={14} className="text-zinc-500" /> {r.label}
                   </span>
-                  <span className="font-mono font-bold text-white">{Math.round(r.val).toLocaleString()} <span className="text-xs text-zinc-500 font-normal">kcal</span></span>
+                  <span className="font-mono font-bold text-zinc-900 dark:text-white">{Math.round(r.val).toLocaleString()} <span className="text-xs text-zinc-500 font-normal">kcal</span></span>
                 </div>
               ))}
               <p className="text-[11px] text-zinc-500">

@@ -210,4 +210,159 @@ Sometimes it's stronger to say what you *want*: "sharp focus, clean background" 
 
 Instead of memorizing lists, use a prompt studio with a clickable negative-prompt bank — toggle the ones you need and the \`--no\` string builds itself.`,
   },
+  {
+    id: "b6",
+    slug: "how-to-remove-image-backgrounds-free",
+    title: "How to Remove Image Backgrounds Free (No Photoshop, 2026)",
+    excerpt: "Clean product shots and profile pictures in seconds — remove any image background free, right in your browser. No Photoshop, no signup.",
+    tags: ["background remover", "image tools", "tutorial"],
+    readingMinutes: 6,
+    publishedAt: "2026-10-03T10:00:00Z",
+    updatedAt: "2026-10-04T10:00:00Z",
+    body: `## Why background removal matters
+
+A clean background turns an amateur phone photo into a professional product shot. Sellers, freelancers and content creators all need it — and it used to require Photoshop skills or a paid subscription. Not anymore.
+
+## The old way vs. the new way
+
+- **Old way:** install Photoshop, learn the pen tool, spend 20 minutes per image — or pay $10/month for remove.bg
+- **New way:** drop your image into a free browser-based background remover, get a transparent PNG in seconds
+
+Modern in-browser AI models handle hair, fur and tricky edges surprisingly well — and because processing happens on your device, your photos stay private.
+
+## Remove a background in 3 steps
+
+- Open a free background remover like the **OmniToolBox Background Remover**
+- Upload your photo (JPG, PNG or WebP — drag and drop works)
+- Wait a few seconds, then download the transparent PNG
+
+That's it. No account, no watermark, no credit card.
+
+## Pro tips for the cleanest cutouts
+
+- **Start with good lighting** — even light on the subject beats any algorithm's guesswork
+- **Contrast helps** — a subject that stands out from the background segments faster and cleaner
+- **Check the edges** — zoom in on hair and glass; a slight feather (1–2px) hides rough edges
+- **Export as PNG** — JPG doesn't support transparency; PNG keeps every pixel perfect
+- **Batch your work** — process all product shots in one session for consistent results
+
+## What to do with transparent PNGs
+
+- Drop them onto colored or branded backgrounds for product listings
+- Layer them into YouTube thumbnails and social posts
+- Build clean profile pictures and team pages
+- Composite mockups for client presentations
+
+## The privacy angle
+
+Server-based removers upload your images to someone else's computer. A client-side tool processes everything locally with WebAssembly — your photos never leave your device. For client work or personal photos, that difference matters.`,
+  },
+  {
+    id: "b7",
+    slug: "best-free-text-to-speech-tools-2026",
+    title: "7 Best Free Text to Speech Tools in 2026 (Natural AI Voices)",
+    excerpt: "Turn any text into natural-sounding voiceovers free. We tested the 7 best free TTS tools for YouTube, podcasts and accessibility.",
+    tags: ["text to speech", "ai voiceover", "free tools"],
+    readingMinutes: 7,
+    publishedAt: "2026-10-02T10:00:00Z",
+    updatedAt: "2026-10-04T10:00:00Z",
+    body: `## Text to speech grew up
+
+Robotic TTS is dead. Today's free AI voices pause, breathe and emphasize like humans — good enough for YouTube narration, podcast intros and audiobooks. Here's what's actually worth your time in 2026.
+
+## The 7 best free TTS tools
+
+- **OmniToolBox AI Voiceover** — free browser-based voiceover studio with multiple languages and one-click MP3 download. No signup, no watermark — ideal for quick narrations.
+- **Google Translate TTS** — hidden gem: paste text, hit the speaker icon. Dozens of languages, surprisingly natural, completely free.
+- **Microsoft Edge Read Aloud** — Edge's built-in neural voices (including excellent natural ones) read any webpage or pasted text aloud, free with the browser.
+- **ElevenLabs (free tier)** — the most human-like voices on the internet; the free plan gives you 10,000 characters a month.
+- **TTSMaker** — free weekly character allowance, commercial use allowed on the free plan, 50+ languages.
+- **CapCut Text to Speech** — built into the free editor; great if you're already editing video there.
+- **NaturalReader (free)** — solid free voices with a clean interface, good for proofreading and accessibility.
+
+## How to pick the right one
+
+- **YouTube narration:** needs MP3 export and long character limits — try OmniToolBox Voiceover or ElevenLabs
+- **Quick voiceovers in another language:** Google Translate TTS or Edge Read Aloud
+- **Editing video anyway:** CapCut's built-in TTS saves you a round-trip
+- **Proofreading your writing:** NaturalReader or Edge Read Aloud
+
+## Getting natural results (the 80/20)
+
+- **Write for the ear** — short sentences, contractions, spoken transitions ("here's the thing")
+- **Punctuate deliberately** — commas and periods control pauses; ellipses add drama
+- **Spell out numbers and abbreviations** — "twenty twenty-six" beats "2026"
+- **Add SSML-style hints where supported** — emphasis tags and break tags shape delivery
+- **Always listen at 1x first** — speed-listening hides pacing problems your audience will hear
+
+## The workflow that works
+
+Draft your script, paste it into a free TTS tool, generate, listen once for awkward phrasing, fix the text (not the audio), regenerate. Two passes and you'll have narration most listeners can't distinguish from a budget voice actor — for zero dollars.`,
+  },
+  {
+    id: "b8",
+    slug: "10-free-online-tools-you-need-daily",
+    title: "10 Free Online Tools You Need Every Day (2026)",
+    excerpt: "Stop paying for subscriptions. These 10 free online tools handle images, PDFs, text and AI tasks you'll actually use daily.",
+    tags: ["free tools", "productivity", "online utilities"],
+    readingMinutes: 8,
+    publishedAt: "2026-10-01T10:00:00Z",
+    updatedAt: "2026-10-04T10:00:00Z",
+    body: `## The subscription trap
+
+The average person now pays for 5+ app subscriptions they barely use. Meanwhile, the daily tasks — converting an image, compressing a PDF, counting words, generating a QR code — are all solvable with free browser tools that take seconds.
+
+Here are the 10 free online tools worth bookmarking.
+
+## 1. Image Converter
+
+WebP won't open in your design tool? Convert WebP, PNG and JPG instantly in the browser — no upload, no waiting.
+
+## 2. Image Compressor
+
+Shrink photos up to 90% with zero visible quality loss. Essential before uploading to any website, email or marketplace listing.
+
+## 3. Background Remover
+
+One-click transparent PNGs for product shots, thumbnails and profile pictures. No Photoshop required.
+
+## 4. AI Prompt Studio
+
+Writing better prompts for ChatGPT, Midjourney, Flux and Claude with structured builders, style presets and a negative-prompt bank.
+
+## 5. AI Voiceover / Text to Speech
+
+Turn scripts into natural voiceovers with free AI voices and MP3 download — perfect for videos and podcasts.
+
+## 6. Fancy Text Generator
+
+50+ unicode styles for Instagram bios, captions and headlines. Type once, copy anywhere.
+
+## 7. Hashtag Finder
+
+Curated hashtag packs balanced across competition levels so your posts actually get discovered.
+
+## 8. QR Code Generator
+
+Free QR codes for menus, links, WiFi passwords and business cards — no signup, no expiry tricks.
+
+## 9. PDF Tools
+
+Merge, split and compress PDFs without installing anything or creating an account.
+
+## 10. Bio Generator
+
+Niche-aware Instagram and TikTok bio templates with emoji, CTAs and character counts.
+
+## Why browser-based beats installed
+
+- **Zero install** — works on any device, including locked-down work computers
+- **Private** — files processed locally never touch a server
+- **Always updated** — no update prompts, no version rot
+- **Free forever** — no trials, no credit cards, no "pro" upsells for basics
+
+## Build your daily toolkit
+
+Bookmark one all-in-one toolbox instead of ten random sites. The tools above all live free inside **OmniToolBox** — one tab, zero signup, everything in this list. That's the whole point: the daily stuff should just work.`,
+  },
 ];

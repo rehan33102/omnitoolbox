@@ -37,7 +37,7 @@ export default function PromptStudioPage() {
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           AI Prompt <span className="text-gradient">Studio</span>
         </h1>
-        <p className="text-zinc-400 mt-3">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Build better prompts for Midjourney, ChatGPT, Flux and Claude — preset styles,
           negative-prompt builder, reusable {"{variables}"} and one-click copy.
         </p>
@@ -48,11 +48,14 @@ export default function PromptStudioPage() {
       <DynamicAdSlot placement="prompt-studio-mid" format="horizontal" className="mt-10" />
 
       <div className="grid sm:grid-cols-3 gap-4 mt-10">
+        <h2 className="sm:col-span-3 font-display text-xl md:text-2xl font-bold tracking-tight">
+          How it works
+        </h2>
         {STEPS.map((s) => (
           <Card key={s.n}>
             <p className="font-display text-3xl font-extrabold text-gradient mb-2">{s.n}</p>
             <h3 className="font-display font-semibold mb-1">{s.t}</h3>
-            <p className="text-sm text-zinc-400">{s.d}</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">{s.d}</p>
           </Card>
         ))}
       </div>

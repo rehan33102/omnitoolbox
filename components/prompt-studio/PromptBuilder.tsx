@@ -102,7 +102,7 @@ export default function PromptBuilder() {
       {/* ── Builder ─────────────────────────────── */}
       <Card className="space-y-5">
         <div className="flex items-center gap-2">
-          <Wand2 size={18} className="text-brand-400" />
+          <Wand2 size={18} className="text-brand-700 dark:text-brand-400" />
           <h2 className="font-display font-semibold">Build your prompt</h2>
         </div>
 
@@ -131,7 +131,7 @@ export default function PromptBuilder() {
 
         {variables.length > 0 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium text-zinc-300">Variables</p>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Variables</p>
             <div className="grid sm:grid-cols-2 gap-2">
               {variables.map((v) => (
                 <input
@@ -147,7 +147,7 @@ export default function PromptBuilder() {
         )}
 
         <div className="space-y-2">
-          <p className="text-sm font-medium text-zinc-300">Preset styles <span className="text-zinc-500 font-normal">({styles.length} selected)</span></p>
+          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Preset styles <span className="text-zinc-500 font-normal">({styles.length} selected)</span></p>
           <div className="flex flex-wrap gap-2">
             {PRESET_STYLES[model].map((s) => {
               const on = styles.some((x) => x.id === s.id);
@@ -157,7 +157,7 @@ export default function PromptBuilder() {
                   onClick={() => toggleStyle(s)}
                   className={cn(
                     "btn-base px-3 py-1.5 text-xs rounded-full border",
-                    on ? "bg-brand-600/25 border-brand-500/50 text-white" : "glass text-zinc-400 hover:text-white"
+                    on ? "bg-brand-600/25 border-brand-500/50 text-zinc-900 dark:text-white" : "glass text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                   )}
                 >
                   {on && <Check size={12} />}
@@ -170,7 +170,7 @@ export default function PromptBuilder() {
 
         {meta.supportsNegative && (
           <div className="space-y-2">
-            <p className="text-sm font-medium text-zinc-300">Negative prompt <span className="text-zinc-500 font-normal">(things to avoid)</span></p>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Negative prompt <span className="text-zinc-500 font-normal">(things to avoid)</span></p>
             <div className="flex flex-wrap gap-2">
               {NEGATIVE_BANK.map((n) => {
                 const on = negatives.includes(n);
@@ -180,7 +180,7 @@ export default function PromptBuilder() {
                     onClick={() => toggleNegative(n)}
                     className={cn(
                       "btn-base px-3 py-1.5 text-xs rounded-full border",
-                      on ? "bg-red-600/25 border-red-500/50 text-red-200" : "glass text-zinc-400 hover:text-white"
+                      on ? "bg-red-600/25 border-red-500/50 text-red-700 dark:text-red-200" : "glass text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white"
                     )}
                   >
                     {n}
@@ -204,13 +204,13 @@ export default function PromptBuilder() {
         {model === "midjourney" && (
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <p className="text-sm font-medium text-zinc-300 mb-2">Aspect ratio</p>
+              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Aspect ratio</p>
               <div className="flex flex-wrap gap-2">
                 {MJ_ASPECTS.map((a) => (
                   <button
                     key={a}
                     onClick={() => setAr(a)}
-                    className={cn("btn-base px-3 py-1.5 text-xs rounded-lg border", ar === a ? "bg-brand-600/25 border-brand-500/50 text-white" : "glass text-zinc-400")}
+                    className={cn("btn-base px-3 py-1.5 text-xs rounded-lg border", ar === a ? "bg-brand-600/25 border-brand-500/50 text-zinc-900 dark:text-white" : "glass text-zinc-600 dark:text-zinc-400")}
                   >
                     {a}
                   </button>
@@ -218,7 +218,7 @@ export default function PromptBuilder() {
               </div>
             </div>
             <div>
-              <p className="text-sm font-medium text-zinc-300 mb-2">Stylize: {stylize}</p>
+              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Stylize: {stylize}</p>
               <input type="range" min={0} max={1000} step={50} value={stylize}
                 onChange={(e) => setStylize(Number(e.target.value))} className="w-full accent-violet-500" />
             </div>
@@ -231,7 +231,7 @@ export default function PromptBuilder() {
         <Card className="relative">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Sparkles size={16} className="text-accent-400" />
+              <Sparkles size={16} className="text-accent-600 dark:text-accent-400" />
               <h2 className="font-display font-semibold">Generated prompt</h2>
             </div>
             <Badge variant="ai">{meta.label}</Badge>
@@ -257,10 +257,10 @@ export default function PromptBuilder() {
           <Card>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <History size={16} className="text-zinc-400" />
+                <History size={16} className="text-zinc-600 dark:text-zinc-400" />
                 <h3 className="font-display font-semibold text-sm">History</h3>
               </div>
-              <button onClick={() => setHistory([])} className="text-xs text-zinc-500 hover:text-red-400 flex items-center gap-1">
+              <button onClick={() => setHistory([])} className="text-xs text-zinc-500 hover:text-red-600 dark:hover:text-red-400 flex items-center gap-1">
                 <Trash2 size={12} /> Clear
               </button>
             </div>
@@ -269,7 +269,7 @@ export default function PromptBuilder() {
                 <button
                   key={i}
                   onClick={() => copy(h, "Prompt copied from history")}
-                  className="w-full text-left text-xs text-zinc-400 hover:text-white glass rounded-lg p-2.5 truncate transition"
+                  className="w-full text-left text-xs text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white glass rounded-lg p-2.5 truncate transition"
                   title={h}
                 >
                   {h.slice(0, 90)}…

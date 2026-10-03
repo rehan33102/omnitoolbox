@@ -44,11 +44,11 @@ export default function VoteButtons({ slug, initialVotes, compact = false }: { s
         "btn-base rounded-xl border flex-col !gap-0",
         compact ? "px-2.5 py-1.5" : "px-3.5 py-2",
         voted
-          ? "bg-brand-600/25 border-brand-500/50 text-white cursor-default"
-          : "glass text-zinc-300 hover:border-brand-500/50 hover:text-white"
+          ? "bg-brand-600/25 border-brand-500/50 text-zinc-900 dark:text-white cursor-default"
+          : "glass text-zinc-700 dark:text-zinc-300 hover:border-brand-500/50 hover:text-zinc-900 dark:hover:text-white"
       )}
     >
-      {voted ? <Check size={compact ? 14 : 16} className="text-emerald-400" /> : <ChevronUp size={compact ? 14 : 16} />}
+      {voted ? <Check size={compact ? 14 : 16} className="text-emerald-700 dark:text-emerald-400" /> : <ChevronUp size={compact ? 14 : 16} />}
       <span className={cn("font-bold", compact ? "text-xs" : "text-sm")}>{votes.toLocaleString()}</span>
     </button>
   );

@@ -34,7 +34,7 @@ const FEATURES = [
     icon: LibraryBig,
     title: "Private on-device library",
     text: "Everything you create is saved to your private My Library, stored in your browser — never uploaded, never tracked.",
-    accent: "text-amber-300",
+    accent: "text-amber-700 dark:text-amber-300",
     glow: "from-amber-600/30",
   },
 ];
@@ -57,11 +57,11 @@ export default function VoiceoverSpotlightPage() {
 
       <div className="container pt-14 pb-10 md:pt-20 md:pb-14 text-center">
         <p className="eyebrow justify-center mb-6 animate-fade-up">
-          <Sparkles size={12} className="text-ember-400" />
+          <Sparkles size={12} className="text-ember-600 dark:text-ember-400" />
           Spotlight · Voiceover Studio
         </p>
 
-        <h1 className="font-condensed uppercase leading-[0.92] tracking-tight text-white text-[16vw] sm:text-7xl md:text-8xl lg:text-[7rem] select-none">
+        <h1 className="font-condensed uppercase leading-[0.92] tracking-tight text-zinc-900 dark:text-white text-[16vw] sm:text-7xl md:text-8xl lg:text-[7rem] select-none">
           <span className="block overflow-hidden">
             <span className="block animate-hero-line">Voiceover</span>
           </span>
@@ -72,7 +72,7 @@ export default function VoiceoverSpotlightPage() {
           </span>
         </h1>
 
-        <p className="mt-6 text-zinc-400 text-base md:text-lg max-w-2xl mx-auto animate-fade-up [animation-delay:240ms]">
+        <p className="mt-6 text-zinc-600 dark:text-zinc-400 text-base md:text-lg max-w-2xl mx-auto animate-fade-up [animation-delay:240ms]">
           Type a script. Pick a voice. Get studio-quality narration in seconds —
           free, private, and yours to keep.
         </p>
@@ -102,7 +102,7 @@ export default function VoiceoverSpotlightPage() {
                 <div className={`absolute -top-12 left-1/2 -translate-x-1/2 h-28 w-40 rounded-full bg-gradient-to-b ${f.glow} to-transparent blur-[36px] opacity-60 group-hover:opacity-100 transition-opacity`} aria-hidden />
                 <f.icon size={26} className={`${f.accent} mb-4 relative`} />
                 <h3 className="font-display font-bold text-lg mb-2 relative">{f.title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed relative">{f.text}</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed relative">{f.text}</p>
               </Card>
             </Reveal>
           ))}
@@ -122,12 +122,12 @@ export default function VoiceoverSpotlightPage() {
 
       <div className="container pb-16">
         <Reveal className="max-w-3xl mx-auto">
-          <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-ember-600/20 via-magent-600/15 to-purple-600/20 p-8 md:p-10 text-center relative overflow-hidden">
+          <div className="rounded-3xl border border-black/10 dark:border-white/10 bg-gradient-to-br from-ember-600/20 via-magent-600/15 to-purple-600/20 p-8 md:p-10 text-center relative overflow-hidden">
             <div className="absolute -top-20 left-1/2 -translate-x-1/2 h-48 w-96 rounded-full bg-magent-500/25 blur-[80px]" aria-hidden />
             <h2 className="font-condensed uppercase text-3xl md:text-5xl tracking-tight relative">
               Your creations live in <span className="text-gradient-warm">your library</span>
             </h2>
-            <p className="text-zinc-400 mt-3 max-w-xl mx-auto relative">
+            <p className="text-zinc-600 dark:text-zinc-400 mt-3 max-w-xl mx-auto relative">
               Every voiceover, QR code and converted image is saved on your device.
               Play them back, download them again, delete them — anytime.
             </p>

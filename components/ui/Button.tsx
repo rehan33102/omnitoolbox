@@ -8,9 +8,9 @@ export type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 const variants: Record<ButtonVariant, string> = {
   primary: "bg-gradient-to-r from-brand-600 to-fuchsia-600 text-white shadow-glow hover:brightness-110",
-  secondary: "glass hover:bg-white/10 text-zinc-100",
-  ghost: "hover:bg-white/10 text-zinc-300",
-  outline: "border border-white/15 hover:border-brand-500/60 text-zinc-300 hover:text-white",
+  secondary: "glass hover:bg-black/5 dark:hover:bg-white/10 text-zinc-800 dark:text-zinc-100",
+  ghost: "hover:bg-black/5 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300",
+  outline: "border border-black/15 dark:border-white/15 hover:border-brand-500/60 text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white",
   danger: "bg-red-600/90 text-white hover:bg-red-600",
 };
 

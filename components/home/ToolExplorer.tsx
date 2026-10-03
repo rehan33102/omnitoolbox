@@ -1,71 +1,85 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Search, SearchX } from "lucide-react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { SearchX, Sparkles } from "lucide-react";
+import SmartSearch from "./SmartSearch";
 import ToolCard from "./ToolCard";
 import SectionHeader from "./SectionHeader";
 import Badge from "@/components/ui/Badge";
+import ToolIcon from "@/components/ui/ToolIcon";
 import { Reveal } from "@/hooks/useReveal";
 import { TOOL_CATEGORIES, type ToolCategoryId } from "@/lib/constants";
+import { findAlternatives, smartSearch } from "@/lib/smart-search";
+import { useToolOverrides } from "@/hooks/useToolOverrides";
+import { applyToolOverrides } from "@/lib/tool-overrides";
 import { cn } from "@/lib/utils";
 import type { Tool } from "@/types";
 
-export default function ToolExplorer({ tools }: { tools: Tool[] }) {
-  const [query, setQuery] = useState("");
+function ExplorerInner({ tools }: { tools: Tool[] }) {
+  const params = useSearchParams();
+  const [query, setQuery] = useState(() => params.get("q") ?? "");
   const [cat, setCat] = useState<"all" | ToolCategoryId>("all");
 
+  // Admin edits from /admin/tools (IndexedDB/localStorage) apply instantly.
+  const overrides = useToolOverrides();
+  const liveTools = useMemo(() => applyToolOverrides(tools, overrides), [tools, overrides]);
+
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return tools.filter(
-      (t) =>
-        (cat === "all" || t.category === cat) &&
-        (!q || `${t.title} ${t.tagline} ${t.description}`.toLowerCase().includes(q))
-    );
-  }, [tools, query, cat]);
+    const q = query.trim();
+    const base = cat === "all" ? liveTools : liveTools.filter((t) => t.category === cat);
+    if (!q) return base;
+    const slugs = new Set(smartSearch(liveTools, q, 100).map((h) => h.tool.slug));
+    return base.filter((t) => slugs.has(t.slug));
+  }, [liveTools, query, cat]);
+
+  const alternatives = useMemo(
+    () => (query.trim() && filtered.length === 0 ? findAlternatives(liveTools, query, 3) : []),
+    [liveTools, query, filtered.length]
+  );
 
   return (
     <section id="tools" className="container scroll-mt-24">
       <SectionHeader
         eyebrow="The collection"
         title={<>Find your <span className="text-gradient-warm">tool</span></>}
-        sub={`Search across all ${tools.length} utilities — free forever, no signup.`}
+        sub={`Search across all ${liveTools.length} utilities — free forever, no signup.`}
       />
 
       <Reveal delay={100}>
-        <div className="max-w-xl mx-auto relative mb-6">
-          <Search size={17} className="absolute left-4 top-3.5 text-zinc-500" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search tools… (e.g. prompt, compress, hashtag)"
-            className="input-base !pl-11 !py-3.5 !rounded-2xl !text-base"
+        <div className="max-w-2xl mx-auto relative mb-6">
+          <SmartSearch
+            tools={liveTools}
+            variant="hero"
+            initialQuery={params.get("q") ?? ""}
+            onQueryChange={setQuery}
           />
         </div>
       </Reveal>
 
       <Reveal delay={160}>
         <div className="flex flex-wrap justify-center gap-2 mb-10">
-        <button
-          onClick={() => setCat("all")}
-          className={cn("btn-base px-4 py-2 text-sm rounded-full border",
-            cat === "all" ? "bg-gradient-to-r from-ember-500 to-magent-500 text-white border-transparent shadow-glow-warm" : "glass text-zinc-400 hover:text-white")}
-        >
-          All <Badge variant="default" className="ml-1">{tools.length}</Badge>
-        </button>
-        {TOOL_CATEGORIES.map((c) => {
-          const n = tools.filter((t) => t.category === c.id).length;
-          if (!n) return null;
-          return (
-            <button
-              key={c.id}
-              onClick={() => setCat(c.id)}
-              className={cn("btn-base px-4 py-2 text-sm rounded-full border",
-                cat === c.id ? "bg-gradient-to-r from-ember-500 to-magent-500 text-white border-transparent shadow-glow-warm" : "glass text-zinc-400 hover:text-white")}
-            >
-              {c.label} <Badge variant="default" className="ml-1">{n}</Badge>
-            </button>
-          );
-        })}
+          <button
+            onClick={() => setCat("all")}
+            className={cn("btn-base px-4 py-2 text-sm rounded-full border",
+              cat === "all" ? "bg-gradient-to-r from-ember-500 to-magent-500 text-white border-transparent shadow-glow-warm" : "glass text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white")}
+          >
+            All <Badge variant="default" className="ml-1">{liveTools.length}</Badge>
+          </button>
+          {TOOL_CATEGORIES.map((c) => {
+            const n = liveTools.filter((t) => t.category === c.id).length;
+            if (!n) return null;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setCat(c.id)}
+                className={cn("btn-base px-4 py-2 text-sm rounded-full border",
+                  cat === c.id ? "bg-gradient-to-r from-ember-500 to-magent-500 text-white border-transparent shadow-glow-warm" : "glass text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white")}
+              >
+                {c.label} <Badge variant="default" className="ml-1">{n}</Badge>
+              </button>
+            );
+          })}
         </div>
       </Reveal>
 
@@ -74,11 +88,39 @@ export default function ToolExplorer({ tools }: { tools: Tool[] }) {
           {filtered.map((t) => <ToolCard key={t.slug} tool={t} />)}
         </div>
       ) : (
-        <div className="text-center py-16 text-zinc-500">
-          <SearchX size={36} className="mx-auto mb-3" />
-          <p>No tools match “{query}”. Try another keyword.</p>
+        <div className="text-center py-16">
+          <SearchX size={36} className="mx-auto mb-3 text-zinc-600" />
+          <p className="text-zinc-500">No tools match “{query}”. Try another keyword.</p>
+          {alternatives.length > 0 && (
+            <div className="mt-6 flex flex-col items-center gap-2">
+              <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-zinc-500">
+                <Sparkles size={12} className="text-ember-600 dark:text-ember-400" />
+                Did you mean / alternatives
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                {alternatives.map(({ tool }) => (
+                  <a
+                    key={tool.slug}
+                    href={tool.href}
+                    className="inline-flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 px-4 py-2 text-sm text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:border-ember-400/50 transition"
+                  >
+                    <ToolIcon name={tool.icon} size={15} />
+                    {tool.title}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </section>
+  );
+}
+
+export default function ToolExplorer({ tools }: { tools: Tool[] }) {
+  return (
+    <Suspense>
+      <ExplorerInner tools={tools} />
+    </Suspense>
   );
 }

@@ -129,7 +129,7 @@ export default function UnitConverter() {
       : n.toLocaleString("en-US", { maximumFractionDigits: 6 });
 
   const selectCls =
-    "w-full glass rounded-xl px-3.5 py-3 text-sm font-medium outline-none focus:border-brand-500/60 [&>option]:bg-[#0b0b14]";
+    "w-full glass rounded-xl px-3.5 py-3 text-sm font-medium outline-none focus:border-brand-500/60 [&>option]:bg-white dark:[&>option]:bg-white dark:[&>option]:bg-[#0b0b14]";
 
   return (
     <div className="space-y-5">
@@ -142,7 +142,7 @@ export default function UnitConverter() {
               "px-4 py-2 text-sm rounded-xl border transition",
               cat === t
                 ? "bg-brand-600 text-white border-brand-500 shadow-glow"
-                : "glass border-transparent text-zinc-400 hover:text-white hover:border-white/15"
+                : "glass border-transparent text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:border-black/15 dark:border-white/15"
             )}
           >
             {CATEGORIES[t].label}
@@ -153,11 +153,11 @@ export default function UnitConverter() {
       <div className="grid lg:grid-cols-2 gap-5">
         <Card className="space-y-5">
           <div className="flex items-center gap-2">
-            <Ruler size={18} className="text-brand-400" />
+            <Ruler size={18} className="text-brand-700 dark:text-brand-400" />
             <h3 className="font-semibold">{CATEGORIES[cat].label} converter</h3>
           </div>
           <div>
-            <label className="text-sm font-medium text-zinc-300 block mb-1.5">Value</label>
+            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5">Value</label>
             <input
               type="number"
               value={value}
@@ -167,7 +167,7 @@ export default function UnitConverter() {
           </div>
           <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
             <div>
-              <label className="text-sm font-medium text-zinc-300 block mb-1.5">From</label>
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5">From</label>
               <select value={from} onChange={(e) => setFrom(e.target.value)} className={selectCls}>
                 {units.map((u) => (
                   <option key={u.code} value={u.code}>{u.label} ({u.code})</option>
@@ -179,10 +179,10 @@ export default function UnitConverter() {
               aria-label="Swap units"
               className="mb-0.5 p-3 rounded-xl glass hover:border-brand-500/50 hover:rotate-180 transition-all duration-300"
             >
-              <ArrowLeftRight size={16} className="text-brand-400" />
+              <ArrowLeftRight size={16} className="text-brand-700 dark:text-brand-400" />
             </button>
             <div>
-              <label className="text-sm font-medium text-zinc-300 block mb-1.5">To</label>
+              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5">To</label>
               <select value={to} onChange={(e) => setTo(e.target.value)} className={selectCls}>
                 {units.map((u) => (
                   <option key={u.code} value={u.code}>{u.label} ({u.code})</option>
@@ -192,7 +192,7 @@ export default function UnitConverter() {
           </div>
           {result !== null && (
             <div className="glass rounded-xl px-4 py-4 text-center">
-              <p className="text-xs text-zinc-400 mb-1">{value || "0"} {from} =</p>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 mb-1">{value || "0"} {from} =</p>
               <p className="font-display text-3xl font-extrabold text-gradient">{fmt(result)} <span className="text-lg">{to}</span></p>
             </div>
           )}
@@ -203,8 +203,8 @@ export default function UnitConverter() {
           <div className="space-y-1.5 max-h-[380px] overflow-y-auto pr-1">
             {allResults.map(({ unit, val }) => (
               <div key={unit.code} className="flex items-center justify-between glass rounded-lg px-3.5 py-2.5">
-                <span className="text-sm text-zinc-300">{unit.label}</span>
-                <span className="font-mono text-sm text-white">{fmt(val)} <span className="text-zinc-500">{unit.code}</span></span>
+                <span className="text-sm text-zinc-700 dark:text-zinc-300">{unit.label}</span>
+                <span className="font-mono text-sm text-zinc-900 dark:text-white">{fmt(val)} <span className="text-zinc-500">{unit.code}</span></span>
               </div>
             ))}
           </div>

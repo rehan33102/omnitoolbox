@@ -116,7 +116,7 @@ export default function AdminMonetizationPage() {
         ) : ads.length === 0 ? (
           <p className="p-4 text-sm text-zinc-500">No placements yet. Add your first one above.</p>
         ) : (
-          <div className="divide-y divide-white/5">
+          <div className="divide-y divide-black/5 dark:divide-white/5">
             {ads.map((a) => (
               <div key={a.id} className="flex items-center gap-4 p-4">
                 <Badge variant={TYPE_BADGE[a.type]}>{a.type}</Badge>
@@ -129,7 +129,7 @@ export default function AdminMonetizationPage() {
                 <Switch checked={a.enabled} onChange={(v) => toggle(a.id, v)} label={`Toggle ${a.placement}`} />
                 <button onClick={() => remove(a.id)} aria-label="Delete"
                   className="p-2 rounded-lg hover:bg-red-500/10 transition">
-                  <Trash2 size={15} className="text-red-400" />
+                  <Trash2 size={15} className="text-red-600 dark:text-red-400" />
                 </button>
               </div>
             ))}
@@ -140,7 +140,7 @@ export default function AdminMonetizationPage() {
       <Card>
         <h2 className="font-display font-semibold mb-1">AdSense client</h2>
         <p className="text-xs text-zinc-500">
-          Set via the <code className="text-zinc-300">NEXT_PUBLIC_ADSENSE_CLIENT_ID</code> env var on Vercel.
+          Set via the <code className="text-zinc-700 dark:text-zinc-300">NEXT_PUBLIC_ADSENSE_CLIENT_ID</code> env var on Vercel.
           Slot-level control above is fully dynamic.
         </p>
       </Card>

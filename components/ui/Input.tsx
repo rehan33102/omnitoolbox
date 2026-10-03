@@ -12,10 +12,10 @@ interface FieldProps {
 function FieldWrap({ label, error, hint, children, htmlFor }: FieldProps & { children: React.ReactNode; htmlFor?: string }) {
   return (
     <label className="block" htmlFor={htmlFor}>
-      {label && <span className="block text-sm font-medium mb-1.5 text-zinc-300">{label}</span>}
+      {label && <span className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">{label}</span>}
       {children}
       {hint && !error && <span className="block text-xs text-zinc-500 mt-1.5">{hint}</span>}
-      {error && <span className="block text-xs text-red-400 mt-1.5">{error}</span>}
+      {error && <span className="block text-xs text-red-600 dark:text-red-400 mt-1.5">{error}</span>}
     </label>
   );
 }

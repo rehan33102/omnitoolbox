@@ -40,12 +40,12 @@ export default function AdminSeoPage() {
           <div>
             <h2 className="font-display font-semibold">Dynamic sitemap</h2>
             <p className="text-sm text-zinc-500 mt-1">
-              Served at <code className="text-zinc-300">/sitemap.xml</code> — includes all enabled tools,
+              Served at <code className="text-zinc-700 dark:text-zinc-300">/sitemap.xml</code> — includes all enabled tools,
               published posts and directory listings. Cached for 1 hour, regenerates on demand.
             </p>
             <p className="text-xs text-zinc-500 mt-2">
               Last regenerated:{" "}
-              <span className="text-zinc-300">
+              <span className="text-zinc-700 dark:text-zinc-300">
                 {state ? (state.lastGenerated ? new Date(state.lastGenerated).toLocaleString() : "never") : <Skeleton className="inline-block h-3 w-24" />}
               </span>
             </p>
@@ -61,9 +61,9 @@ export default function AdminSeoPage() {
             {state.pings.map((p) => (
               <div key={p.engine} className="flex items-center gap-2 text-sm">
                 {p.ok
-                  ? <CheckCircle2 size={15} className="text-emerald-400" />
-                  : <XCircle size={15} className="text-red-400" />}
-                <span className="text-zinc-300">{p.engine}</span>
+                  ? <CheckCircle2 size={15} className="text-emerald-700 dark:text-emerald-400" />
+                  : <XCircle size={15} className="text-red-600 dark:text-red-400" />}
+                <span className="text-zinc-700 dark:text-zinc-300">{p.engine}</span>
                 <span className="text-xs text-zinc-500">{p.ok ? "sitemap ping accepted" : "ping failed"}</span>
               </div>
             ))}
@@ -94,11 +94,11 @@ export default function AdminSeoPage() {
 
       <Card>
         <h2 className="font-display font-semibold mb-2">SEO checklist</h2>
-        <ul className="text-sm text-zinc-400 space-y-2">
+        <ul className="text-sm text-zinc-600 dark:text-zinc-400 space-y-2">
           <li>✓ JSON-LD structured data on every page (WebSite, SoftwareApplication, Article, FAQ, Breadcrumbs)</li>
-          <li>✓ Canonical URLs + OpenGraph / Twitter cards via <code className="text-zinc-300">buildMetadata()</code></li>
+          <li>✓ Canonical URLs + OpenGraph / Twitter cards via <code className="text-zinc-700 dark:text-zinc-300">buildMetadata()</code></li>
           <li>✓ SSR for all marketing pages — instant indexing, no client-render delay</li>
-          <li>✓ Dynamic OG images via <code className="text-zinc-300">app/opengraph-image.tsx</code></li>
+          <li>✓ Dynamic OG images via <code className="text-zinc-700 dark:text-zinc-300">app/opengraph-image.tsx</code></li>
           <li>✓ Semantic HTML, single H1 per page, descriptive alt text</li>
         </ul>
       </Card>

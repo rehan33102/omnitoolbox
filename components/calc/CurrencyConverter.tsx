@@ -83,26 +83,26 @@ export default function CurrencyConverter() {
     n.toLocaleString("en-US", { maximumFractionDigits: n < 1 ? 4 : 2, minimumFractionDigits: 2 });
 
   const selectCls =
-    "w-full glass rounded-xl px-3.5 py-3 text-sm font-medium text-white bg-transparent outline-none focus:border-brand-500/60 [&>option]:bg-[#0b0b14]";
+    "w-full glass rounded-xl px-3.5 py-3 text-sm font-medium text-zinc-900 dark:text-white bg-transparent outline-none focus:border-brand-500/60 [&>option]:bg-white dark:[&>option]:bg-white dark:[&>option]:bg-[#0b0b14]";
 
   return (
     <div className="grid lg:grid-cols-2 gap-5">
       <Card className="space-y-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Banknote size={18} className="text-brand-400" />
+            <Banknote size={18} className="text-brand-700 dark:text-brand-400" />
             <h3 className="font-semibold">Convert</h3>
           </div>
           <span className={cn(
             "text-[11px] px-2.5 py-1 rounded-full font-semibold uppercase tracking-wider",
-            live ? "bg-emerald-500/15 text-emerald-400" : "bg-amber-500/15 text-amber-400"
+            live ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400" : "bg-amber-500/15 text-amber-700 dark:text-amber-400"
           )}>
             {loading ? "loading…" : live ? "● live rates" : "cached rates"}
           </span>
         </div>
 
         <div>
-          <label className="text-sm font-medium text-zinc-300 block mb-1.5">Amount</label>
+          <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5">Amount</label>
           <input
             type="number"
             min={0}
@@ -116,7 +116,7 @@ export default function CurrencyConverter() {
               <button
                 key={q}
                 onClick={() => setAmount(String(q))}
-                className="text-xs px-2.5 py-1 rounded-lg glass hover:border-brand-500/50 text-zinc-300 transition"
+                className="text-xs px-2.5 py-1 rounded-lg glass hover:border-brand-500/50 text-zinc-700 dark:text-zinc-300 transition"
               >
                 {q.toLocaleString()}
               </button>
@@ -126,7 +126,7 @@ export default function CurrencyConverter() {
 
         <div className="grid grid-cols-[1fr_auto_1fr] gap-2 items-end">
           <div>
-            <label className="text-sm font-medium text-zinc-300 block mb-1.5">From</label>
+            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5">From</label>
             <select value={from} onChange={(e) => setFrom(e.target.value as Code)} className={selectCls}>
               {CURRENCIES.map((c) => (
                 <option key={c.code} value={c.code}>{c.flag} {c.code} — {c.name}</option>
@@ -138,10 +138,10 @@ export default function CurrencyConverter() {
             aria-label="Swap currencies"
             className="mb-0.5 p-3 rounded-xl glass hover:border-brand-500/50 hover:rotate-180 transition-all duration-300"
           >
-            <ArrowLeftRight size={16} className="text-brand-400" />
+            <ArrowLeftRight size={16} className="text-brand-700 dark:text-brand-400" />
           </button>
           <div>
-            <label className="text-sm font-medium text-zinc-300 block mb-1.5">To</label>
+            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300 block mb-1.5">To</label>
             <select value={to} onChange={(e) => setTo(e.target.value as Code)} className={selectCls}>
               {CURRENCIES.map((c) => (
                 <option key={c.code} value={c.code}>{c.flag} {c.code} — {c.name}</option>
@@ -157,23 +157,23 @@ export default function CurrencyConverter() {
 
       <Card className="flex flex-col justify-center">
         {loading ? (
-          <div className="flex items-center justify-center py-16 text-zinc-400">
+          <div className="flex items-center justify-center py-16 text-zinc-600 dark:text-zinc-400">
             <Loader2 size={22} className="animate-spin mr-2" /> Fetching live rates…
           </div>
         ) : result ? (
           <div className="text-center py-6">
-            <p className="text-sm text-zinc-400 mb-2">
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">
               {fmt(parseFloat(amount) || 0)} {from} =
             </p>
             <p className="font-display text-4xl md:text-5xl font-extrabold text-gradient break-all">
               {fmt(result.converted)} {to}
             </p>
             <div className="mt-6 glass rounded-xl px-4 py-3 inline-block">
-              <p className="text-xs text-zinc-400">
-                1 {from} = <span className="text-white font-mono font-semibold">{fmt(result.rate)}</span> {to}
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                1 {from} = <span className="text-zinc-900 dark:text-white font-mono font-semibold">{fmt(result.rate)}</span> {to}
               </p>
-              <p className="text-xs text-zinc-400 mt-1">
-                1 {to} = <span className="text-white font-mono font-semibold">{fmt(1 / result.rate)}</span> {from}
+              <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1">
+                1 {to} = <span className="text-zinc-900 dark:text-white font-mono font-semibold">{fmt(1 / result.rate)}</span> {from}
               </p>
             </div>
             <div>

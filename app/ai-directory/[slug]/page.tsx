@@ -52,7 +52,7 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
       ]} />
       <TrackUsage slug={`directory-${tool.slug}`} />
 
-      <Link href="/ai-directory" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-white mb-6 transition">
+      <Link href="/ai-directory" className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-white mb-6 transition">
         <ArrowLeft size={15} /> Back to directory
       </Link>
 
@@ -64,8 +64,8 @@ export default async function ToolDetailPage({ params }: { params: { slug: strin
               <h1 className="font-display text-2xl md:text-3xl font-extrabold">{tool.name}</h1>
               {tool.featured && <Badge variant="pro">Featured</Badge>}
             </div>
-            <p className="text-brand-300 font-medium">{tool.tagline}</p>
-            <p className="text-zinc-400 mt-3 leading-relaxed">{tool.description}</p>
+            <p className="text-brand-700 dark:text-brand-300 font-medium">{tool.tagline}</p>
+            <p className="text-zinc-600 dark:text-zinc-400 mt-3 leading-relaxed">{tool.description}</p>
             <div className="flex gap-1.5 mt-4 flex-wrap">
               <Badge variant="default">{tool.category}</Badge>
               {tool.tags.map((t) => <Badge key={t} variant="ai">#{t}</Badge>)}

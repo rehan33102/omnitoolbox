@@ -55,7 +55,7 @@ export default function Modal({
       >
         <div className="flex items-center justify-between mb-4">
           {title ? <h3 className="font-display text-lg font-semibold">{title}</h3> : <span />}
-          <button onClick={onClose} aria-label="Close" className="p-2 rounded-lg hover:bg-white/10 transition">
+          <button onClick={onClose} aria-label="Close" className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition">
             <X size={18} />
           </button>
         </div>

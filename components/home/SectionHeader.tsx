@@ -31,7 +31,7 @@ export default function SectionHeader({
         {title}
       </h2>
       {sub && (
-        <p className={cn("mt-4 text-zinc-400 text-sm md:text-base max-w-xl leading-relaxed", align === "center" && "mx-auto")}>
+        <p className={cn("mt-4 text-zinc-600 dark:text-zinc-400 text-sm md:text-base max-w-xl leading-relaxed", align === "center" && "mx-auto")}>
           {sub}
         </p>
       )}

@@ -47,7 +47,7 @@ export default function TermsPage() {
         {SECTIONS.map((s) => (
           <Card key={s.h}>
             <h2 className="font-display font-semibold text-lg mb-2">{s.h}</h2>
-            <p className="text-sm text-zinc-400 leading-relaxed">{s.p}</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">{s.p}</p>
           </Card>
         ))}
       </div>

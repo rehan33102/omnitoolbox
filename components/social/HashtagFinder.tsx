@@ -25,14 +25,14 @@ export default function HashtagFinder() {
   return (
     <Card className="space-y-5">
       <div>
-        <p className="text-sm font-medium text-zinc-300 mb-2">Niche</p>
+        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Niche</p>
         <div className="flex flex-wrap gap-2">
           {HASHTAG_NICHES.map((n) => (
             <button
               key={n}
               onClick={() => setNiche(n)}
               className={cn("btn-base px-3.5 py-1.5 text-xs rounded-full border capitalize",
-                niche === n ? "bg-brand-600/25 border-brand-500/50 text-white" : "glass text-zinc-400 hover:text-white")}
+                niche === n ? "bg-brand-600/25 border-brand-500/50 text-zinc-900 dark:text-white" : "glass text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white")}
             >
               {n}
             </button>
@@ -41,7 +41,7 @@ export default function HashtagFinder() {
       </div>
 
       <div>
-        <p className="text-sm font-medium text-zinc-300 mb-2">Hashtag count: {count}</p>
+        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Hashtag count: {count}</p>
         <input type="range" min={5} max={30} value={count}
           onChange={(e) => setCount(Number(e.target.value))} className="w-full accent-violet-500" />
       </div>
@@ -51,7 +51,7 @@ export default function HashtagFinder() {
           <button
             key={t}
             onClick={() => copy(t, `${t} copied`)}
-            className="glass rounded-full px-3 py-1.5 text-sm text-accent-300 hover:bg-white/10 transition flex items-center gap-1"
+            className="glass rounded-full px-3 py-1.5 text-sm text-accent-600 dark:text-accent-300 hover:bg-black/5 dark:hover:bg-white/10 transition flex items-center gap-1"
           >
             <Hash size={12} />{t.slice(1)}
           </button>

@@ -13,13 +13,13 @@ export default function DirectoryCard({ tool }: { tool: AIToolListing }) {
       <VoteButtons slug={tool.slug} initialVotes={tool.votes} compact />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <Link href={`/ai-directory/${tool.slug}`} className="font-display font-semibold hover:text-brand-300 transition">
+          <Link href={`/ai-directory/${tool.slug}`} className="font-display font-semibold hover:text-brand-700 dark:hover:text-brand-300 transition">
             {tool.name}
           </Link>
           {tool.featured && <Badge variant="pro">Featured</Badge>}
           <Badge variant="default">{tool.category}</Badge>
         </div>
-        <p className="text-sm text-zinc-400 mt-1 line-clamp-2">{tool.tagline}</p>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 line-clamp-2">{tool.tagline}</p>
         <div className="flex items-center justify-between mt-3">
           <div className="flex gap-1.5 flex-wrap">
             {tool.tags.slice(0, 3).map((t) => (

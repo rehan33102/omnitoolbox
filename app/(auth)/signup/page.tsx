@@ -43,7 +43,7 @@ export default function SignupPage() {
         <Button type="submit" disabled={busy} className="w-full">{busy ? "Creating…" : "Sign up free"}</Button>
       </form>
       <p className="text-sm text-zinc-500 mt-5 text-center">
-        Have an account? <Link href="/login" className="text-brand-400 hover:text-brand-300">Log in</Link>
+        Have an account? <Link href="/login" className="text-brand-700 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300">Log in</Link>
       </p>
     </Card>
   );

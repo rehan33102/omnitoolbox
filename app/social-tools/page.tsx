@@ -33,7 +33,7 @@ export default function SocialToolsPage() {
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           Social Media <span className="text-gradient">Growth Suite</span>
         </h1>
-        <p className="text-zinc-400 mt-3">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Fancy unicode text, scroll-stopping bios and high-reach hashtags —
           everything you need to grow on Instagram & TikTok.
         </p>

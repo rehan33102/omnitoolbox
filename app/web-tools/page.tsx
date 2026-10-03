@@ -31,13 +31,13 @@ export default function WebToolsPage() {
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           Web <span className="text-gradient">Tools</span>
         </h1>
-        <p className="text-zinc-400 mt-3">
+        <p className="text-zinc-600 dark:text-zinc-400 mt-3">
           Handy everyday utilities that run entirely in your browser.
           Scannable QR codes and unbreakable passwords — zero uploads, zero cost.
         </p>
       </div>
 
-      <div className="relative rounded-2xl overflow-hidden mb-8 border border-white/10">
+      <div className="relative rounded-2xl overflow-hidden mb-8 border border-black/10 dark:border-white/10">
         <Image
           src="/images/web-tools-hero.webp"
           alt="QR code generator and password generator — free web utilities"

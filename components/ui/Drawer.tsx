@@ -40,14 +40,14 @@ export default function Drawer({
       />
       <aside
         className={cn(
-          "absolute right-0 top-0 h-full w-[300px] glass-strong border-l border-white/10 p-5 overflow-y-auto",
+          "absolute right-0 top-0 h-full w-[300px] glass-strong border-l border-black/10 dark:border-white/10 p-5 overflow-y-auto",
           "transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
           shown ? "translate-x-0" : "translate-x-full"
         )}
       >
         <div className="flex items-center justify-between mb-6">
           {title ? <h3 className="font-display font-semibold">{title}</h3> : <span />}
-          <button onClick={onClose} aria-label="Close menu" className="p-2 rounded-lg hover:bg-white/10 transition">
+          <button onClick={onClose} aria-label="Close menu" className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition">
             <X size={18} />
           </button>
         </div>

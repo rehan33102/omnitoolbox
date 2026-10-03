@@ -245,7 +245,7 @@ export default function BackgroundRemover() {
         onClick={() => inputRef.current?.click()}
         onDrop={(e) => (e.preventDefault(), onFile(e.dataTransfer.files[0]))}
         onDragOver={(e) => e.preventDefault()}
-        className="border-2 border-dashed border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
+        className="border-2 border-dashed border-black/15 dark:border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
       >
         <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
         {preview ? (
@@ -253,7 +253,7 @@ export default function BackgroundRemover() {
         ) : (
           <div className="py-6">
             <ImagePlus size={36} className="mx-auto text-zinc-500 mb-3" />
-            <p className="text-sm text-zinc-300">Drop a photo here or <span className="text-brand-400">browse</span></p>
+            <p className="text-sm text-zinc-700 dark:text-zinc-300">Drop a photo here or <span className="text-brand-700 dark:text-brand-400">browse</span></p>
             <p className="text-xs text-zinc-500 mt-1">Private — AI runs on your device, nothing is uploaded</p>
           </div>
         )}
@@ -262,7 +262,7 @@ export default function BackgroundRemover() {
       {/* Honest engine status — real progress, and a way out if it stalls */}
       {engine === "warming" && (
         <div className="space-y-2">
-          <div className="flex items-center justify-center gap-2 text-xs text-zinc-400">
+          <div className="flex items-center justify-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-60" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-brand-500" />
@@ -270,7 +270,7 @@ export default function BackgroundRemover() {
             {loadPct > 0 ? `Loading AI model… ${loadPct}%` : "Preparing the AI…"}
           </div>
           {loadPct > 0 && (
-            <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-1.5 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
               <div className="h-full rounded-full bg-brand-500 transition-all" style={{ width: `${loadPct}%` }} />
             </div>
           )}
@@ -279,10 +279,10 @@ export default function BackgroundRemover() {
       )}
       {engine === "failed" && (
         <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-4 flex items-start gap-3">
-          <TriangleAlert size={18} className="text-red-400 shrink-0 mt-0.5" />
+          <TriangleAlert size={18} className="text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm text-red-200 font-medium">AI engine didn&apos;t start</p>
-            <p className="text-xs text-red-200/70 mt-1">Check your internet connection and try again.</p>
+            <p className="text-sm text-red-700 dark:text-red-200 font-medium">AI engine didn&apos;t start</p>
+            <p className="text-xs text-red-700 dark:text-red-200/70 mt-1">Check your internet connection and try again.</p>
           </div>
           <Button size="sm" variant="secondary" onClick={retryEngine}>
             <RefreshCw size={14} /> Retry
@@ -299,14 +299,14 @@ export default function BackgroundRemover() {
 
           {/* Working state — simple "Processing" with honest progress */}
           {busy && (
-            <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 text-center">
+            <div className="relative overflow-hidden rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-6 text-center">
               <div className="absolute inset-0 animate-shimmer bg-gradient-to-r from-transparent via-white/10 to-transparent" />
               <div className="relative space-y-2">
-                <Loader2 size={28} className="mx-auto text-brand-400 animate-spin" />
-                <p className="text-sm font-medium text-zinc-200">Processing…</p>
+                <Loader2 size={28} className="mx-auto text-brand-700 dark:text-brand-400 animate-spin" />
+                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Processing…</p>
                 {busyPct > 0 && (
                   <div className="pt-1">
-                    <div className="h-1.5 rounded-full bg-white/10 overflow-hidden max-w-xs mx-auto">
+                    <div className="h-1.5 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden max-w-xs mx-auto">
                       <div className="h-full rounded-full bg-brand-500 transition-all" style={{ width: `${busyPct}%` }} />
                     </div>
                     <p className="text-[11px] text-zinc-600 mt-1">{busyPct}%</p>
@@ -318,9 +318,9 @@ export default function BackgroundRemover() {
 
           {error && (
             <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-4 flex items-start gap-3 animate-fade-up">
-              <TriangleAlert size={18} className="text-red-400 shrink-0 mt-0.5" />
+              <TriangleAlert size={18} className="text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
               <div className="flex-1">
-                <p className="text-sm text-red-200">{error}</p>
+                <p className="text-sm text-red-700 dark:text-red-200">{error}</p>
               </div>
               <Button size="sm" variant="secondary" onClick={engine === "ready" ? remove : retryEngine}>
                 <RefreshCw size={14} /> Retry
@@ -335,7 +335,7 @@ export default function BackgroundRemover() {
                 <img src={result.url} alt="Background removed" className="max-h-64 rounded-lg" />
               </div>
               <div className="glass rounded-xl p-4 flex items-center justify-between">
-                <p className="text-sm text-zinc-400">{formatBytes(result.size)} · transparent PNG</p>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400">{formatBytes(result.size)} · transparent PNG</p>
                 <a href={result.url} download={`no-bg-${file.name.replace(/\.[^.]+$/, "")}.png`}>
                   <Button size="sm"><Download size={14} /> Download PNG</Button>
                 </a>

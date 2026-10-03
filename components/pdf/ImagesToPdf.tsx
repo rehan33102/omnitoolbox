@@ -131,13 +131,13 @@ export default function ImagesToPdf() {
         onClick={() => inputRef.current?.click()}
         onDrop={(e) => (e.preventDefault(), e.dataTransfer.files.length && addFiles(e.dataTransfer.files))}
         onDragOver={(e) => e.preventDefault()}
-        className="border-2 border-dashed border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
+        className="border-2 border-dashed border-black/15 dark:border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
       >
         <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden"
           onChange={(e) => { if (e.target.files?.length) addFiles(e.target.files); e.target.value = ""; }} />
         <div className="py-6">
           <Images size={36} className="mx-auto text-zinc-500 mb-3" />
-          <p className="text-sm text-zinc-300">Drop images here or <span className="text-brand-400">browse</span></p>
+          <p className="text-sm text-zinc-700 dark:text-zinc-300">Drop images here or <span className="text-brand-700 dark:text-brand-400">browse</span></p>
           <p className="text-xs text-zinc-500 mt-1">JPG · PNG · WebP · up to {MAX_FILES} images · 100% client-side</p>
         </div>
       </div>
@@ -160,11 +160,11 @@ export default function ImagesToPdf() {
                 <p className="text-[11px] text-zinc-500 truncate px-1">{f.file.name}</p>
                 <div className="flex gap-1 px-1 pb-1">
                   <button onClick={() => move(i, -1)} disabled={i === 0} aria-label="Move earlier"
-                    className={cn("flex-1 p-1.5 rounded-lg border text-xs transition flex items-center justify-center gap-1", i === 0 ? "opacity-30 border-white/10" : "border-white/15 hover:border-brand-500/60 text-zinc-400 hover:text-white")}>
+                    className={cn("flex-1 p-1.5 rounded-lg border text-xs transition flex items-center justify-center gap-1", i === 0 ? "opacity-30 border-black/10 dark:border-white/10" : "border-black/15 dark:border-white/15 hover:border-brand-500/60 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white")}>
                     <ArrowUp size={12} /> Prev
                   </button>
                   <button onClick={() => move(i, 1)} disabled={i === files.length - 1} aria-label="Move later"
-                    className={cn("flex-1 p-1.5 rounded-lg border text-xs transition flex items-center justify-center gap-1", i === files.length - 1 ? "opacity-30 border-white/10" : "border-white/15 hover:border-brand-500/60 text-zinc-400 hover:text-white")}>
+                    className={cn("flex-1 p-1.5 rounded-lg border text-xs transition flex items-center justify-center gap-1", i === files.length - 1 ? "opacity-30 border-black/10 dark:border-white/10" : "border-black/15 dark:border-white/15 hover:border-brand-500/60 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white")}>
                     Next <ArrowDown size={12} />
                   </button>
                 </div>
@@ -172,8 +172,8 @@ export default function ImagesToPdf() {
             ))}
           </div>
 
-          <p className="text-sm text-zinc-400 flex items-center gap-2">
-            <ImagePlus size={14} className="text-brand-400" />
+          <p className="text-sm text-zinc-600 dark:text-zinc-400 flex items-center gap-2">
+            <ImagePlus size={14} className="text-brand-700 dark:text-brand-400" />
             {files.length} image{files.length > 1 ? "s" : ""} → each becomes one centered A4 page
           </p>
 
@@ -185,7 +185,7 @@ export default function ImagesToPdf() {
           </Button>
 
           {busy && progress && (
-            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+            <div className="h-2 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-brand-500 to-accent-500 transition-all duration-300"
                 style={{ width: `${Math.round((progress.current / progress.total) * 100)}%` }}
@@ -196,7 +196,7 @@ export default function ImagesToPdf() {
           {result && (
             <div className="glass rounded-xl p-4 flex items-center justify-between animate-fade-up">
               <div className="text-sm">
-                <p className="font-medium text-emerald-300">PDF ready</p>
+                <p className="font-medium text-emerald-700 dark:text-emerald-300">PDF ready</p>
                 <p className="text-zinc-500 text-xs">{formatBytes(result.size)}</p>
               </div>
               <a href={result.url} download="images.pdf">

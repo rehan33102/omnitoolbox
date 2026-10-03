@@ -44,7 +44,7 @@ function LoginForm() {
         <Button type="submit" disabled={busy} className="w-full">{busy ? "Logging in…" : "Log in"}</Button>
       </form>
       <p className="text-sm text-zinc-500 mt-5 text-center">
-        No account? <Link href="/signup" className="text-brand-400 hover:text-brand-300">Sign up free</Link>
+        No account? <Link href="/signup" className="text-brand-700 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300">Sign up free</Link>
       </p>
     </Card>
   );

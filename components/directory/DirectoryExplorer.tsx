@@ -54,7 +54,7 @@ export default function DirectoryExplorer({ tools }: { tools: AIToolListing[] })
             key={c}
             onClick={() => setCat(c)}
             className={cn("btn-base px-3.5 py-1.5 text-xs rounded-full border capitalize",
-              cat === c ? "bg-brand-600 text-white border-brand-500 shadow-glow" : "glass text-zinc-400 hover:text-white")}
+              cat === c ? "bg-brand-600 text-white border-brand-500 shadow-glow" : "glass text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white")}
           >
             {c === "all" ? "All tools" : c}
           </button>

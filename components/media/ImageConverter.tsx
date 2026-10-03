@@ -98,7 +98,7 @@ export default function ImageConverter() {
         onDrop={(e) => (e.preventDefault(), setDrag(false), onFile(e.dataTransfer.files[0]))}
         className={cn(
           "border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition",
-          drag ? "border-brand-500 bg-brand-500/10" : "border-white/15 hover:border-brand-500/50"
+          drag ? "border-brand-500 bg-brand-500/10" : "border-black/15 dark:border-white/15 hover:border-brand-500/50"
         )}
       >
         <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
@@ -107,7 +107,7 @@ export default function ImageConverter() {
         ) : (
           <div className="py-6">
             <ImagePlus size={36} className="mx-auto text-zinc-500 mb-3" />
-            <p className="text-sm text-zinc-300">Drop an image here or <span className="text-brand-400">browse</span></p>
+            <p className="text-sm text-zinc-700 dark:text-zinc-300">Drop an image here or <span className="text-brand-700 dark:text-brand-400">browse</span></p>
             <p className="text-xs text-zinc-500 mt-1">PNG · JPG · WebP · GIF · AVIF — processed locally, never uploaded</p>
           </div>
         )}
@@ -116,19 +116,19 @@ export default function ImageConverter() {
       {file && (
         <>
           <div className="flex items-center justify-between text-sm">
-            <span className="text-zinc-400 truncate">{file.name}</span>
+            <span className="text-zinc-600 dark:text-zinc-400 truncate">{file.name}</span>
             <span className="text-zinc-500 shrink-0 ml-2">{formatBytes(file.size)}</span>
           </div>
 
           <div>
-            <p className="text-sm font-medium text-zinc-300 mb-2">Output format</p>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Output format</p>
             <div className="flex gap-2">
               {FORMATS.map((f) => (
                 <button
                   key={f.id}
                   onClick={() => setFormat(f.id)}
                   className={cn("btn-base px-4 py-2 text-sm rounded-lg border",
-                    format === f.id ? "bg-brand-600/25 border-brand-500/50 text-white" : "glass text-zinc-400")}
+                    format === f.id ? "bg-brand-600/25 border-brand-500/50 text-zinc-900 dark:text-white" : "glass text-zinc-600 dark:text-zinc-400")}
                 >
                   {f.label}
                 </button>
@@ -138,7 +138,7 @@ export default function ImageConverter() {
 
           {format !== "png" && (
             <div>
-              <p className="text-sm font-medium text-zinc-300 mb-2">Quality: {quality}%</p>
+              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Quality: {quality}%</p>
               <input type="range" min={10} max={100} value={quality}
                 onChange={(e) => setQuality(Number(e.target.value))} className="w-full accent-violet-500" />
             </div>
@@ -157,7 +157,7 @@ export default function ImageConverter() {
               <div className="text-sm">
                 <p className="font-medium">Ready to download</p>
                 <p className="text-zinc-500 text-xs">{formatBytes(file.size)} → {formatBytes(result.size)}</p>
-                {savedNote && <p className="text-emerald-400 text-xs mt-1">Saved to Library ✓</p>}
+                {savedNote && <p className="text-emerald-700 dark:text-emerald-400 text-xs mt-1">Saved to Library ✓</p>}
               </div>
               <a href={result.url} download={`${file.name.replace(/\.[^.]+$/, "")}.${format}`}>
                 <Button size="sm"><Download size={14} /> Download</Button>

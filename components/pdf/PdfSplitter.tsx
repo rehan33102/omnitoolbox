@@ -95,22 +95,22 @@ export default function PdfSplitter() {
         onClick={() => inputRef.current?.click()}
         onDrop={(e) => (e.preventDefault(), onFile(e.dataTransfer.files[0]))}
         onDragOver={(e) => e.preventDefault()}
-        className="border-2 border-dashed border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
+        className="border-2 border-dashed border-black/15 dark:border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
       >
         <input ref={inputRef} type="file" accept=".pdf,application/pdf" className="hidden"
           onChange={(e) => { onFile(e.target.files?.[0]); e.target.value = ""; }} />
         {file ? (
           <div className="py-4 flex items-center justify-center gap-3">
-            <FileText size={32} className="text-red-400 shrink-0" />
+            <FileText size={32} className="text-red-600 dark:text-red-400 shrink-0" />
             <div className="text-left">
               <p className="text-sm font-medium truncate max-w-[220px]">{file.name}</p>
-              <p className="text-xs text-zinc-500">{formatBytes(file.size)} · <span className="text-brand-300 font-semibold">{pageCount} pages</span></p>
+              <p className="text-xs text-zinc-500">{formatBytes(file.size)} · <span className="text-brand-700 dark:text-brand-300 font-semibold">{pageCount} pages</span></p>
             </div>
           </div>
         ) : (
           <div className="py-6">
             <Upload size={36} className="mx-auto text-zinc-500 mb-3" />
-            <p className="text-sm text-zinc-300">Drop a PDF here or <span className="text-brand-400">browse</span></p>
+            <p className="text-sm text-zinc-700 dark:text-zinc-300">Drop a PDF here or <span className="text-brand-700 dark:text-brand-400">browse</span></p>
             <p className="text-xs text-zinc-500 mt-1">Single PDF · up to 25 MB · 100% client-side</p>
           </div>
         )}
@@ -119,7 +119,7 @@ export default function PdfSplitter() {
       {file && (
         <>
           <div>
-            <label htmlFor="pdf-range" className="text-sm font-medium text-zinc-300 mb-2 block">
+            <label htmlFor="pdf-range" className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">
               Pages to extract
             </label>
             <input
@@ -131,7 +131,7 @@ export default function PdfSplitter() {
               className="w-full glass rounded-xl px-4 py-2.5 text-sm placeholder:text-zinc-600 focus:outline-none focus:border-brand-500/60 border border-transparent"
             />
             <p className="text-xs text-zinc-500 mt-1.5">
-              Single pages or ranges, separated by commas — e.g. <span className="text-zinc-300">1-3,5</span>. This PDF has {pageCount} pages.
+              Single pages or ranges, separated by commas — e.g. <span className="text-zinc-700 dark:text-zinc-300">1-3,5</span>. This PDF has {pageCount} pages.
             </p>
           </div>
 
@@ -143,7 +143,7 @@ export default function PdfSplitter() {
           {result && (
             <div className="glass rounded-xl p-4 flex items-center justify-between animate-fade-up">
               <div className="text-sm">
-                <p className="font-medium text-emerald-300">{result.pages} page{result.pages > 1 ? "s" : ""} extracted</p>
+                <p className="font-medium text-emerald-700 dark:text-emerald-300">{result.pages} page{result.pages > 1 ? "s" : ""} extracted</p>
                 <p className="text-zinc-500 text-xs">{formatBytes(result.size)} · new PDF</p>
               </div>
               <a href={result.url} download={`extracted-pages.pdf`}>

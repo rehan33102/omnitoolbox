@@ -100,7 +100,7 @@ export default function ImageCompressor() {
         onClick={() => inputRef.current?.click()}
         onDrop={(e) => (e.preventDefault(), onFile(e.dataTransfer.files[0]))}
         onDragOver={(e) => e.preventDefault()}
-        className="border-2 border-dashed border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
+        className="border-2 border-dashed border-black/15 dark:border-white/15 hover:border-brand-500/50 rounded-2xl p-8 text-center cursor-pointer transition"
       >
         <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
         {preview ? (
@@ -108,7 +108,7 @@ export default function ImageCompressor() {
         ) : (
           <div className="py-6">
             <ImagePlus size={36} className="mx-auto text-zinc-500 mb-3" />
-            <p className="text-sm text-zinc-300">Drop an image here or <span className="text-brand-400">browse</span></p>
+            <p className="text-sm text-zinc-700 dark:text-zinc-300">Drop an image here or <span className="text-brand-700 dark:text-brand-400">browse</span></p>
             <p className="text-xs text-zinc-500 mt-1">100% client-side — your image never leaves the browser</p>
           </div>
         )}
@@ -117,12 +117,12 @@ export default function ImageCompressor() {
       {file && (
         <>
           <div>
-            <p className="text-sm font-medium text-zinc-300 mb-2">Output format</p>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Output format</p>
             <div className="flex flex-wrap gap-2">
               {FORMATS.map((f) => (
                 <button key={f.id} onClick={() => setFormat(f.id)}
                   className={cn("btn-base px-4 py-2 text-sm rounded-lg border",
-                    format === f.id ? "bg-brand-600/25 border-brand-500/50 text-white" : "glass text-zinc-400")}>
+                    format === f.id ? "bg-brand-600/25 border-brand-500/50 text-zinc-900 dark:text-white" : "glass text-zinc-600 dark:text-zinc-400")}>
                   {f.label} <span className="text-xs opacity-60">· {f.hint}</span>
                 </button>
               ))}
@@ -130,18 +130,18 @@ export default function ImageCompressor() {
           </div>
           {format !== "png" && (
             <div>
-              <p className="text-sm font-medium text-zinc-300 mb-2">Quality: {quality}%</p>
+              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Quality: {quality}%</p>
               <input type="range" min={10} max={100} value={quality}
                 onChange={(e) => setQuality(Number(e.target.value))} className="w-full accent-violet-500" />
             </div>
           )}
           <div>
-            <p className="text-sm font-medium text-zinc-300 mb-2">Max dimension</p>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">Max dimension</p>
             <div className="flex flex-wrap gap-2">
               {MAX_DIMS.map((d) => (
                 <button key={d.id} onClick={() => setMaxDim(d.id)}
                   className={cn("btn-base px-4 py-2 text-sm rounded-lg border",
-                    maxDim === d.id ? "bg-brand-600/25 border-brand-500/50 text-white" : "glass text-zinc-400")}>
+                    maxDim === d.id ? "bg-brand-600/25 border-brand-500/50 text-zinc-900 dark:text-white" : "glass text-zinc-600 dark:text-zinc-400")}>
                   {d.label}
                 </button>
               ))}
@@ -151,11 +151,11 @@ export default function ImageCompressor() {
             {busy ? <Loader2 size={16} className="animate-spin" /> : <Minimize2 size={16} />}
             {busy ? "Compressing…" : "Compress image"}
           </Button>
-          {note && <p className="text-xs text-amber-300/80">{note}</p>}
+          {note && <p className="text-xs text-amber-700 dark:text-amber-300/80">{note}</p>}
           {result && (
             <div className="glass rounded-xl p-4 flex items-center justify-between animate-fade-up">
               <div className="text-sm">
-                <p className="font-medium text-emerald-300">
+                <p className="font-medium text-emerald-700 dark:text-emerald-300">
                   {Math.round((1 - result.size / file.size) * 100)}% smaller
                 </p>
                 <p className="text-zinc-500 text-xs">{formatBytes(file.size)} → {formatBytes(result.size)}</p>
