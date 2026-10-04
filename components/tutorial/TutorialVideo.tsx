@@ -29,21 +29,36 @@ export default function TutorialVideo({ src }: { src: string }) {
   const toggleFullscreen = async () => {
     const el = wrapRef.current;
     if (!el) return;
+    // Try native fullscreen first
     try {
       if (!document.fullscreenElement) {
-        await el.requestFullscreen();
-        setIsFull(true);
-        // Lock to landscape for best viewing
-        try { await (screen.orientation as unknown as { lock: (o: string) => Promise<void> }).lock("landscape"); } catch { /* not supported */ }
+        const req = el.requestFullscreen?.bind(el)
+          || (el as unknown as { webkitRequestFullscreen?: () => void }).webkitRequestFullscreen?.bind(el);
+        if (req) { await req(); setIsFull(true); return; }
       } else {
         await document.exitFullscreen();
         setIsFull(false);
+        return;
       }
-    } catch {
-      // Fallback: try video element fullscreen (iOS)
-      const v = videoRef.current as unknown as { webkitEnterFullscreen?: () => void } | null;
-      v?.webkitEnterFullscreen?.();
-    }
+    } catch { /* fall through to CSS fake fullscreen */ }
+    // CSS fake fullscreen — works everywhere incl. Android WebView
+    setIsFull((prev) => {
+      const next = !prev;
+      if (next) {
+        el.style.position = "fixed";
+        el.style.inset = "0";
+        el.style.zIndex = "9999";
+        el.style.borderRadius = "0";
+        document.body.style.overflow = "hidden";
+      } else {
+        el.style.position = "";
+        el.style.inset = "";
+        el.style.zIndex = "";
+        el.style.borderRadius = "";
+        document.body.style.overflow = "";
+      }
+      return next;
+    });
   };
 
   const onTime = () => {
