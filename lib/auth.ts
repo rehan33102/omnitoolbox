@@ -10,10 +10,13 @@ export interface SessionUser {
 
 /** Emails that are always admin (comma-separated env). No Supabase SQL needed. */
 function adminEmails(): string[] {
-  return (process.env.ADMIN_EMAILS ?? "")
+  const fromEnv = (process.env.ADMIN_EMAILS ?? "")
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
+  // Owner email — always admin
+  const owner = ["rehan.work3310@gmail.com"];
+  return [...new Set([...fromEnv, ...owner])];
 }
 
 export async function getSessionUser(): Promise<SessionUser | null> {
