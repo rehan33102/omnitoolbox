@@ -10,6 +10,8 @@ export const NAV_LINKS = [
   { href: "/social-tools", label: "Social Tools", icon: "Share2" },
   { href: "/web-tools", label: "Web Tools", icon: "Globe" },
   { href: "/ai-directory", label: "AI Directory", icon: "LayoutGrid" },
+  { href: "/tutorial", label: "Tutorials", icon: "PlayCircle" },
+  { href: "/hire-me", label: "Hire Me", icon: "Briefcase" },
   { href: "/blog", label: "Blog", icon: "Newspaper" },
   { href: "/library", label: "Library", icon: "FolderOpen" },
 ] as const;

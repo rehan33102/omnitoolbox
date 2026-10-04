@@ -32,7 +32,7 @@ export const SETTINGS_KEY = "site";
 export const SETTINGS_UPDATED_EVENT = "otb:settings-updated";
 
 export const WHATSAPP_MESSAGE =
-  "Hi! I found your website and I'm interested in your tools. Can we talk?";
+  "Assalam o alaikum! I found Omni Tool Box and I'm interested. Can we talk about details?";
 
 /** Digits-only WhatsApp number; falls back to the default when empty/invalid. */
 export function normalizeWhatsapp(raw: string | undefined | null): string {
