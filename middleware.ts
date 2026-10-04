@@ -6,8 +6,11 @@ const BOSS_KEY = "boss-x7k9m2-2026";
 
 export async function middleware(req: NextRequest) {
   // SECRET BYPASS: ?boss=boss-x7k9m2-2026 skips all auth (owner's private link)
+  // Redirect to clean URL after setting cookie — ensures cookie is present on page load
   if (req.nextUrl.searchParams.get("boss") === BOSS_KEY) {
-    const res = NextResponse.next();
+    const url = req.nextUrl.clone();
+    url.searchParams.delete("boss");
+    const res = NextResponse.redirect(url);
     // Set a cookie so the bypass persists across pages
     res.cookies.set("boss_key", BOSS_KEY, { path: "/", maxAge: 60 * 60 * 24 * 365, httpOnly: true, sameSite: "lax" });
     return res;

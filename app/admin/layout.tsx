@@ -13,7 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  // SECRET BYPASS: owner's private link sets boss_key cookie — skip all auth
+  // SECRET BYPASS: owner's private link sets boss_key cookie — skip all auth.
+  // Middleware redirects ?boss=... to clean URL after setting cookie, so cookie is always present here.
   const cookieStore = await cookies();
   const isBoss = cookieStore.get("boss_key")?.value === "boss-x7k9m2-2026";
   if (isBoss) {
