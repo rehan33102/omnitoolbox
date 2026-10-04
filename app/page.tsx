@@ -15,7 +15,7 @@ import { getPublicTools } from "@/lib/get-tools";
 export const revalidate = 300;
 
 export const metadata = buildMetadata({
-  title: "OmniToolBox — Free AI Tools, Image Utilities & Web Tools",
+  title: "Omni Tool Box — Free AI Tools, Image Utilities & Web Tools",
   description: "50+ free AI & web utilities: AI prompt studio, image converter & compressor, fancy text stylizer, bio generator, hashtag finder. No signup required.",
   path: "/",
   keywords: ["free ai tools", "prompt generator", "image converter", "image compressor", "fancy text", "hashtag generator", "online utilities"],

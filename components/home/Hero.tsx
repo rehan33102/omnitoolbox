@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { ArrowRight, Smartphone, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Sparkles, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
+import DownloadAppButton from "./DownloadAppButton";
 
 const MARQUEE_ITEMS = [
   "AI Prompt Studio",
@@ -21,9 +22,9 @@ export default function Hero({ toolCount }: { toolCount: number }) {
       {/* Warm premium glow field — GPU-friendly blurred radial blobs */}
       <div className="absolute inset-0 -z-10" aria-hidden>
         <div className="absolute inset-0 bg-ink-950 dark:bg-ink-950" />
-        <div className="absolute -top-48 left-[8%] h-[420px] w-[420px] rounded-full bg-ember-500/25 blur-[130px] animate-glow-drift" />
-        <div className="absolute -top-24 right-[4%] h-[380px] w-[380px] rounded-full bg-magent-500/20 blur-[130px] animate-glow-drift [animation-delay:-4s]" />
-        <div className="absolute top-40 left-1/2 -translate-x-1/2 h-[300px] w-[700px] rounded-full bg-brand-600/15 blur-[140px]" />
+        <div className="absolute -top-48 left-[8%] h-[420px] w-[420px] rounded-full bg-ember-500/25 blur-[80px] animate-glow-drift will-change-transform" />
+        <div className="absolute -top-24 right-[4%] h-[380px] w-[380px] rounded-full bg-magent-500/20 blur-[80px] animate-glow-drift [animation-delay:-4s] will-change-transform" />
+        <div className="absolute top-40 left-1/2 -translate-x-1/2 h-[300px] w-[700px] rounded-full bg-brand-600/15 blur-[90px]" />
         {/* faint grid texture */}
         <div
           className="absolute inset-0 opacity-[0.13]"
@@ -75,9 +76,7 @@ export default function Hero({ toolCount }: { toolCount: number }) {
               <Zap size={17} /> Explore tools <ArrowRight size={17} />
             </Button>
           </Link>
-          <a href="/downloads/omnibox-app.apk" target="_blank" rel="noopener">
-            <Button size="lg" variant="secondary"><Smartphone size={17} /> Download App</Button>
-          </a>
+          <DownloadAppButton />
         </div>
 
         {/* Trust strip */}

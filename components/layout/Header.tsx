@@ -11,6 +11,7 @@ import Drawer from "@/components/ui/Drawer";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import SmartSearch from "@/components/home/SmartSearch";
 import LogoMark from "@/components/layout/LogoMark";
+import ToolIcon from "@/components/ui/ToolIcon";
 import type { Tool } from "@/types";
 
 export default function Header() {
@@ -45,12 +46,13 @@ export default function Header() {
               key={l.href}
               href={l.href}
               className={cn(
-                "px-3 py-2 rounded-lg text-sm transition-colors",
+                "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-colors",
                 pathname === l.href
                   ? "text-zinc-900 dark:text-white bg-black/5 dark:bg-white/10"
                   : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/5"
               )}
             >
+              <ToolIcon name={l.icon} size={15} />
               {l.label}
             </Link>
           ))}
@@ -82,10 +84,11 @@ export default function Header() {
               href={l.href}
               onClick={() => setDrawer(false)}
               className={cn(
-                "px-4 py-3 rounded-xl text-sm transition-colors",
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors",
                 pathname === l.href ? "bg-brand-600/20 text-zinc-900 dark:text-white" : "text-zinc-600 dark:text-zinc-400 hover:bg-black/[0.03] dark:hover:bg-white/5"
               )}
             >
+              <ToolIcon name={l.icon} size={17} />
               {l.label}
             </Link>
           ))}

@@ -17,7 +17,7 @@ const CDN_URLS = [
 ];
 
 // Give slow mobile connections a fair chance, but NEVER hang forever.
-const ENGINE_TIMEOUT_MS = 150_000;
+const ENGINE_TIMEOUT_MS = 600_000;
 
 // Shared across mounts: the heavy AI engine loads once per page lifetime.
 let enginePromise: Promise<RemoveFn> | null = null;

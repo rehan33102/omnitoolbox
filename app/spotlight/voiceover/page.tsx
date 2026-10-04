@@ -50,9 +50,9 @@ export default function VoiceoverSpotlightPage() {
       {/* Premium glow field — ember → magenta → purple */}
       <div className="absolute inset-0 -z-10" aria-hidden>
         <div className="absolute inset-0 bg-ink-950" />
-        <div className="absolute -top-40 left-[5%] h-[440px] w-[440px] rounded-full bg-ember-500/25 blur-[130px] animate-glow-drift" />
-        <div className="absolute -top-24 right-[2%] h-[400px] w-[400px] rounded-full bg-magent-500/25 blur-[130px] animate-glow-drift [animation-delay:-4s]" />
-        <div className="absolute top-64 left-1/2 -translate-x-1/2 h-[320px] w-[720px] rounded-full bg-purple-600/20 blur-[150px]" />
+        <div className="absolute -top-40 left-[5%] h-[440px] w-[440px] rounded-full bg-ember-500/25 blur-[80px] animate-glow-drift will-change-transform" />
+        <div className="absolute -top-24 right-[2%] h-[400px] w-[400px] rounded-full bg-magent-500/25 blur-[80px] animate-glow-drift will-change-transform [animation-delay:-4s]" />
+        <div className="absolute top-64 left-1/2 -translate-x-1/2 h-[320px] w-[720px] rounded-full bg-purple-600/20 blur-[90px]" />
       </div>
 
       <div className="container pt-14 pb-10 md:pt-20 md:pb-14 text-center">
