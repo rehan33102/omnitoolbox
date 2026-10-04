@@ -144,6 +144,16 @@ export function smartSearch(tools: Tool[], rawQuery: string, limit = 8): SearchH
         }
         if (q.length >= 4 && kw.includes(q)) bonus = Math.max(bonus, 3);
       }
+      // A-to-Z prefix boost: typing "a" surfaces tools STARTING with "a" first.
+      // ("a" -> "AI Voiceover" before "Background Remover" which merely contains "a")
+      const titleNorm = norm(tool.title);
+      if (titleNorm.startsWith(q)) {
+        bonus += 10 + (20 / (1 + titleNorm.length)); // shorter titles rank slightly higher
+      } else {
+        // word-boundary prefix: "voice" matches "AI Voiceover" at word start
+        const words = titleNorm.split(/\s+/);
+        if (words.some((w) => w.startsWith(q))) bonus += 5;
+      }
       hits.push({ tool, score: total + bonus });
     }
   }
