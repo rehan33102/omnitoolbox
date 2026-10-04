@@ -25,16 +25,16 @@ function LoginForm() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast({ title: "Welcome back!", variant: "success" });
-      // Admin users go straight to dashboard
+      // Admin users go straight to dashboard (hard redirect ensures server sees session)
       const next = params.get("next");
       if (next) {
-        router.push(next);
+        window.location.href = next;
       } else if (email.trim().toLowerCase() === "rehan.work3310@gmail.com") {
-        router.push("/admin");
+        window.location.href = "/admin";
       } else {
         router.push("/");
+        router.refresh();
       }
-      router.refresh();
     } catch (err) {
       toast({ title: "Login failed", description: (err as Error).message, variant: "error" });
     } finally {
