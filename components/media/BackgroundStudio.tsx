@@ -13,6 +13,7 @@ import { useToast } from "@/components/ui/Toast";
 import { loadBgEngine, removeBackgroundSmart, type ProgressCb, type RemoveFn } from "@/lib/bg-engine";
 import { formatBytes } from "@/lib/utils";
 import { saveBlob } from "@/lib/db";
+import { saveToLibrary } from "@/lib/library-save";
 
 type BgKind = "transparent" | "color" | "gradient" | "blur" | "image" | "preset";
 
@@ -578,7 +579,7 @@ export default function BackgroundStudio() {
       if (!blob) throw new Error("encode");
       // Persist so the output survives refresh — best-effort, never blocks UX.
       try {
-        void saveBlob("image", blob, hd ? "background-studio-hd.png" : "background-studio.png", {
+        void saveToLibrary("image", blob, hd ? "background-studio-hd.png" : "background-studio.png", {
           tool: "bg-studio",
           background: bgKind,
         });

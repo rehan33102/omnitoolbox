@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes } from "@/lib/utils";
 import { saveBlob } from "@/lib/db";
+import { saveToLibrary } from "@/lib/library-save";
 
 const MAX_SIZE = 25 * 1024 * 1024;
 
@@ -83,7 +84,7 @@ export default function PdfSplitter() {
       const blob = new Blob([bytes as unknown as BlobPart], { type: "application/pdf" });
       setResult({ url: URL.createObjectURL(blob), size: blob.size, pages: pages.length });
       try {
-        void saveBlob("pdf", blob, "extracted-pages.pdf", { tool: "pdf-split", pages: pages.length });
+        void saveToLibrary("pdf", blob, "extracted-pages.pdf", { tool: "pdf-split", pages: pages.length });
       } catch {
         /* library save is non-critical */
       }

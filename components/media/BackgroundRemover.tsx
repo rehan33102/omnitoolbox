@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes } from "@/lib/utils";
 import { saveBlob } from "@/lib/db";
+import { saveToLibrary } from "@/lib/library-save";
 
 type ProgressCb = (key: string, current: number, total: number) => void;
 type RemoveFn = (image: Blob, config?: Record<string, unknown>) => Promise<Blob>;
@@ -129,7 +130,7 @@ export default function BackgroundRemover() {
   const persistResult = (blob: Blob) => {
     try {
       const base = file?.name.replace(/\.[^.]+$/, "") ?? "image";
-      void saveBlob("image", blob, `no-bg-${base}.png`, { tool: "bg-remover" });
+      void saveToLibrary("image", blob, `no-bg-${base}.png`, { tool: "bg-remover" });
     } catch {
       /* library save is non-critical */
     }

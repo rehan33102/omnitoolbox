@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/Toast";
 import { formatBytes } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { saveBlob } from "@/lib/db";
+import { saveToLibrary } from "@/lib/library-save";
 
 type OutFormat = "png" | "jpeg" | "webp";
 const FORMATS: { id: OutFormat; label: string }[] = [
@@ -71,7 +72,7 @@ export default function ImageConverter() {
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
       // Auto-save to My Library — best-effort.
       try {
-        const id = await saveBlob("image", blob, `${file.name.replace(/\.[^.]+$/, "")}.${format}`, { format });
+        const id = await saveToLibrary("image", blob, `${file.name.replace(/\.[^.]+$/, "")}.${format}`, { format });
         if (id) setSavedNote(true);
       } catch {
         /* library save is non-critical */

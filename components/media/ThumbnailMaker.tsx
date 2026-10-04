@@ -15,6 +15,7 @@ import Switch from "@/components/ui/Switch";
 import { useToast } from "@/components/ui/Toast";
 import { loadBgEngine, removeBackgroundSmart, type RemoveFn } from "@/lib/bg-engine";
 import { saveBlob } from "@/lib/db";
+import { saveToLibrary } from "@/lib/library-save";
 
 const W = 1280, H = 720;
 
@@ -242,12 +243,12 @@ export default function ThumbnailMaker() {
     toast({ title: `Downloaded ${fmt.toUpperCase()}!`, variant: "success" });
   };
 
-  const saveToLibrary = async () => {
+  const handleSaveToLibrary = async () => {
     const cv = canvasRef.current;
     if (!cv) return;
     cv.toBlob(async (blob) => {
       if (!blob) return;
-      await saveBlob("image", blob, `thumbnail-${Date.now()}.png`, { tool: "thumbnail-maker" });
+      await saveToLibrary("image", blob, `thumbnail-${Date.now()}.png`, { tool: "thumbnail-maker" });
       toast({ title: "Saved to Library!", variant: "success" });
     }, "image/png");
   };
@@ -266,7 +267,7 @@ export default function ThumbnailMaker() {
         <div className="mt-3 flex flex-wrap gap-2">
           <Button size="sm" onClick={() => download("png")}><Download size={14} /> PNG</Button>
           <Button size="sm" variant="secondary" onClick={() => download("jpg")}><Download size={14} /> JPG</Button>
-          <Button size="sm" variant="outline" onClick={saveToLibrary}><ImagePlus size={14} /> Save to Library</Button>
+          <Button size="sm" variant="outline" onClick={handleSaveToLibrary}><ImagePlus size={14} /> Save to Library</Button>
         </div>
       </Card>
 

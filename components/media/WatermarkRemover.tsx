@@ -20,6 +20,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { autoRemoveGeminiWatermark, getAlphaMap, removeWatermarkReverseAlpha } from "@/lib/gemini-watermark";
 import { saveBlob } from "@/lib/db";
+import { saveToLibrary } from "@/lib/library-save";
 
 /* ---------------- manual inpainting fallback (non-Gemini marks) -------- */
 
@@ -167,9 +168,9 @@ export default function WatermarkRemover() {
   const { toast } = useToast();
 
   // Persist so the output survives refresh — best-effort, never blocks UX.
-  const persistResult = (kind: string, blob: Blob, name: string) => {
+  const persistResult = (kind: "voiceover" | "qr" | "image" | "pdf" | "video", blob: Blob, name: string) => {
     try {
-      void saveBlob(kind, blob, name, { tool: "watermark" });
+      void saveToLibrary(kind, blob, name, { tool: "watermark" });
     } catch {
       /* library save is non-critical */
     }

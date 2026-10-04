@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes, cn } from "@/lib/utils";
 import { saveBlob } from "@/lib/db";
+import { saveToLibrary } from "@/lib/library-save";
 
 type OutFormat = "webp" | "jpeg" | "png";
 const FORMATS: { id: OutFormat; label: string; hint: string }[] = [
@@ -88,7 +89,7 @@ export default function ImageCompressor() {
       // Persist so the output survives refresh — best-effort, never blocks UX.
       try {
         const name = `compressed-${file.name.replace(/\.[^.]+$/, "")}.${format === "jpeg" ? "jpg" : format}`;
-        void saveBlob("image", blob, name, { tool: "compressor" });
+        void saveToLibrary("image", blob, name, { tool: "compressor" });
       } catch {
         /* library save is non-critical */
       }

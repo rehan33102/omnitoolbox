@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { saveBlob } from "@/lib/db";
+import { saveToLibrary } from "@/lib/library-save";
 
 type ECLevel = "L" | "M" | "Q" | "H";
 
@@ -51,7 +52,7 @@ export default function QrGenerator() {
         savedForRef.current = value;
         try {
           const blob = await (await fetch(url)).blob();
-          const id = await saveBlob("qr", blob, `qr-${Date.now()}.png`, {
+          const id = await saveToLibrary("qr", blob, `qr-${Date.now()}.png`, {
             text: value.slice(0, 100),
           });
           if (id) setSavedNote(true);

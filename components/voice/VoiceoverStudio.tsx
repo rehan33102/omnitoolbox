@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { Textarea } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { deleteBlob, getBlob, saveBlob } from "@/lib/db";
+import { saveToLibrary } from "@/lib/library-save";
 
 const MAX_CHARS = 100000; // effectively unlimited — chunked server-side
 const PART_CHARS = 500; // per server request; server chunks further internally
@@ -282,7 +283,7 @@ export default function VoiceoverStudio() {
         ? `${edgeVoice === "male" ? "Male" : "Female"} · ${edgeStyles.find((s) => s.key === edgeStyle)?.label ?? edgeStyle}`
         : undefined;
       // Persist the MP3 to the central library (kind "voiceover"), SRT in meta.
-      const blobId = await saveBlob("voiceover", blob, fileName, {
+      const blobId = await saveToLibrary("voiceover", blob, fileName, {
         text: script.slice(0, 100) + (script.length > 100 ? "…" : ""),
         lang,
         langLabel: langLabel(lang),
