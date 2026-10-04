@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { ShieldAlert } from "lucide-react";
 import { getSessionUser } from "@/lib/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminMobileNav from "@/components/admin/AdminMobileNav";
-import AdminLoginForm from "@/components/admin/AdminLoginForm";
 import Card from "@/components/ui/Card";
 
 export const metadata: Metadata = {
@@ -14,8 +14,10 @@ export const metadata: Metadata = {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const user = await getSessionUser();
 
-  // Not logged in → /admin itself shows the Gmail + password login form.
-  if (!user) return <AdminLoginForm />;
+  // Not logged in → redirect to dedicated admin auth page.
+  if (!user) {
+    redirect("/admin/auth");
+  }
 
   // Logged in but not admin → clear message instead of a confusing redirect.
   if (user.role !== "admin") {
