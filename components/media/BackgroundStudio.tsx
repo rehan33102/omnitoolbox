@@ -17,9 +17,12 @@ import { saveBlob } from "@/lib/db";
 type BgKind = "transparent" | "color" | "gradient" | "blur" | "image" | "preset";
 
 const COLOR_SWATCHES = [
-  "#ffffff", "#f5f5f4", "#e7e5e4", "#a8a29e", "#57534e", "#1c1917",
-  "#ef4444", "#f97316", "#f59e0b", "#84cc16", "#22c55e", "#14b8a6",
-  "#06b6d4", "#3b82f6", "#6366f1", "#a855f7", "#d946ef", "#ec4899",
+  "#ffffff", "#f5f5f4", "#e7e5e4", "#a8a29e", "#57534e", "#1c1917", "#000000",
+  "#ef4444", "#dc2626", "#991b1b", "#f97316", "#ea580c", "#f59e0b", "#fbbf24",
+  "#84cc16", "#65a30d", "#22c55e", "#16a34a", "#14b8a6", "#0d9488", "#06b6d4",
+  "#0284c7", "#3b82f6", "#2563eb", "#1e40af", "#6366f1", "#4f46e5", "#a855f7",
+  "#7e22ce", "#d946ef", "#a21caf", "#ec4899", "#db2777", "#9d174d", "#f43f5e",
+  "#e11d48", "#881337", "#fb7185", "#fda4af", "#fecdd3",
 ];
 
 const GRADIENTS: { name: string; from: string; to: string }[] = [
@@ -56,6 +59,14 @@ const PRESETS: { name: string; css: string; img: string }[] = [
   { name: "Vintage Car", css: "linear-gradient(180deg, #451a03 0%, #92400e 50%, #fbbf24 100%)", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80" },
   { name: "Bridge", css: "linear-gradient(180deg, #1e293b 0%, #020617 100%)", img: "https://images.unsplash.com/photo-1449034446853-66c86144b0ad?w=800&q=80" },
   { name: "Field", css: "linear-gradient(180deg, #fefce8 0%, #fef08a 50%, #eab308 100%)", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80" },
+  { name: "Taj Mahal", css: "linear-gradient(180deg, #fef3c7 0%, #f59e0b 100%)", img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80" },
+  { name: "Eiffel Tower", css: "linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%)", img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800&q=80" },
+  { name: "Balloons", css: "linear-gradient(180deg, #fce7f3 0%, #ec4899 100%)", img: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=800&q=80" },
+  { name: "Snow", css: "linear-gradient(180deg, #f8fafc 0%, #cbd5e1 100%)", img: "https://images.unsplash.com/photo-1418985991508-e47386d96a71?w=800&q=80" },
+  { name: "Autumn", css: "linear-gradient(180deg, #7c2d12 0%, #fbbf24 100%)", img: "https://images.unsplash.com/photo-1507371341162-763b5e419408?w=800&q=80" },
+  { name: "Castle", css: "linear-gradient(180deg, #312e81 0%, #0f172a 100%)", img: "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=800&q=80" },
+  { name: "Island", css: "linear-gradient(180deg, #7dd3fc 0%, #0c4a6e 100%)", img: "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&q=80" },
+  { name: "Stadium", css: "linear-gradient(180deg, #166534 0%, #052e16 100%)", img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80" },
 ];
 
 export default function BackgroundStudio() {
@@ -127,8 +138,13 @@ export default function BackgroundStudio() {
       const bitmap = await createImageBitmap(blob);
       const fg = document.createElement("canvas");
       fg.width = bitmap.width; fg.height = bitmap.height;
-      fg.getContext("2d")!.drawImage(bitmap, 0, 0);
+      const fgCtx = fg.getContext("2d")!;
+      fgCtx.drawImage(bitmap, 0, 0);
       bitmap.close();
+
+      // Edge refine: smooth jagged alpha edges for cleaner cutout
+      refineAlphaEdges(fg, 1.5);
+
       fgRef.current = fg;
       dimsRef.current = { w: fg.width, h: fg.height };
 
@@ -514,6 +530,29 @@ function Slider({ label, value, min, max, step = 1, onChange, fmt }: {
       <span className="w-12 shrink-0 text-right text-zinc-300">{fmt(value)}</span>
     </label>
   );
+}
+
+/** Smooth jagged alpha edges on a cutout canvas for cleaner subject extraction. */
+function refineAlphaEdges(cv: HTMLCanvasElement, radius: number) {
+  const ctx = cv.getContext("2d")!;
+  const w = cv.width, h = cv.height;
+  // Step 1: slight blur on alpha only via temp canvas
+  const tmp = document.createElement("canvas");
+  tmp.width = w; tmp.height = h;
+  const tctx = tmp.getContext("2d")!;
+  tctx.filter = `blur(${radius}px)`;
+  tctx.drawImage(cv, 0, 0);
+  // Step 2: threshold semi-transparent fringe pixels
+  const src = ctx.getImageData(0, 0, w, h);
+  const blr = tctx.getImageData(0, 0, w, h);
+  const d = src.data, b = blr.data;
+  for (let i = 3; i < d.length; i += 4) {
+    const a = b[i];
+    // kill faint halo fringe, keep solid subject
+    if (a < 24) d[i] = 0;
+    else if (a < 128) d[i] = Math.round(a * 0.85);
+  }
+  ctx.putImageData(src, 0, 0);
 }
 
 /** Cache for preloaded scene images. */
