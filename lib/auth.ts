@@ -33,13 +33,9 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       .single();
 
     if (!profile) {
-      // First-ever user in the system becomes admin automatically (bootstrap).
-      const { count } = await admin
-        .from("profiles")
-        .select("id", { count: "exact", head: true })
-        .eq("role", "admin");
-      let role: "admin" | "user" = !count ? "admin" : "user";
-      if (adminEmails().includes(email)) role = "admin";
+      // SECURITY: No auto-bootstrap. Only emails in ADMIN_EMAILS env can ever be admin.
+      // New users are always "user" role — admin must be granted explicitly.
+      const role: "admin" | "user" = adminEmails().includes(email) ? "admin" : "user";
       const { data: created } = await admin
         .from("profiles")
         .insert({ id: user.id, email: user.email ?? "", role })
