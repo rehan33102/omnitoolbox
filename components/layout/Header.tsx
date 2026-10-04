@@ -41,21 +41,34 @@ export default function Header() {
         </Link>
 
         <nav className="hidden xl:flex items-center gap-1 ml-4">
-          {NAV_LINKS.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm transition-colors",
-                pathname === l.href
-                  ? "text-zinc-900 dark:text-white bg-black/5 dark:bg-white/10"
-                  : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-black/[0.03] dark:hover:bg-white/5"
-              )}
-            >
-              <ToolIcon name={l.icon} size={15} />
-              {l.label}
-            </Link>
-          ))}
+          {NAV_LINKS.map((l) => {
+            const active = pathname === l.href;
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={cn(
+                  "group relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200",
+                  active
+                    ? "text-white bg-gradient-to-r from-ember-500 to-magent-500 shadow-glow-warm scale-[1.02]"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-gradient-to-r hover:from-ember-500/10 hover:to-magent-500/10 hover:shadow-md hover:-translate-y-px"
+                )}
+              >
+                <ToolIcon
+                  name={l.icon}
+                  size={15}
+                  className={cn(
+                    "transition-transform duration-200",
+                    active ? "scale-110" : "group-hover:scale-110 group-hover:rotate-6"
+                  )}
+                />
+                {l.label}
+                {active && (
+                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-white/80" />
+                )}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
