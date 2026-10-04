@@ -7,9 +7,16 @@ export default function manifest(): MetadataRoute.Manifest {
     short_name: "OmniToolBox",
     description: SITE_TAGLINE,
     start_url: "/",
+    scope: "/",
     display: "standalone",
-    background_color: "#08080f",
-    theme_color: "#7c3aed",
-    icons: [{ src: "/icon", sizes: "64x64", type: "image/png" }],
+    orientation: "portrait",
+    background_color: "#050A14",
+    theme_color: "#050A14",
+    icons: [
+      { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icons/icon-maskable-192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
+      { src: "/icons/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+    ],
   };
 }

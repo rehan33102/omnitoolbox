@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { Toaster, ToastProvider } from "@/components/ui/Toast";
 import { siteUrl } from "@/lib/utils";
 import { SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
@@ -46,6 +47,14 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -54,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`${inter.variable} ${display.variable} ${condensed.variable} min-h-screen flex flex-col`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ToastProvider>
+            <ServiceWorkerRegister />
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
