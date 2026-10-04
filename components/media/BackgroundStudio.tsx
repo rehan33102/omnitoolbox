@@ -33,32 +33,29 @@ const GRADIENTS: { name: string; from: string; to: string }[] = [
   { name: "Fire", from: "#f83600", to: "#f9d423" },
 ];
 
-const PRESETS: { name: string; css: string }[] = [
-  { name: "Studio", css: "radial-gradient(circle at 50% 35%, #f8fafc 0%, #cbd5e1 55%, #94a3b8 100%)" },
-  { name: "Beach", css: "linear-gradient(180deg, #7dd3fc 0%, #bae6fd 45%, #fde68a 75%, #fcd34d 100%)" },
-  { name: "Office", css: "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 60%, #94a3b8 100%)" },
-  { name: "Neon", css: "radial-gradient(circle at 20% 20%, #d946ef 0%, transparent 50%), radial-gradient(circle at 80% 80%, #06b6d4 0%, transparent 50%), linear-gradient(135deg, #0f172a, #1e1b4b)" },
-  { name: "Sunset", css: "linear-gradient(180deg, #312e81 0%, #be185d 55%, #fb923c 100%)" },
-  { name: "Forest", css: "radial-gradient(circle at 50% 100%, #166534 0%, #052e16 70%)" },
-  { name: "Midnight", css: "linear-gradient(180deg, #1e1b4b 0%, #4c1d95 50%, #0f172a 100%)" },
-  { name: "Golden Hour", css: "linear-gradient(180deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)" },
-  { name: "Deep Ocean", css: "linear-gradient(180deg, #0c4a6e 0%, #0369a1 60%, #082f49 100%)" },
-  { name: "Cotton Candy", css: "linear-gradient(180deg, #fce7f3 0%, #f9a8d4 50%, #ec4899 100%)" },
-  { name: "Aurora", css: "radial-gradient(circle at 30% 30%, #34d399 0%, transparent 50%), radial-gradient(circle at 70% 60%, #60a5fa 0%, transparent 50%), linear-gradient(135deg, #020617, #0f172a)" },
-  { name: "Desert Dusk", css: "linear-gradient(180deg, #7c2d12 0%, #c2410c 50%, #431407 100%)" },
-  { name: "Mint Fresh", css: "linear-gradient(180deg, #ecfdf5 0%, #6ee7b7 100%)" },
-  { name: "City Lights", css: "radial-gradient(circle at 50% 80%, #fbbf24 0%, transparent 40%), radial-gradient(circle at 20% 30%, #ef4444 0%, transparent 40%), radial-gradient(circle at 80% 20%, #3b82f6 0%, transparent 40%), linear-gradient(135deg, #111827, #1f2937)" },
-  { name: "Lavender", css: "linear-gradient(180deg, #fdf4ff 0%, #e9d5ff 50%, #a855f7 100%)" },
-  { name: "Teal Depth", css: "linear-gradient(180deg, #0f766e 0%, #042f2e 100%)" },
-  { name: "Peach Glow", css: "linear-gradient(180deg, #fff7ed 0%, #fdba74 60%, #ea580c 100%)" },
-  { name: "Galaxy", css: "radial-gradient(circle at 70% 30%, #8b5cf6 0%, transparent 50%), radial-gradient(circle at 30% 70%, #ec4899 0%, transparent 50%), linear-gradient(135deg, #030014, #1e1b4b)" },
-  { name: "Aqua Mist", css: "linear-gradient(180deg, #f0fdfa 0%, #99f6e4 100%)" },
-  { name: "Coffee Gold", css: "linear-gradient(180deg, #451a03 0%, #92400e 50%, #fbbf24 100%)" },
-  { name: "Dark Slate", css: "linear-gradient(180deg, #1e293b 0%, #020617 100%)" },
-  { name: "Lemon Shine", css: "linear-gradient(180deg, #fefce8 0%, #fef08a 50%, #eab308 100%)" },
-  { name: "Rose Night", css: "radial-gradient(circle at 50% 40%, #f43f5e 0%, transparent 60%), linear-gradient(135deg, #1c0a0a, #450a0a)" },
-  { name: "Sky Blue", css: "linear-gradient(180deg, #eff6ff 0%, #93c5fd 100%)" },
-  { name: "Clean White", css: "radial-gradient(circle at 50% 50%, #ffffff 0%, #f1f5f9 70%, #cbd5e1 100%)" },
+const PRESETS: { name: string; css: string; img: string }[] = [
+  { name: "Studio", css: "radial-gradient(circle at 50% 35%, #f8fafc 0%, #cbd5e1 55%, #94a3b8 100%)", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" },
+  { name: "Beach", css: "linear-gradient(180deg, #7dd3fc 0%, #bae6fd 45%, #fde68a 75%, #fcd34d 100%)", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80" },
+  { name: "Office", css: "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 60%, #94a3b8 100%)", img: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80" },
+  { name: "Neon City", css: "radial-gradient(circle at 20% 20%, #d946ef 0%, transparent 50%), radial-gradient(circle at 80% 80%, #06b6d4 0%, transparent 50%), linear-gradient(135deg, #0f172a, #1e1b4b)", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&q=80" },
+  { name: "Sunset", css: "linear-gradient(180deg, #312e81 0%, #be185d 55%, #fb923c 100%)", img: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800&q=80" },
+  { name: "Forest", css: "radial-gradient(circle at 50% 100%, #166534 0%, #052e16 70%)", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80" },
+  { name: "Mountains", css: "linear-gradient(180deg, #1e1b4b 0%, #4c1d95 50%, #0f172a 100%)", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80" },
+  { name: "City Street", css: "linear-gradient(180deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)", img: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80" },
+  { name: "Ocean", css: "linear-gradient(180deg, #0c4a6e 0%, #0369a1 60%, #082f49 100%)", img: "https://images.unsplash.com/photo-1439405326854-014607f694d7?w=800&q=80" },
+  { name: "Flowers", css: "linear-gradient(180deg, #fce7f3 0%, #f9a8d4 50%, #ec4899 100%)", img: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=80" },
+  { name: "Northern Lights", css: "radial-gradient(circle at 30% 30%, #34d399 0%, transparent 50%), radial-gradient(circle at 70% 60%, #60a5fa 0%, transparent 50%), linear-gradient(135deg, #020617, #0f172a)", img: "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=800&q=80" },
+  { name: "Desert", css: "linear-gradient(180deg, #7c2d12 0%, #c2410c 50%, #431407 100%)", img: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=800&q=80" },
+  { name: "Library", css: "linear-gradient(180deg, #ecfdf5 0%, #6ee7b7 100%)", img: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80" },
+  { name: "Night Sky", css: "radial-gradient(circle at 50% 80%, #fbbf24 0%, transparent 40%), linear-gradient(135deg, #111827, #1f2937)", img: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80" },
+  { name: "Garden", css: "linear-gradient(180deg, #fdf4ff 0%, #e9d5ff 50%, #a855f7 100%)", img: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&q=80" },
+  { name: "Waterfall", css: "linear-gradient(180deg, #0f766e 0%, #042f2e 100%)", img: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80" },
+  { name: "Coffee Shop", css: "linear-gradient(180deg, #fff7ed 0%, #fdba74 60%, #ea580c 100%)", img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80" },
+  { name: "Galaxy", css: "radial-gradient(circle at 70% 30%, #8b5cf6 0%, transparent 50%), linear-gradient(135deg, #030014, #1e1b4b)", img: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80" },
+  { name: "Lake", css: "linear-gradient(180deg, #f0fdfa 0%, #99f6e4 100%)", img: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80" },
+  { name: "Vintage Car", css: "linear-gradient(180deg, #451a03 0%, #92400e 50%, #fbbf24 100%)", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80" },
+  { name: "Bridge", css: "linear-gradient(180deg, #1e293b 0%, #020617 100%)", img: "https://images.unsplash.com/photo-1449034446853-66c86144b0ad?w=800&q=80" },
+  { name: "Field", css: "linear-gradient(180deg, #fefce8 0%, #fef08a 50%, #eab308 100%)", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80" },
 ];
 
 export default function BackgroundStudio() {
@@ -74,6 +71,19 @@ export default function BackgroundStudio() {
   const [gradAngle, setGradAngle] = useState(135);
   const [blurAmt, setBlurAmt] = useState(12);
   const [presetIdx, setPresetIdx] = useState(0);
+  const [, setSceneTick] = useState(0);
+
+  // Preload scene photos so canvas shows real images, not fallback
+  useEffect(() => {
+    PRESETS.forEach((p, i) => {
+      if (sceneImgCache.has(i)) return;
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => setSceneTick((t) => t + 1);
+      img.src = p.img;
+      sceneImgCache.set(i, img);
+    });
+  }, []);
   const [shadowOn, setShadowOn] = useState(true);
   const [shadowOpacity, setShadowOpacity] = useState(0.35);
   const [shadowBlur, setShadowBlur] = useState(24);
@@ -434,12 +444,12 @@ export default function BackgroundStudio() {
           </label>
         )}
         {bgKind === "preset" && (
-          <div className="grid grid-cols-3 gap-1.5">
+          <div className="grid grid-cols-3 gap-1.5 max-h-64 overflow-y-auto">
             {PRESETS.map((p, i) => (
               <button key={p.name} onClick={() => setPresetIdx(i)}
-                className={`h-14 rounded-lg text-[11px] font-bold text-white ring-2 transition ${presetIdx === i ? "ring-fuchsia-400 scale-[1.03]" : "ring-white/10"}`}
-                style={{ background: p.css }}>
-                {p.name}
+                className={`relative h-16 rounded-lg text-[11px] font-bold text-white ring-2 transition overflow-hidden ${presetIdx === i ? "ring-fuchsia-400 scale-[1.03]" : "ring-white/10"}`}>
+                <img src={p.img} alt={p.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+                <span className="absolute inset-x-0 bottom-0 bg-black/50 text-[10px] py-0.5">{p.name}</span>
               </button>
             ))}
           </div>
@@ -506,74 +516,39 @@ function Slider({ label, value, min, max, step = 1, onChange, fmt }: {
   );
 }
 
-/** Paint a preset scene into a canvas (canvas-gradient approximation of the CSS looks). */
+/** Cache for preloaded scene images. */
+const sceneImgCache = new Map<number, HTMLImageElement>();
+
+function getSceneImage(idx: number): HTMLImageElement | null {
+  const cached = sceneImgCache.get(idx);
+  if (cached) return cached.complete && cached.naturalWidth > 0 ? cached : null;
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  img.src = PRESETS[idx].img;
+  sceneImgCache.set(idx, img);
+  return null;
+}
+
+/** Draw cover-fit image. */
+function drawCover(ctx: CanvasRenderingContext2D, img: HTMLImageElement, w: number, h: number) {
+  const ir = img.naturalWidth / img.naturalHeight;
+  const cr = w / h;
+  let dw = w, dh = h;
+  if (ir > cr) { dh = h; dw = h * ir; } else { dw = w; dh = w / ir; }
+  ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+}
+
+/** Paint a preset scene — real photo, gradient fallback while loading. */
 function paintPreset(cv: HTMLCanvasElement, idx: number) {
   const ctx = cv.getContext("2d")!;
   const w = cv.width, h = cv.height;
-  const lin = (stops: [number, string][]) => {
-    const g = ctx.createLinearGradient(0, 0, 0, h);
-    stops.forEach(([o, c]) => g.addColorStop(o, c));
-    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-  };
-  const radial = (x: number, y: number, stops: [number, string][]) => {
-    const g = ctx.createRadialGradient(w*x, h*y, 10, w*x, h*y, Math.max(w, h)*0.85);
-    stops.forEach(([o, c]) => g.addColorStop(o, c));
-    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-  };
-  const glow = (x: number, y: number, color: string, alpha: number) => {
-    const g = ctx.createRadialGradient(w*x, h*y, 10, w*x, h*y, w*0.5);
-    g.addColorStop(0, color.replace("A", String(alpha)));
-    g.addColorStop(1, color.replace("A", "0"));
-    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
-  };
-  switch (idx) {
-    case 0: radial(0.5, 0.35, [[0, "#f8fafc"], [0.55, "#cbd5e1"], [1, "#94a3b8"]]); break; // Studio
-    case 1: lin([[0, "#7dd3fc"], [0.45, "#bae6fd"], [0.75, "#fde68a"], [1, "#fcd34d"]]); break; // Beach
-    case 2: lin([[0, "#e2e8f0"], [0.6, "#cbd5e1"], [1, "#94a3b8"]]); break; // Office
-    case 3: { // Neon
-      ctx.fillStyle = "#0f172a"; ctx.fillRect(0, 0, w, h);
-      glow(0.2, 0.2, "rgba(217,70,239,A)", 0.8); glow(0.8, 0.8, "rgba(6,182,212,A)", 0.8); break;
-    }
-    case 4: lin([[0, "#312e81"], [0.55, "#be185d"], [1, "#fb923c"]]); break; // Sunset
-    case 5: radial(0.5, 1, [[0, "#166534"], [1, "#052e16"]]); break; // Forest
-    case 6: lin([[0, "#1e1b4b"], [0.5, "#4c1d95"], [1, "#0f172a"]]); break; // Midnight Purple
-    case 7: lin([[0, "#fef3c7"], [0.5, "#fcd34d"], [1, "#f59e0b"]]); break; // Golden Hour
-    case 8: lin([[0, "#0c4a6e"], [0.6, "#0369a1"], [1, "#082f49"]]); break; // Deep Ocean
-    case 9: lin([[0, "#fce7f3"], [0.5, "#f9a8d4"], [1, "#ec4899"]]); break; // Cotton Candy
-    case 10: { // Aurora
-      ctx.fillStyle = "#020617"; ctx.fillRect(0, 0, w, h);
-      glow(0.3, 0.3, "rgba(52,211,153,A)", 0.7); glow(0.7, 0.6, "rgba(96,165,250,A)", 0.6); break;
-    }
-    case 11: lin([[0, "#7c2d12"], [0.5, "#c2410c"], [1, "#431407"]]); break; // Desert Dusk
-    case 12: lin([[0, "#ecfdf5"], [1, "#6ee7b7"]]); break; // Mint Fresh
-    case 13: { // City Lights
-      ctx.fillStyle = "#111827"; ctx.fillRect(0, 0, w, h);
-      glow(0.5, 0.8, "rgba(251,191,36,A)", 0.5); glow(0.2, 0.3, "rgba(239,68,68,A)", 0.4); glow(0.8, 0.2, "rgba(59,130,246,A)", 0.4); break;
-    }
-    case 14: lin([[0, "#fdf4ff"], [0.5, "#e9d5ff"], [1, "#a855f7"]]); break; // Lavender Dream
-    case 15: lin([[0, "#0f766e"], [1, "#042f2e"]]); break; // Teal Depth
-    case 16: lin([[0, "#fff7ed"], [0.6, "#fdba74"], [1, "#ea580c"]]); break; // Peach Glow
-    case 17: { // Galaxy
-      ctx.fillStyle = "#030014"; ctx.fillRect(0, 0, w, h);
-      glow(0.7, 0.3, "rgba(139,92,246,A)", 0.8); glow(0.3, 0.7, "rgba(236,72,153,A)", 0.6); break;
-    }
-    case 18: lin([[0, "#f0fdfa"], [1, "#99f6e4"]]); break; // Aqua Mist
-    case 19: lin([[0, "#451a03"], [0.5, "#92400e"], [1, "#fbbf24"]]); break; // Coffee Gold
-    case 20: lin([[0, "#1e293b"], [1, "#020617"]]); break; // Dark Slate
-    case 21: lin([[0, "#fefce8"], [0.5, "#fef08a"], [1, "#eab308"]]); break; // Lemon Shine
-    case 22: { // Rose Night
-      ctx.fillStyle = "#1c0a0a"; ctx.fillRect(0, 0, w, h);
-      glow(0.5, 0.4, "rgba(244,63,94,A)", 0.7); break;
-    }
-    case 23: lin([[0, "#eff6ff"], [1, "#93c5fd"]]); break; // Sky Blue
-    case 24: radial(0.5, 0.5, [[0, "#ffffff"], [0.7, "#f1f5f9"], [1, "#cbd5e1"]]); break; // Clean White
-    default: radial(0.5, 1, [[0, "#166534"], [1, "#052e16"]]); break; // Forest
+  const img = getSceneImage(idx);
+  if (img) {
+    drawCover(ctx, img, w, h);
+    return;
   }
+  // fallback gradient while image loads
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  g.addColorStop(0, "#4c1d95"); g.addColorStop(1, "#0f172a");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
 }
-
-export const PRESET_SCENES = [
-  "Studio", "Beach", "Office", "Neon", "Sunset", "Forest",
-  "Midnight", "Golden Hour", "Deep Ocean", "Cotton Candy", "Aurora", "Desert Dusk",
-  "Mint Fresh", "City Lights", "Lavender", "Teal Depth", "Peach Glow", "Galaxy",
-  "Aqua Mist", "Coffee Gold", "Dark Slate", "Lemon Shine", "Rose Night", "Sky Blue", "Clean White",
-];
