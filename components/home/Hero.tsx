@@ -75,7 +75,7 @@ export default function Hero({ toolCount }: { toolCount: number }) {
               <Zap size={17} /> Explore tools <ArrowRight size={17} />
             </Button>
           </Link>
-          <a href="/downloads/omnibox-app.apk" download>
+          <a href="/downloads/omnibox-app.apk" target="_blank" rel="noopener">
             <Button size="lg" variant="secondary"><Smartphone size={17} /> Download App</Button>
           </a>
         </div>
