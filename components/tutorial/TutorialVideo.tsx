@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { Maximize, Minimize, Play, Pause, Volume2, VolumeX } from "lucide-react";
 
 /** Video player with WORKING fullscreen — like YouTube. */
-export default function TutorialVideo({ src }: { src: string }) {
+export default function TutorialVideo({ src, poster }: { src: string; poster?: string }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
@@ -90,7 +90,8 @@ export default function TutorialVideo({ src }: { src: string }) {
       <video
         ref={videoRef}
         src={src}
-        preload="auto"
+        poster={poster}
+        preload="metadata"
         playsInline
         className="w-full h-full"
         onClick={togglePlay}

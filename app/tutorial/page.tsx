@@ -66,7 +66,7 @@ export default function TutorialPage() {
           <Card key={t.title} className="overflow-hidden">
             {t.video ? (
               <div className="mb-4">
-                <TutorialVideo src={t.video} />
+                <TutorialVideo src={t.video} poster={t.poster} />
               </div>
             ) : (
               <div className="w-full aspect-video rounded-xl mb-4 bg-gradient-to-br from-violet-600/20 to-fuchsia-600/20 border border-white/10 grid place-items-center">
