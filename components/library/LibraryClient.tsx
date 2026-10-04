@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Download, FolderOpen, ImagePlus, Loader2, Mic, Play, QrCode,
-  Square, Trash2, LibraryBig, Sparkles, FileText,
+  Square, Trash2, LibraryBig, Sparkles, FileText, Clapperboard,
 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -42,6 +42,10 @@ const GROUPS: GroupDef[] = [
   {
     kind: "pdf", title: "PDF files", blurb: "Merged, split & converted PDFs", icon: FileText,
     toolHref: "/pdf-tools", toolLabel: "Open PDF Tools",
+  },
+  {
+    kind: "video", title: "Videos", blurb: "Generated videos", icon: Clapperboard,
+    toolHref: "/tools/video-generator", toolLabel: "Open Video Generator",
   },
 ];
 

@@ -1,30 +1,43 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Loader2, Smartphone } from "lucide-react";
+import { Download, Loader2, Smartphone, MonitorDown } from "lucide-react";
 import Button from "@/components/ui/Button";
 
 export default function DownloadAppButton() {
-  const [clicked, setClicked] = useState(false);
+  const [clicked, setClicked] = useState<"apk" | "exe" | null>(null);
 
-  const handleClick = () => {
-    setClicked(true);
-    // Open download in new tab; reset state after a moment
-    window.open("/downloads/omnibox-app.apk", "_blank", "noopener");
-    setTimeout(() => setClicked(false), 3000);
+  const handleClick = (type: "apk" | "exe") => {
+    setClicked(type);
+    const url = type === "apk" ? "/downloads/omnibox-app.apk" : "/downloads/omnibox-pc-portable.zip";
+    window.open(url, "_blank", "noopener");
+    setTimeout(() => setClicked(null), 3000);
   };
 
   return (
-    <Button size="lg" variant="secondary" onClick={handleClick}>
-      {clicked ? (
-        <>
-          <Loader2 size={17} className="animate-spin" /> Starting download…
-        </>
-      ) : (
-        <>
-          <Smartphone size={17} /> Download App
-        </>
-      )}
-    </Button>
+    <div className="flex flex-wrap items-center gap-3">
+      <Button size="lg" variant="secondary" onClick={() => handleClick("apk")}>
+        {clicked === "apk" ? (
+          <>
+            <Loader2 size={17} className="animate-spin" /> Starting download…
+          </>
+        ) : (
+          <>
+            <Smartphone size={17} /> Download Android App
+          </>
+        )}
+      </Button>
+      <Button size="lg" onClick={() => handleClick("exe")}>
+        {clicked === "exe" ? (
+          <>
+            <Loader2 size={17} className="animate-spin" /> Starting download…
+          </>
+        ) : (
+          <>
+            <MonitorDown size={17} /> Download for PC
+          </>
+        )}
+      </Button>
+    </div>
   );
 }
