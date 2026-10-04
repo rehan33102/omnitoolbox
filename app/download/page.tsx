@@ -46,6 +46,27 @@ export default function DownloadPage() {
           <p className="text-xs text-zinc-500 mt-3">v6 · Android 7.0+</p>
         </Card>
 
+        {/* Admin App */}
+        <Card className="p-6 text-center border-2 border-amber-500/30">
+          <span className="inline-grid place-items-center size-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-500 text-white mb-4">
+            <Smartphone size={32} />
+          </span>
+          <h2 className="font-display text-xl font-bold mb-2">Admin App 🔐</h2>
+          <p className="text-sm text-zinc-500 mb-4">
+            For site owner only. Manage everything A to Z from your phone.
+          </p>
+          <ul className="text-left text-sm space-y-2 mb-6 max-w-xs mx-auto">
+            <li className="flex items-center gap-2"><Check size={16} className="text-amber-500 shrink-0" /> Tools add/edit/delete</li>
+            <li className="flex items-center gap-2"><Check size={16} className="text-amber-500 shrink-0" /> Ads & monetization</li>
+            <li className="flex items-center gap-2"><Check size={16} className="text-amber-500 shrink-0" /> Audience stats</li>
+          </ul>
+          <a href="/downloads/omnibox-admin.apk" download
+            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold px-6 py-3 hover:scale-105 transition">
+            <Download size={18} /> Download Admin APK
+          </a>
+          <p className="text-xs text-zinc-500 mt-3">v1.0 · Android 7.0+ · Owner only</p>
+        </Card>
+
         {/* PC */}
         <Card className="p-6 text-center">
           <span className="inline-grid place-items-center size-16 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white mb-4">
