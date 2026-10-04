@@ -14,7 +14,7 @@ const TUTORIALS = [
     title: "Complete Website Tutorial",
     desc: "Full walkthrough — AI Voiceover live demo, Background Remover live demo, QR tools, PDF tools and more. English + Urdu!",
     duration: "67 sec",
-    video: "/tutorials/omnitoolbox-tutorial.mp4",
+    video: "/tutorials/omnitoolbox-tutorial-v2.mp4",
     poster: "/images/tools/ai-voiceover.jpg",
     icon: PlayCircle,
   },
