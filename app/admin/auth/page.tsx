@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, Mail, UserPlus, LogIn, ShieldCheck } from "lucide-react";
+import { Lock, Mail, UserPlus, LogIn, ShieldCheck, KeyRound } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -120,6 +120,19 @@ export default function AdminAuthPage() {
           Pehli baar? <b>Signup</b> tab se account banao, phir <b>Login</b> karo.
           <br />Dashboard mein live stats, tools, ads — sab kuch!
         </p>
+
+        <div className="mt-4 pt-4 border-t border-black/10 dark:border-white/10">
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={() => { window.location.href = "/admin?boss=boss-x7k9m2-2026"; }}
+          >
+            <KeyRound size={16} /> Secret Link se Direct Jao 🔐
+          </Button>
+          <p className="text-[11px] text-zinc-500 text-center mt-2">
+            Bina login ke seedha dashboard!
+          </p>
+        </div>
       </Card>
     </div>
   );
