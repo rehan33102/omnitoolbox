@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Download, FolderOpen, ImagePlus, Loader2, Mic, Play, QrCode,
-  Square, Trash2, LibraryBig, Sparkles,
+  Square, Trash2, LibraryBig, Sparkles, FileText,
 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -38,6 +38,10 @@ const GROUPS: GroupDef[] = [
   {
     kind: "image", title: "Images", blurb: "Converted images", icon: ImagePlus,
     thumb: true, toolHref: "/media-tools", toolLabel: "Open Image Converter",
+  },
+  {
+    kind: "pdf", title: "PDF files", blurb: "Merged, split & converted PDFs", icon: FileText,
+    toolHref: "/pdf-tools", toolLabel: "Open PDF Tools",
   },
 ];
 
