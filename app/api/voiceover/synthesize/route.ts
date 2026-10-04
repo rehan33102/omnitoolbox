@@ -166,18 +166,9 @@ export async function POST(req: NextRequest) {
     let cues: SpeechCue[] = [];
     let engine = "google";
 
-    if (voiceId && VOICE_ID_RE.test(voiceId) && process.env.ELEVENLABS_API_KEY) {
-      // Premium path: valid ElevenLabs voice requested and key configured.
-      // Falls back to Edge neural on failure (e.g. free-plan voice limits).
-      try {
-        audio = await elevenLabsTTS(text, voiceId, speed);
-        engine = "elevenlabs";
-      } catch (e) {
-        console.error("ElevenLabs failed, falling back to Edge:", e instanceof Error ? e.message : e);
-        voiceId = ""; // force Edge path below
-      }
-    }
-    if (!audio && EDGE_LANGUAGES[lang]) {
+    // Primary: Microsoft Edge neural voices (free, no key) — retried 3x.
+    // (User's own VoiceoverStudio tool approach — ElevenLabs is videos-only.)
+    if (EDGE_LANGUAGES[lang]) {
       // Primary path: Microsoft Edge neural voices (free, no key) — retried 3x.
       try {
         const p = resolveEdgeParams(lang, voice, style, ratePct, pitchHz, pauseSec);

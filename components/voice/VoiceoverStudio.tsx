@@ -186,10 +186,6 @@ export default function VoiceoverStudio() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [playingId, setPlayingId] = useState<string | null>(null);
   // Premium (ElevenLabs) controls — only shown when the server has a key.
-  const [premium, setPremium] = useState(false);
-  const [elevenVoices, setElevenVoices] = useState<ElevenVoice[]>([]);
-  const [voiceId, setVoiceId] = useState("");
-  const [speed, setSpeed] = useState(1);
   // Edge neural voice controls (free, primary engine).
   const [edgeLangs, setEdgeLangs] = useState<EdgeLang[]>(EDGE_LANGS_FALLBACK);
   const [edgeStyles, setEdgeStyles] = useState<EdgeStyle[]>(EDGE_STYLES_FALLBACK);
@@ -209,7 +205,7 @@ export default function VoiceoverStudio() {
   const { toast } = useToast();
 
   const isEdgeLang = edgeLangs.some((l) => l.code === lang);
-  const showEdgeControls = isEdgeLang && !premium;
+  const showEdgeControls = isEdgeLang;
 
   useEffect(() => {
     try {
@@ -220,14 +216,9 @@ export default function VoiceoverStudio() {
     }
     fetch("/api/voiceover/config")
       .then((r) => r.json())
-      .then((c: { provider?: string; voices?: ElevenVoice[]; edge?: { languages?: EdgeLang[]; styles?: EdgeStyle[] } }) => {
+      .then((c: { edge?: { languages?: EdgeLang[]; styles?: EdgeStyle[] } }) => {
         if (c.edge?.languages?.length) setEdgeLangs(c.edge.languages);
         if (c.edge?.styles?.length) setEdgeStyles(c.edge.styles);
-        if (c.provider === "elevenlabs" && c.voices?.length) {
-          setPremium(true);
-          setElevenVoices(c.voices);
-          setVoiceId(c.voices[0].id);
-        }
       })
       .catch(() => {});
   }, []);
@@ -301,17 +292,12 @@ export default function VoiceoverStudio() {
         if (stopRef.current) return;
         setGenStep(parts.length > 1 ? `Generating part ${i + 1} of ${parts.length}…` : "Generating voice…");
         const payload: Record<string, unknown> = { text: parts[i], lang };
-        if (premium && voiceId) {
-          payload.voiceId = voiceId;
-          payload.speed = speed;
-        } else if (edgeLangs.some((l) => l.code === lang)) {
+        if (edgeLangs.some((l) => l.code === lang)) {
           payload.voice = edgeVoice;
           payload.style = edgeStyle;
           if (useCustomRate) payload.ratePct = ratePct;
           if (useCustomPitch) payload.pitchHz = pitchHz;
           if (useCustomPause) payload.pauseSec = pauseSec;
-        } else {
-          payload.speed = speed;
         }
         const res = await fetch("/api/voiceover/synthesize", {
           method: "POST",
@@ -356,11 +342,9 @@ export default function VoiceoverStudio() {
       } catch {
         /* SRT is best-effort */
       }
-      const vLabel = premium
-        ? elevenVoices.find((v) => v.id === voiceId)?.name
-        : edgeLangs.some((l) => l.code === lang)
-          ? `${edgeVoice === "male" ? "Male" : "Female"} · ${edgeStyles.find((s) => s.key === edgeStyle)?.label ?? edgeStyle}`
-          : undefined;
+      const vLabel = edgeLangs.some((l) => l.code === lang)
+        ? `${edgeVoice === "male" ? "Male" : "Female"} · ${edgeStyles.find((s) => s.key === edgeStyle)?.label ?? edgeStyle}`
+        : undefined;
       // Persist the MP3 to the central library (kind "voiceover"), SRT in meta.
       const blobId = await saveBlob("voiceover", blob, fileName, {
         text: script.slice(0, 100) + (script.length > 100 ? "…" : ""),
@@ -394,7 +378,7 @@ export default function VoiceoverStudio() {
       setGenStep("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, lang, history, audioUrl, toast, premium, voiceId, speed, edgeLangs, edgeStyles, edgeVoice, edgeStyle, ratePct, pitchHz, pauseSec, useCustomRate, useCustomPitch, useCustomPause]);
+  }, [text, lang, history, audioUrl, toast, edgeLangs, edgeStyles, edgeVoice, edgeStyle, ratePct, pitchHz, pauseSec, useCustomRate, useCustomPitch, useCustomPause]);
 
   const cancelGenerate = () => {
     stopRef.current = true;
@@ -601,37 +585,6 @@ export default function VoiceoverStudio() {
                   onChange={(e) => setPauseSec(Number(e.target.value))}
                   className="w-full accent-brand-500 disabled:opacity-30" aria-label="Paragraph pause" />
               </div>
-            </div>
-          </>
-        )}
-
-        {premium && (
-          <>
-            <div>
-              <label htmlFor="vo-voice" className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
-                <Mic size={15} className="text-brand-700 dark:text-brand-400" /> Voice
-              </label>
-              <select id="vo-voice" value={voiceId} onChange={(e) => setVoiceId(e.target.value)} className="input-base w-full">
-                <optgroup label="Female">
-                  {elevenVoices.filter((v) => v.gender === "Female").map((v) => (
-                    <option key={v.id} value={v.id}>{v.name} · Female</option>
-                  ))}
-                </optgroup>
-                <optgroup label="Male">
-                  {elevenVoices.filter((v) => v.gender === "Male").map((v) => (
-                    <option key={v.id} value={v.id}>{v.name} · Male</option>
-                  ))}
-                </optgroup>
-              </select>
-              <p className="text-xs text-zinc-500 mt-1.5">Premium natural voices</p>
-            </div>
-            <div>
-              <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                Speed: <span className="text-brand-700 dark:text-brand-300">{speed.toFixed(2)}×</span>
-              </p>
-              <input type="range" min={0.7} max={1.2} step={0.05} value={speed}
-                onChange={(e) => setSpeed(Number(e.target.value))}
-                className="w-full accent-brand-500" aria-label="Speech speed" />
             </div>
           </>
         )}
