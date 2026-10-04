@@ -10,6 +10,32 @@ import { HASHTAG_NICHES, HASHTAG_PACKS, type HashtagNiche } from "@/data/hashtag
 import { cn } from "@/lib/utils";
 import { saveRecord } from "@/lib/db";
 
+/** Generate an engaging social media description for any topic. */
+function generateDescription(topic: string): string {
+  const t = topic.trim();
+  if (!t) return "";
+  const cap = t.charAt(0).toUpperCase() + t.slice(1);
+  return `${cap} ✨\n\nWhat an unforgettable moment! This is one of those memories I'll cherish forever. Every second was worth it! 💫\n\nDrop a ❤️ if you can relate!\nTag someone who needs to see this! 👇\n\nFollow for more amazing moments! 🔔`;
+}
+
+/** Generate SEO keywords + meta for any topic. */
+function generateSeo(topic: string): { keywords: string; meta: string } {
+  const t = topic.trim().toLowerCase();
+  if (!t) return { keywords: "", meta: "" };
+  const words = t.split(/\s+/).filter(Boolean);
+  const keywords = [
+    t,
+    ...words.filter((w) => w.length > 3),
+    `${t} 2026`,
+    `best ${t}`,
+    `${t} video`,
+    `${t} trending`,
+    `viral ${t}`,
+  ].join(", ");
+  const cap = t.charAt(0).toUpperCase() + t.slice(1);
+  const meta = `${cap} — Watch the best ${t} moments, trending videos and unforgettable memories. Don't miss out!`;
+  return { keywords, meta };
+}
 /** Generate hashtags for any custom topic the user types. */
 function customHashtags(topic: string, count: number): string[] {
   const clean = topic.toLowerCase().trim().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ");
@@ -45,6 +71,8 @@ export default function HashtagFinder() {
   const [niche, setNiche] = useState<HashtagNiche | "custom">("fitness");
   const [customTopic, setCustomTopic] = useState("");
   const [count, setCount] = useState(20);
+  const [showDesc, setShowDesc] = useState(false);
+  const [showSeo, setShowSeo] = useState(false);
   const { copy, copied } = useCopyToClipboard();
   const lastSavedRef = useRef("");
 
@@ -139,6 +167,48 @@ export default function HashtagFinder() {
           {copied ? "Copied" : "Copy all"}
         </Button>
       </div>
+
+      {/* Content Generator Buttons */}
+      {(niche === "custom" && customTopic.trim()) && (
+        <div className="pt-4 border-t border-white/10 space-y-4">
+          <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+            🚀 Generate for: <span className="text-violet-500">"{customTopic.trim()}"</span>
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <Button size="sm" onClick={() => { setShowDesc(!showDesc); setShowSeo(false); }} className="w-full">
+              📝 {showDesc ? "Hide" : "Generate"} Description
+            </Button>
+            <Button size="sm" onClick={() => { setShowSeo(!showSeo); setShowDesc(false); }} className="w-full">
+              🔍 {showSeo ? "Hide" : "Generate"} SEO
+            </Button>
+          </div>
+
+          {showDesc && (
+            <div className="rounded-xl bg-black/5 dark:bg-white/5 p-4 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">📝 Description</p>
+              <p className="text-sm whitespace-pre-line">{generateDescription(customTopic)}</p>
+              <Button size="sm" onClick={() => copy(generateDescription(customTopic), "Description copied!")}>
+                {copied ? <Check size={14} /> : <Copy size={14} />} Copy Description
+              </Button>
+            </div>
+          )}
+
+          {showSeo && (
+            <div className="rounded-xl bg-black/5 dark:bg-white/5 p-4 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">🔍 SEO Keywords</p>
+              <p className="text-sm">{generateSeo(customTopic).keywords}</p>
+              <Button size="sm" onClick={() => copy(generateSeo(customTopic).keywords, "SEO keywords copied!")}>
+                {copied ? <Check size={14} /> : <Copy size={14} />} Copy Keywords
+              </Button>
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 pt-2">📄 Meta Description</p>
+              <p className="text-sm">{generateSeo(customTopic).meta}</p>
+              <Button size="sm" onClick={() => copy(generateSeo(customTopic).meta, "Meta description copied!")}>
+                {copied ? <Check size={14} /> : <Copy size={14} />} Copy Meta
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
     </Card>
   );
 }
