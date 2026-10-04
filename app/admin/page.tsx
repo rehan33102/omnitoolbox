@@ -42,15 +42,17 @@ export default function AdminOverviewPage() {
     );
   }
 
-  const { totals, daily, topTools } = data;
+  const totals = data?.totals ?? { visitors: 0, pageViews: 0, toolUses: 0, ctr: 0, deltas: {} };
+  const daily = data?.daily ?? [];
+  const topTools = data?.topTools ?? [];
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Visitors" value={formatCompact(totals.visitors)} delta={totals.deltas.visitors} icon={Users} />
-        <StatCard label="Page views" value={formatCompact(totals.pageViews)} delta={totals.deltas.pageViews} icon={Eye} />
-        <StatCard label="Tool uses" value={formatCompact(totals.toolUses)} delta={totals.deltas.toolUses} icon={MousePointerClick} />
-        <StatCard label="Tool CTR" value={`${totals.ctr.toFixed(1)}%`} delta={totals.deltas.ctr} icon={Activity} />
+        <StatCard label="Visitors" value={formatCompact(totals.visitors ?? 0)} delta={totals.deltas?.visitors} icon={Users} />
+        <StatCard label="Page views" value={formatCompact(totals.pageViews ?? 0)} delta={totals.deltas?.pageViews} icon={Eye} />
+        <StatCard label="Tool uses" value={formatCompact(totals.toolUses ?? 0)} delta={totals.deltas?.toolUses} icon={MousePointerClick} />
+        <StatCard label="Tool CTR" value={`${(totals.ctr ?? 0).toFixed(1)}%`} delta={totals.deltas?.ctr} icon={Activity} />
       </div>
 
       <Card>
