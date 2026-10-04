@@ -24,7 +24,12 @@ export default function SignupPage() {
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
       toast({ title: "Account created!", description: "Check your email to confirm.", variant: "success" });
-      router.push("/");
+      // Admin users go straight to dashboard after signup
+      if (email.trim().toLowerCase() === "rehan.work3310@gmail.com") {
+        router.push("/admin");
+      } else {
+        router.push("/");
+      }
       router.refresh();
     } catch (err) {
       toast({ title: "Signup failed", description: (err as Error).message, variant: "error" });
