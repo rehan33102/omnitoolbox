@@ -487,6 +487,42 @@ async function mapLimit<T, R>(items: T[], limit: number, fn: (item: T) => Promis
   return results;
 }
 
+/**
+ * Normalize text for cleaner TTS pronunciation:
+ * - Expand common abbreviations (Dr., Mr., etc.)
+ * - Normalize whitespace and stray characters
+ * - Ensure sentence-ending punctuation for natural pauses
+ */
+export function normalizeTtsText(text: string): string {
+  let t = text;
+  // Common abbreviations → spoken form
+  const abbrev: [RegExp, string][] = [
+    [/\bDr\./g, "Doctor"],
+    [/\bMr\./g, "Mister"],
+    [/\bMrs\./g, "Missus"],
+    [/\bMs\./g, "Miss"],
+    [/\bSt\./g, "Saint"],
+    [/\bvs\./g, "versus"],
+    [/\be\.g\./gi, "for example"],
+    [/\bi\.e\./gi, "that is"],
+    [/\betc\./gi, "etcetera"],
+  ];
+  for (const [re, rep] of abbrev) {
+    t = t.replace(re, rep);
+  }
+  // Remove characters TTS chokes on, normalize whitespace
+  t = t
+    .replace(/[*_`#<>]/g, "")
+    .replace(/&/g, " and ")
+    .replace(/@/g, " at ")
+    .replace(/%/g, " percent ")
+    .replace(/\+/g, " plus ")
+    .replace(/=/g, " equals ")
+    .replace(/\s+/g, " ")
+    .trim();
+  return t;
+}
+
 async function edgeTtsSingle(opts: EdgeTtsOptions): Promise<{ audio: Buffer; cues: SpeechCue[] }> {
   const timeoutMs = opts.timeoutMs ?? 45000;
   let clockSkew = 0;

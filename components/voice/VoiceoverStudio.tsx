@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { deleteBlob, getBlob, saveBlob } from "@/lib/db";
 
-const MAX_CHARS = 20000; // ~15-18 minutes of speech — no small limits
+const MAX_CHARS = 100000; // effectively unlimited — chunked server-side
 const PART_CHARS = 500; // per server request; server chunks further internally
 const HISTORY_KEY = "omnitoolbox-voiceover-history";
 const HISTORY_LIMIT = 20;
@@ -73,7 +73,6 @@ type HistoryItem = {
   voiceLabel?: string;
   createdAt: number;
   chars: number;
-  srt?: string;
 };
 
 type ElevenVoice = { id: string; name: string; gender: string };
@@ -115,59 +114,6 @@ function chunkText(text: string, maxLen = PART_CHARS): string[] {
   return chunks.length > 0 ? chunks : [text];
 }
 
-function srtTime(t: number): string {
-  const ms = Math.max(0, Math.round(t * 1000));
-  const h = Math.floor(ms / 3600000);
-  const m = Math.floor((ms % 3600000) / 60000);
-  const s = Math.floor((ms % 60000) / 1000);
-  const r = ms % 1000;
-  const p = (n: number, l = 2) => String(n).padStart(l, "0");
-  return `${p(h)}:${p(m)}:${p(s)},${p(r, 3)}`;
-}
-
-/** Build an SRT from per-part audio durations + server sentence timings (or estimates). */
-async function buildSrt(parts: { text: string; blob: Blob; cues: SpeechCue[] }[]): Promise<string> {
-  const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-  const ctx = new Ctx();
-  try {
-    const out: string[] = [];
-    let idx = 1;
-    let cursor = 0;
-    for (const part of parts) {
-      let dur = 0;
-      try {
-        const ab = await part.blob.arrayBuffer();
-        const decoded = await ctx.decodeAudioData(ab.slice(0));
-        dur = decoded.duration;
-      } catch {
-        // estimate ~14 chars/sec if decode fails
-        dur = Math.max(0.5, part.text.length / 14);
-      }
-      if (part.cues.length > 0) {
-        for (const c of part.cues) {
-          const s = cursor + c.start;
-          const e = cursor + Math.max(c.end, c.start + 0.2);
-          out.push(`${idx++}\n${srtTime(s)} --> ${srtTime(e)}\n${c.text.trim()}\n`);
-        }
-      } else {
-        const sents = part.text.match(/[^.!?…۔؟\n]+[.!?…۔؟]+["'”]?|[^\n]+$/g) ?? [part.text];
-        const total = sents.reduce((a, s) => a + s.length, 0) || 1;
-        let t = cursor;
-        for (const s of sents) {
-          const d = Math.max(0.2, dur * (s.length / total));
-          const txt = s.trim();
-          if (txt) out.push(`${idx++}\n${srtTime(t)} --> ${srtTime(t + d)}\n${txt}\n`);
-          t += d;
-        }
-      }
-      cursor += dur;
-    }
-    return out.join("\n");
-  } finally {
-    ctx.close().catch(() => {});
-  }
-}
-
 function downloadBlob(blob: Blob, filename: string) {
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -177,19 +123,18 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 export default function VoiceoverStudio() {
-  const [lang, setLang] = useState("ur");
+  const [lang, setLang] = useState("en");
   const [text, setText] = useState(DEFAULT_TEXT);
   const [generating, setGenerating] = useState(false);
   const [genStep, setGenStep] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
-  const [srtText, setSrtText] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [playingId, setPlayingId] = useState<string | null>(null);
   // Premium (ElevenLabs) controls — only shown when the server has a key.
   // Edge neural voice controls (free, primary engine).
   const [edgeLangs, setEdgeLangs] = useState<EdgeLang[]>(EDGE_LANGS_FALLBACK);
   const [edgeStyles, setEdgeStyles] = useState<EdgeStyle[]>(EDGE_STYLES_FALLBACK);
-  const [edgeVoice, setEdgeVoice] = useState<"male" | "female">("male");
+  const [edgeVoice, setEdgeVoice] = useState<"male" | "female">("female");
   const [edgeStyle, setEdgeStyle] = useState("sleep");
   const [ratePct, setRatePct] = useState(0);   // speed override, -40..40 (0 = style default)
   const [pitchHz, setPitchHz] = useState(0);   // pitch override, -15..15 (0 = style default)
@@ -284,7 +229,6 @@ export default function VoiceoverStudio() {
     stopRef.current = false;
     setGenerating(true);
     setGenStep("");
-    setSrtText("");
     try {
       const parts = chunkText(script);
       const partData: { text: string; blob: Blob; cues: SpeechCue[] }[] = [];
@@ -334,14 +278,6 @@ export default function VoiceoverStudio() {
       if (audioUrl) URL.revokeObjectURL(audioUrl);
       const url = URL.createObjectURL(blob);
       setAudioUrl(url);
-      // SRT subtitles from real timings (or estimates).
-      let srt = "";
-      try {
-        srt = await buildSrt(partData);
-        setSrtText(srt);
-      } catch {
-        /* SRT is best-effort */
-      }
       const vLabel = edgeLangs.some((l) => l.code === lang)
         ? `${edgeVoice === "male" ? "Male" : "Female"} · ${edgeStyles.find((s) => s.key === edgeStyle)?.label ?? edgeStyle}`
         : undefined;
@@ -352,7 +288,6 @@ export default function VoiceoverStudio() {
         langLabel: langLabel(lang),
         voiceLabel: vLabel ?? "",
         chars: script.length,
-        srt: srt || "",
       });
       const id = blobId ?? `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       const item: HistoryItem = {
@@ -363,12 +298,11 @@ export default function VoiceoverStudio() {
         voiceLabel: vLabel,
         createdAt: Date.now(),
         chars: script.length,
-        srt: srt || undefined,
       };
       const next = [item, ...history].slice(0, HISTORY_LIMIT);
       for (const old of history.slice(HISTORY_LIMIT - 1)) deleteBlob(old.id);
       saveHistory(next);
-      toast({ title: "Voiceover ready", variant: "success", description: "Play it, or download the MP3 + SRT." });
+      toast({ title: "Voiceover ready", variant: "success", description: "Play it, or download the MP3." });
     } catch (e) {
       if (!stopRef.current) {
         toast({ title: "Generation failed", variant: "error", description: e instanceof Error ? e.message : "Try again." });
@@ -420,14 +354,6 @@ export default function VoiceoverStudio() {
     downloadBlob(blob, `voiceover-${item.lang}-${new Date(item.createdAt).toISOString().slice(0, 10)}.mp3`);
   };
 
-  const downloadHistorySrt = (item: HistoryItem) => {
-    if (!item.srt) {
-      toast({ title: "No subtitles", variant: "error", description: "This recording has no subtitle data." });
-      return;
-    }
-    downloadBlob(new Blob([item.srt], { type: "text/srt" }), `voiceover-${item.lang}-${new Date(item.createdAt).toISOString().slice(0, 10)}.srt`);
-  };
-
   const deleteHistory = async (id: string) => {
     await deleteBlob(id);
     saveHistory(history.filter((h) => h.id !== id));
@@ -444,10 +370,6 @@ export default function VoiceoverStudio() {
     setPlayingId(null);
   };
 
-  const downloadSrt = () => {
-    if (!srtText) return;
-    downloadBlob(new Blob([srtText], { type: "text/srt" }), `voiceover-${lang}-${Date.now()}.srt`);
-  };
 
   const overLimit = text.length > MAX_CHARS;
   // Rough estimate: ~850 characters per minute of speech.
@@ -598,7 +520,7 @@ export default function VoiceoverStudio() {
             <span className="relative flex items-center justify-center gap-2.5">
               <Mic size={18} className="group-hover:scale-110 transition-transform" />
               Generate voiceover
-              <span className="text-xs font-medium opacity-80 bg-white/20 rounded-full px-2.5 py-0.5">MP3 + SRT</span>
+              <span className="text-xs font-medium opacity-80 bg-white/20 rounded-full px-2.5 py-0.5">MP3</span>
             </span>
           </button>
         ) : (
@@ -629,24 +551,18 @@ export default function VoiceoverStudio() {
               </p>
             ) : null}
             <audio controls src={audioUrl} className="w-full" />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               <a href={audioUrl} download={`voiceover-${lang}-${Date.now()}.mp3`}>
                 <span className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_4px_20px_rgba(16,185,129,0.35)] hover:shadow-[0_4px_28px_rgba(16,185,129,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all">
-                  <Download size={16} /> MP3
+                  <Download size={16} /> Download MP3
                 </span>
               </a>
-              <button
-                className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-violet-700 dark:text-violet-300 border-2 border-violet-500/40 bg-violet-500/10 hover:bg-violet-500/20 hover:border-violet-500/60 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 disabled:hover:scale-100"
-                onClick={downloadSrt} disabled={!srtText}
-              >
-                <FileText size={16} /> SRT subtitles
-              </button>
             </div>
           </div>
         )}
 
         <p className="text-[11px] text-zinc-500 leading-relaxed">
-          Free AI voices generated on our server — the MP3 + subtitles are yours to download and use anywhere.
+          Free AI voices generated on our server — the MP3 is yours to download and use anywhere.
           Your recordings stay on this device.
         </p>
       </Card>
@@ -680,11 +596,6 @@ export default function VoiceoverStudio() {
                 <button onClick={() => downloadHistory(h)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-brand-700 dark:hover:text-brand-300 transition" aria-label="Download MP3">
                   <Download size={15} />
                 </button>
-                {h.srt && (
-                  <button onClick={() => downloadHistorySrt(h)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-brand-700 dark:hover:text-brand-300 transition" aria-label="Download SRT">
-                    <FileText size={15} />
-                  </button>
-                )}
                 <button onClick={() => deleteHistory(h.id)} className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 transition" aria-label="Delete">
                   <Trash2 size={15} />
                 </button>
