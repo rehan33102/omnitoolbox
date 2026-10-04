@@ -4,14 +4,13 @@ import { NextResponse } from "next/server";
 // polls this endpoint on startup; if versionCode is higher than the
 // installed app's, it shows an "Update available" popup.
 const LATEST = {
-  versionCode: 6,
-  versionName: "6",
+  versionCode: 7,
+  versionName: "7",
   apkUrl: "https://omnitoolbox-zeta.vercel.app/downloads/omnibox-app.apk",
   changelog:
-    "• Crash-proof launch (no more instant crashes)\n" +
-    "• Fixed header hiding under the status bar\n" +
-    "• Update notifications inside the app\n" +
-    "• All website features keep updating automatically!",
+    "• Cache auto-clear — website updates appear instantly!\n" +
+    "• Fixed old content showing issue\n" +
+    "• All previous fixes included",
 };
 
 export async function GET() {
