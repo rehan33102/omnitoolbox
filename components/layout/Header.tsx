@@ -29,7 +29,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 glass-strong border-b border-black/10 dark:border-white/10">
+    <header id="site-header" className="sticky top-0 z-50 glass-strong border-b border-black/10 dark:border-white/10" style={{ paddingTop: "env(safe-area-inset-top)" }}>
       <div className="container flex h-16 items-center gap-4">
         <Link href="/" className="flex items-center gap-3 shrink-0 group">
           <span className="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
@@ -40,7 +40,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1 ml-4">
+        <nav className="hidden xl:flex items-center gap-1 ml-4">
           {NAV_LINKS.map((l) => (
             <Link
               key={l.href}
@@ -66,7 +66,7 @@ export default function Header() {
           <button
             aria-label="Open menu"
             onClick={() => setDrawer(true)}
-            className="lg:hidden p-2.5 rounded-xl glass hover:bg-black/5 dark:hover:bg-white/10 transition"
+            className="xl:hidden p-2.5 rounded-xl glass hover:bg-black/5 dark:hover:bg-white/10 transition"
           >
             <Menu size={18} />
           </button>

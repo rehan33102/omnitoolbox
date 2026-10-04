@@ -18,6 +18,7 @@ const condensed = Anton({ subsets: ["latin"], variable: "--font-condensed", disp
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: dark)", color: "#08080f" },
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
