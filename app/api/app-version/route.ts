@@ -4,14 +4,14 @@ import { NextResponse } from "next/server";
 // polls this endpoint on startup; if versionCode is higher than the
 // installed app's, it shows an "Update available" popup.
 const LATEST = {
-  versionCode: 8,
-  versionName: "8",
+  versionCode: 9,
+  versionName: "9",
   apkUrl: "https://omnitoolbox-zeta.vercel.app/downloads/omnibox-app.apk",
   changelog:
-    "• Fresh v8 — all latest website styles & fixes!\n" +
-    "• New gradient nav bar & Higgsfield-style buttons\n" +
-    "• A-to-Z smart search\n" +
-    "• Cache auto-clear — latest content always",
+    "• v9 FINAL — sab tests pass!\n" +
+    "• Naya admin panel (/admin/auth)\n" +
+    "• Sab tools verified working\n" +
+    "• Latest styles & fixes",
 };
 
 export async function GET() {
