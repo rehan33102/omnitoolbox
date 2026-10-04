@@ -4,7 +4,7 @@ import { SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: SITE_NAME,
-    short_name: "OmniToolBox",
+    short_name: "OmniBox",
     description: SITE_TAGLINE,
     start_url: "/",
     scope: "/",
