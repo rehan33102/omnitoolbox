@@ -81,7 +81,7 @@ type EdgeStyle = { key: string; label: string };
 type SpeechCue = { start: number; end: number; text: string };
 
 const DEFAULT_TEXT =
-  "Assalam o alaikum! Welcome to the OmniToolBox AI Voiceover Studio. Type or paste your script here, pick a language, then press Generate — you'll get real MP3 audio you can play, download, and reuse.";
+  "Hello, and welcome to the OmniToolBox A.I. Voiceover Studio. Type, or paste your script here... pick a language, then press Generate. You'll get real, studio-quality MP3 audio, that you can play, download, and reuse anywhere.";
 
 /* Localized preview samples — one short line per neural-voice language. */
 const PREVIEW_SAMPLES: Record<string, string> = {
