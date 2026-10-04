@@ -9,7 +9,9 @@ export default function DownloadAppButton() {
 
   const handleClick = (type: "apk" | "exe") => {
     setClicked(type);
-    const url = type === "apk" ? "/downloads/omnibox-app.apk" : "/downloads/omnibox-pc-portable.zip";
+    const url = type === "apk"
+      ? "/downloads/omnibox-app.apk"
+      : "https://github.com/rehan33102/omnitoolbox/releases/download/v1.0.0-pc/OmniToolBox-PC-Portable.zip";
     window.open(url, "_blank", "noopener");
     setTimeout(() => setClicked(null), 3000);
   };

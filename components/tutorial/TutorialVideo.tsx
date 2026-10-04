@@ -11,12 +11,18 @@ export default function TutorialVideo({ src }: { src: string }) {
   const [muted, setMuted] = useState(false);
   const [isFull, setIsFull] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const togglePlay = () => {
+  const togglePlay = async () => {
     const v = videoRef.current;
     if (!v) return;
-    if (v.paused) { v.play(); setPlaying(true); }
-    else { v.pause(); setPlaying(false); }
+    try {
+      if (v.paused) { await v.play(); setPlaying(true); }
+      else { v.pause(); setPlaying(false); }
+    } catch {
+      setError(true);
+    }
   };
 
   const toggleMute = () => {
@@ -84,7 +90,7 @@ export default function TutorialVideo({ src }: { src: string }) {
       <video
         ref={videoRef}
         src={src}
-        preload="metadata"
+        preload="auto"
         playsInline
         className="w-full h-full"
         onClick={togglePlay}
@@ -92,10 +98,29 @@ export default function TutorialVideo({ src }: { src: string }) {
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
         onEnded={() => setPlaying(false)}
+        onLoadedData={() => setLoading(false)}
+        onError={() => { setLoading(false); setError(true); }}
       />
 
+      {/* Loading spinner */}
+      {loading && !error && (
+        <div className="absolute inset-0 grid place-items-center bg-black/50">
+          <div className="size-12 rounded-full border-4 border-white/20 border-t-white animate-spin" />
+        </div>
+      )}
+
+      {/* Error state */}
+      {error && (
+        <div className="absolute inset-0 grid place-items-center bg-black/70 p-4 text-center">
+          <div>
+            <p className="text-white text-sm font-semibold mb-2">Video failed to load</p>
+            <a href={src} download className="text-xs text-violet-400 underline">Download video instead</a>
+          </div>
+        </div>
+      )}
+
       {/* Big center play button */}
-      {!playing && (
+      {!playing && !loading && !error && (
         <button onClick={togglePlay} aria-label="Play"
           className="absolute inset-0 grid place-items-center bg-black/30">
           <span className="grid place-items-center size-20 rounded-full bg-white/90 text-black shadow-2xl hover:scale-110 transition">

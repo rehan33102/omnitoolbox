@@ -498,7 +498,7 @@ export default function WatermarkRemover() {
               {afterUrl && beforeUrl && (
                 <div className="space-y-2">
                   <div
-                    className="relative touch-none select-none overflow-hidden rounded-2xl ring-1 ring-white/10"
+                    className="relative touch-pan-y select-none overflow-hidden rounded-2xl ring-1 ring-white/10"
                     onPointerDown={e => {
                       const el = e.currentTarget;
                       const move = (ev: PointerEvent) => {
