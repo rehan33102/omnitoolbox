@@ -44,24 +44,33 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       return { id: user.id, email: user.email ?? "", role: (created?.role as SessionUser["role"]) ?? role };
     }
 
-    // Env-listed emails are promoted to admin even if the row says otherwise.
-    if (adminEmails().includes(email) && profile.role !== "admin") {
+    // STRICT: Admin access requires email in ADMIN_EMAILS env — NEVER trust stored role alone.
+    // If email is whitelisted, ensure admin. If NOT whitelisted but stored as admin, DEMOTE.
+    const isWhitelisted = adminEmails().includes(email);
+    if (isWhitelisted && profile.role !== "admin") {
       await admin.from("profiles").update({ role: "admin" }).eq("id", user.id);
       return { id: user.id, email: user.email ?? "", role: "admin" };
     }
+    if (!isWhitelisted && profile.role === "admin") {
+      // SECURITY: Non-whitelisted email had admin role — demote immediately.
+      await admin.from("profiles").update({ role: "user" }).eq("id", user.id);
+      return { id: user.id, email: user.email ?? "", role: "user" };
+    }
 
-    return { id: user.id, email: user.email ?? "", role: (profile.role as SessionUser["role"]) ?? "user" };
+    return { id: user.id, email: user.email ?? "", role: isWhitelisted ? "admin" : "user" };
   } catch {
     // Service role unavailable — fall back to the anon read path.
+    // STRICT: Only whitelisted emails can be admin, even in fallback.
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
       .eq("id", user.id)
       .single();
+    const isWhitelisted = adminEmails().includes(email);
     return {
       id: user.id,
       email: user.email ?? "",
-      role: (profile?.role as SessionUser["role"]) ?? "user",
+      role: isWhitelisted ? "admin" : "user",
     };
   }
 }
