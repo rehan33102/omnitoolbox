@@ -1,5 +1,6 @@
 import { buildMetadata } from "@/lib/seo";
 import Card from "@/components/ui/Card";
+import TutorialVideo from "@/components/tutorial/TutorialVideo";
 import { PlayCircle, Mic, Image, QrCode, FileText, Sparkles } from "lucide-react";
 
 export const metadata = buildMetadata({
@@ -13,7 +14,7 @@ const TUTORIALS = [
   {
     title: "Complete Website Tutorial",
     desc: "Full walkthrough — AI Voiceover live demo, Background Remover live demo, QR tools, PDF tools and more. English + Urdu!",
-    duration: "67 sec",
+    duration: "89 sec",
     video: "/tutorials/omnitoolbox-tutorial-v2.mp4",
     poster: "/images/tools/ai-voiceover.jpg",
     icon: PlayCircle,
@@ -64,12 +65,9 @@ export default function TutorialPage() {
         {TUTORIALS.map((t) => (
           <Card key={t.title} className="overflow-hidden">
             {t.video ? (
-              <video
-                controls
-                preload="metadata"
-                className="w-full aspect-video bg-black rounded-xl mb-4"
-                src={t.video}
-              />
+              <div className="mb-4">
+                <TutorialVideo src={t.video} />
+              </div>
             ) : (
               <div className="w-full aspect-video rounded-xl mb-4 bg-gradient-to-br from-violet-600/20 to-fuchsia-600/20 border border-white/10 grid place-items-center">
                 <t.icon size={48} className="text-violet-400" />
