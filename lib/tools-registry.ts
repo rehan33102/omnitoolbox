@@ -43,11 +43,11 @@ export const TOOLS: Tool[] = [
   },
   {
     id: "t21", slug: "background-studio", title: "Background Studio",
-    tagline: "Remove.bg-style studio — change backgrounds like a pro",
+    tagline: "Pro background studio — change backgrounds like a pro",
     description: "Upload a photo, AI removes the background, then restyle it: solid colors, gradients, blurred background, custom photos, studio scenes. Add drop shadows, tune brightness & contrast, download in HD. 100% free, on-device.",
     category: "image", href: "/tools/background-studio", icon: "Palette", image: "/images/tools/background-studio.jpg", badge: "new",
     enabled: true, sortOrder: 5.5, usageCount: 0, updatedAt: "2026-10-04",
-    keywords: ["background studio", "change background", "photo background changer", "remove.bg alternative", "free remove.bg", "blur background", "photo background editor", "replace background", "background changer app", "portrait background", "studio background", "add shadow to photo", "photo editor online free", "hintergrund ändern", "foto hintergrund wechseln"],
+    keywords: ["background studio", "change background", "photo background changer", "free background remover", "blur background", "photo background editor", "replace background", "background changer app", "portrait background", "studio background", "add shadow to photo", "photo editor online free", "hintergrund ändern", "foto hintergrund wechseln"],
   },
   {
     id: "t6", slug: "fancy-text", title: "Fancy Text Stylizer",

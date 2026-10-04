@@ -13,7 +13,7 @@ const CDN_URLS = [
   "https://esm.sh/@imgly/background-removal@1.5.5",
 ];
 
-const ENGINE_TIMEOUT_MS = 150_000;
+const ENGINE_TIMEOUT_MS = 600_000; // 10 min — slow mobile connections need time for the 40MB model
 
 let enginePromise: Promise<RemoveFn> | null = null;
 

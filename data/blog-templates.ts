@@ -225,7 +225,7 @@ A clean background turns an amateur phone photo into a professional product shot
 
 ## The old way vs. the new way
 
-- **Old way:** install Photoshop, learn the pen tool, spend 20 minutes per image — or pay $10/month for remove.bg
+- **Old way:** install Photoshop, learn the pen tool, spend 20 minutes per image — or pay for expensive subscriptions
 - **New way:** drop your image into a free browser-based background remover, get a transparent PNG in seconds
 
 Modern in-browser AI models handle hair, fur and tricky edges surprisingly well — and because processing happens on your device, your photos stay private.

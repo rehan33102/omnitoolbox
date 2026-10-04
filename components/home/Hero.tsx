@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Smartphone, Sparkles, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
 
 const MARQUEE_ITEMS = [
@@ -75,9 +75,9 @@ export default function Hero({ toolCount }: { toolCount: number }) {
               <Zap size={17} /> Explore tools <ArrowRight size={17} />
             </Button>
           </Link>
-          <Link href="/ai-prompt-studio">
-            <Button size="lg" variant="secondary">Try Prompt Studio</Button>
-          </Link>
+          <a href="/downloads/omnibox-app.apk" download>
+            <Button size="lg" variant="secondary"><Smartphone size={17} /> Download App</Button>
+          </a>
         </div>
 
         {/* Trust strip */}

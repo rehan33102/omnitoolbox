@@ -1,5 +1,5 @@
 /* =====================================================================
- * Background Studio — remove.bg-style full editor.
+ * Background Studio — Pro full editor.
  * Upload once → AI removes background → change it to anything:
  * solid colors, gradients, blurred original, custom photo, preset scenes.
  * Plus drop shadow + foreground tweaks. Live preview. HD download.
@@ -126,7 +126,7 @@ export default function BackgroundStudio() {
       toast({ title: "Background removed — welcome to the studio!", variant: "success" });
     } catch {
       setStage("upload");
-      toast({ title: "Could not remove background. Check connection and retry.", variant: "error" });
+      toast({ title: "Could not remove background. Please try again — if your connection is slow, the AI model needs more time to load.", variant: "error" });
     } finally {
       setProgress(0); setStatus("");
     }

@@ -544,10 +544,12 @@ export default function VoiceoverStudio() {
               <button
                 type="button"
                 onClick={previewVoice}
-                className="btn-base inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-brand-500/40 bg-brand-500/10 text-sm font-medium text-brand-800 dark:text-brand-200 hover:bg-brand-500/20 transition"
+                className="group inline-flex items-center gap-2.5 pl-2 pr-5 py-2 rounded-full border border-violet-500/30 bg-violet-500/10 hover:bg-violet-500/20 hover:border-violet-500/50 text-sm font-semibold text-violet-700 dark:text-violet-300 transition-all hover:scale-105 active:scale-95"
               >
-                {previewing ? <Square size={14} /> : <Play size={14} />}
-                {previewing ? "Playing preview… (tap to stop)" : "🔊 Preview voice"}
+                <span className="grid place-items-center size-9 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-[0_4px_16px_rgba(168,85,247,0.4)] group-hover:shadow-[0_4px_24px_rgba(168,85,247,0.6)] transition-shadow">
+                  {previewing ? <Square size={13} /> : <Play size={13} className="ml-0.5" />}
+                </span>
+                {previewing ? "Playing… tap to stop" : "Preview voice"}
               </button>
               <p className="text-[11px] text-zinc-500">Hear a short sample of this voice before generating.</p>
               <audio ref={previewAudioRef} className="hidden" aria-hidden />
@@ -635,13 +637,24 @@ export default function VoiceoverStudio() {
         )}
 
         {!generating ? (
-          <Button onClick={generate} className="w-full">
-            <Mic size={16} /> Generate voiceover (MP3 + SRT)
-          </Button>
+          <button
+            onClick={generate}
+            className="group relative w-full overflow-hidden rounded-2xl px-6 py-4 text-base font-bold text-white transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] bg-gradient-to-r from-violet-600 via-fuchsia-600 to-orange-500 shadow-[0_8px_32px_rgba(168,85,247,0.4)] hover:shadow-[0_8px_48px_rgba(168,85,247,0.6)]"
+          >
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            <span className="relative flex items-center justify-center gap-2.5">
+              <Mic size={18} className="group-hover:scale-110 transition-transform" />
+              Generate voiceover
+              <span className="text-xs font-medium opacity-80 bg-white/20 rounded-full px-2.5 py-0.5">MP3 + SRT</span>
+            </span>
+          </button>
         ) : (
-          <Button onClick={cancelGenerate} variant="danger" className="w-full">
-            <Square size={16} /> Stop
-          </Button>
+          <button
+            onClick={cancelGenerate}
+            className="w-full rounded-2xl px-6 py-4 text-base font-bold text-white bg-gradient-to-r from-red-500 to-rose-600 shadow-[0_8px_32px_rgba(239,68,68,0.4)] hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2.5"
+          >
+            <Square size={16} /> Stop generating
+          </button>
         )}
 
         {generating && (
@@ -665,13 +678,16 @@ export default function VoiceoverStudio() {
             <audio controls src={audioUrl} className="w-full" />
             <div className="grid grid-cols-2 gap-3">
               <a href={audioUrl} download={`voiceover-${lang}-${Date.now()}.mp3`}>
-                <Button className="w-full" variant="secondary">
+                <span className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 shadow-[0_4px_20px_rgba(16,185,129,0.35)] hover:shadow-[0_4px_28px_rgba(16,185,129,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all">
                   <Download size={16} /> MP3
-                </Button>
+                </span>
               </a>
-              <Button className="w-full" variant="secondary" onClick={downloadSrt} disabled={!srtText}>
+              <button
+                className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-violet-700 dark:text-violet-300 border-2 border-violet-500/40 bg-violet-500/10 hover:bg-violet-500/20 hover:border-violet-500/60 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-40 disabled:hover:scale-100"
+                onClick={downloadSrt} disabled={!srtText}
+              >
                 <FileText size={16} /> SRT subtitles
-              </Button>
+              </button>
             </div>
           </div>
         )}
@@ -697,10 +713,10 @@ export default function VoiceoverStudio() {
               <div key={h.id} className="rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-3 flex items-center gap-3">
                 <button
                   onClick={() => playHistory(h)}
-                  className="grid place-items-center size-9 rounded-full bg-brand-500/20 border border-brand-500/30 shrink-0"
+                  className="grid place-items-center size-10 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-[0_4px_16px_rgba(168,85,247,0.35)] hover:shadow-[0_4px_24px_rgba(168,85,247,0.55)] hover:scale-110 active:scale-95 transition-all shrink-0"
                   aria-label={playingId === h.id ? "Pause" : "Play"}
                 >
-                  {playingId === h.id ? <Square size={14} className="text-brand-700 dark:text-brand-300" /> : <Play size={14} className="text-brand-700 dark:text-brand-300" />}
+                  {playingId === h.id ? <Square size={14} /> : <Play size={14} className="ml-0.5" />}
                 </button>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm text-zinc-800 dark:text-zinc-200 truncate">{h.text}</p>
