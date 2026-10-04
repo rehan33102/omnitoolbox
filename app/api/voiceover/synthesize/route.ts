@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
 
   const text = typeof body.text === "string" ? body.text.trim() : "";
   const lang = typeof body.lang === "string" ? body.lang : "";
-  const voiceId = typeof body.voiceId === "string" ? body.voiceId : "";
+  let voiceId = typeof body.voiceId === "string" ? body.voiceId : "";
   const speed = num(body.speed) ?? 1;
   const voice = typeof body.voice === "string" && EDGE_VOICE_RE.test(body.voice) ? body.voice as "male" | "female" : "male";
   const style = typeof body.style === "string" && EDGE_STYLE_RE.test(body.style) ? body.style : "normal";
@@ -162,15 +162,22 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    let audio: Buffer;
+    let audio: Buffer | null = null;
     let cues: SpeechCue[] = [];
     let engine = "google";
 
     if (voiceId && VOICE_ID_RE.test(voiceId) && process.env.ELEVENLABS_API_KEY) {
       // Premium path: valid ElevenLabs voice requested and key configured.
-      audio = await elevenLabsTTS(text, voiceId, speed);
-      engine = "elevenlabs";
-    } else if (EDGE_LANGUAGES[lang]) {
+      // Falls back to Edge neural on failure (e.g. free-plan voice limits).
+      try {
+        audio = await elevenLabsTTS(text, voiceId, speed);
+        engine = "elevenlabs";
+      } catch (e) {
+        console.error("ElevenLabs failed, falling back to Edge:", e instanceof Error ? e.message : e);
+        voiceId = ""; // force Edge path below
+      }
+    }
+    if (!audio && EDGE_LANGUAGES[lang]) {
       // Primary path: Microsoft Edge neural voices (free, no key) — retried 3x.
       try {
         const p = resolveEdgeParams(lang, voice, style, ratePct, pitchHz, pauseSec);
@@ -189,7 +196,7 @@ export async function POST(req: NextRequest) {
         audio = await googleTTS(text, lang);
         engine = "google-fallback";
       }
-    } else {
+    } else if (!audio) {
       audio = await googleTTS(text, lang);
     }
 
