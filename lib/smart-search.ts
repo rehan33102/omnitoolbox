@@ -7,6 +7,42 @@ export interface SearchHit {
 
 const norm = (s: string) => s.toLowerCase().trim();
 
+/** Site pages (non-tool) that should also appear in search results. */
+const SITE_PAGES: Tool[] = [
+  {
+    id: "page-blog", slug: "page-blog", title: "Blog",
+    tagline: "Articles, guides and tips",
+    description: "Read our latest articles, tutorials and guides.",
+    category: "web", href: "/blog", icon: "newspaper",
+    keywords: ["blog", "articles", "news", "guides", "tips", "posts"],
+    enabled: true, sortOrder: 900, usageCount: 0, updatedAt: "",
+  },
+  {
+    id: "page-library", slug: "page-library", title: "Library",
+    tagline: "Your saved creations",
+    description: "Everything you created — voiceovers, images, QR codes — saved here.",
+    category: "web", href: "/library", icon: "folder",
+    keywords: ["library", "saved", "history", "my files", "creations"],
+    enabled: true, sortOrder: 901, usageCount: 0, updatedAt: "",
+  },
+  {
+    id: "page-contact", slug: "page-contact", title: "Contact",
+    tagline: "Get in touch with us",
+    description: "Contact us for feedback, support or suggestions.",
+    category: "web", href: "/contact", icon: "mail",
+    keywords: ["contact", "support", "help", "feedback", "email"],
+    enabled: true, sortOrder: 902, usageCount: 0, updatedAt: "",
+  },
+  {
+    id: "page-ai-directory", slug: "page-ai-directory", title: "AI Tools Directory",
+    tagline: "Discover the best AI tools",
+    description: "A curated directory of the best AI tools on the internet.",
+    category: "ai", href: "/ai-directory", icon: "sparkles",
+    keywords: ["ai directory", "directory", "ai tools list", "best ai"],
+    enabled: true, sortOrder: 903, usageCount: 0, updatedAt: "",
+  },
+];
+
 /** Field weights — title match beats keyword match beats description match. */
 const W_TITLE = 3;
 const W_KEYWORD = 2.5;
@@ -75,8 +111,10 @@ export function smartSearch(tools: Tool[], rawQuery: string, limit = 8): SearchH
   if (!q) return [];
   const tokens = q.split(/\s+/).filter(Boolean);
   const hits: SearchHit[] = [];
+  // Search tools AND site pages (blog, library, contact...)
+  const all = [...tools, ...SITE_PAGES];
 
-  for (const tool of tools) {
+  for (const tool of all) {
     if (!tool.enabled) continue;
     const keywords = (tool.keywords ?? []).join(" ");
     let total = 0;
@@ -130,7 +168,8 @@ export function findAlternatives(tools: Tool[], rawQuery: string, limit = 3): Se
   const q = norm(rawQuery);
   if (!q || q.length < 2) return [];
   const scored: SearchHit[] = [];
-  for (const tool of tools) {
+  const all = [...tools, ...SITE_PAGES];
+  for (const tool of all) {
     if (!tool.enabled) continue;
     let best = 0;
     for (const c of [tool.title, ...(tool.keywords ?? [])]) {

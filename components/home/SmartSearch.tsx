@@ -296,7 +296,7 @@ export default function SmartSearch({
             </div>
           ) : (
             <p className="px-5 py-6 text-center text-sm text-zinc-500">
-              No tools found for “{query.trim()}”. Try “qr”, “voice”, “pdf”…
+              No results found for “{query.trim()}”. Try “qr”, “voice”, “pdf”, “blog”…
             </p>
           )}
           {flat.length > 0 && hero && (
