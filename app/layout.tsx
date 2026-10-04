@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { Toaster, ToastProvider } from "@/components/ui/Toast";
 import { siteUrl } from "@/lib/utils";
@@ -85,6 +86,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             );
           })()}
         </ThemeProvider>
+        <InstallPrompt />
       </body>
     </html>
   );
