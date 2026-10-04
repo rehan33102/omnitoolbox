@@ -5,7 +5,7 @@
  *  - Static assets (/_next/static, /images, /icons, fonts): CACHE FIRST.
  *  - API routes & /admin: never cached, always network.
  */
-const CACHE = "omnitoolbox-v7";
+const CACHE = "omnitoolbox-v8";
 const CORE = ["/", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
