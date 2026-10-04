@@ -63,7 +63,11 @@ export default function SmartSearch({
   const hero = variant === "hero";
 
   const tokens = useMemo(() => query.toLowerCase().trim().split(/\s+/).filter(Boolean), [query]);
-  const results = useMemo(() => smartSearch(tools, query, 6), [tools, query]);
+  const results = useMemo(() => {
+    // Single-letter/short queries can match many tools — show more results
+    const limit = query.trim().length <= 2 ? 12 : 6;
+    return smartSearch(tools, query, limit);
+  }, [tools, query]);
   const alternatives = useMemo(
     () => (query.trim() && results.length === 0 ? findAlternatives(tools, query, 3) : []),
     [tools, query, results.length]

@@ -47,7 +47,15 @@ function tokenFieldScore(token: string, field: string): number {
   const escaped = token.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   if (new RegExp(`\\b${escaped}\\b`).test(f)) return 1;
   if (token.length > 4 && f.includes(token)) return 1;
-  if (token.length < 3) return 0;
+  // Short tokens (1-2 chars): prefix match — "a" matches titles starting with "a"
+  // so single-letter search shows all tools starting with that letter.
+  if (token.length < 3) {
+    const words = f.split(/[^a-z0-9]+/).filter(Boolean);
+    for (const word of words) {
+      if (word.startsWith(token)) return 0.9;
+    }
+    return 0;
+  }
   let best = 0;
   for (const word of f.split(/[^a-z0-9]+/)) {
     if (!word || Math.abs(word.length - token.length) > 3) continue;
