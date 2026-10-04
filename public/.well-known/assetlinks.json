@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.omnitoolbox.app",
+      "sha256_cert_fingerprints": [
+        "73:C4:91:75:FD:AE:A1:C6:99:E4:6E:5A:54:02:0E:DD:FD:11:3D:C6:B6:03:44:70:77:DC:AD:5E:BD:FA:29:13"
+      ]
+    }
+  }
+]
