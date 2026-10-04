@@ -169,14 +169,6 @@ export const TOOLS: Tool[] = [
     enabled: true, sortOrder: 20, usageCount: 0, updatedAt: "2026-10-04",
     keywords: ["watermark remover", "remove watermark", "gemini watermark", "ai watermark remover", "logo remover", "remove logo from photo", "erase watermark", "watermark eraser", "text remover", "remove text from image", "clean image", "photo watermark remover", "free watermark remover", "video watermark remover", "remove watermark from video", "gemini video watermark"],
   },
-  {
-    id: "t22", slug: "video-generator", title: "Video Generator",
-    tagline: "Turn any script into a YouTube-ready video",
-    description: "Paste your script, pick a category, voice and resolution — get a narrated video with Ken Burns visuals, title & end cards, ready to upload to YouTube. AI voiceover in English, Urdu or Hindi. 100% free.",
-    category: "ai", href: "/tools/video-generator", icon: "Clapperboard", image: "/images/tools/ai-voiceover.jpg", badge: "new",
-    enabled: true, sortOrder: 21, usageCount: 0, updatedAt: "2026-10-04",
-    keywords: ["video generator", "script to video", "text to video", "youtube video maker", "ai video generator", "free video maker", "video maker online", "faceless video maker", "ai voiceover video", "long video generator", "youtube automation", "video aus text erstellen"],
-  },
 ];
 
 export const getEnabledTools = (): Tool[] =>

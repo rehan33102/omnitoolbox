@@ -5,7 +5,6 @@ export const NAV_LINKS = [
   { href: "/", label: "Home", icon: "Home" },
   { href: "/ai-prompt-studio", label: "Prompt Studio", icon: "Sparkles" },
   { href: "/ai-voiceover", label: "🎙️ Voiceover Studio", icon: "Mic" },
-  { href: "/tools/video-generator", label: "🎬 Video Generator", icon: "Clapperboard" },
   { href: "/media-tools", label: "🖼️ Media Tools", icon: "Image" },
   { href: "/pdf-tools", label: "PDF Tools", icon: "FileText" },
   { href: "/social-tools", label: "Social Tools", icon: "Share2" },
