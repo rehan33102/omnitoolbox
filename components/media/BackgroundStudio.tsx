@@ -36,38 +36,277 @@ const GRADIENTS: { name: string; from: string; to: string }[] = [
   { name: "Fire", from: "#f83600", to: "#f9d423" },
 ];
 
-const PRESETS: { name: string; css: string; img: string }[] = [
-  { name: "Studio", css: "radial-gradient(circle at 50% 35%, #f8fafc 0%, #cbd5e1 55%, #94a3b8 100%)", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" },
-  { name: "Beach", css: "linear-gradient(180deg, #7dd3fc 0%, #bae6fd 45%, #fde68a 75%, #fcd34d 100%)", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80" },
-  { name: "Office", css: "linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 60%, #94a3b8 100%)", img: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80" },
-  { name: "Neon City", css: "radial-gradient(circle at 20% 20%, #d946ef 0%, transparent 50%), radial-gradient(circle at 80% 80%, #06b6d4 0%, transparent 50%), linear-gradient(135deg, #0f172a, #1e1b4b)", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&q=80" },
-  { name: "Sunset", css: "linear-gradient(180deg, #312e81 0%, #be185d 55%, #fb923c 100%)", img: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800&q=80" },
-  { name: "Forest", css: "radial-gradient(circle at 50% 100%, #166534 0%, #052e16 70%)", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80" },
-  { name: "Mountains", css: "linear-gradient(180deg, #1e1b4b 0%, #4c1d95 50%, #0f172a 100%)", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80" },
-  { name: "City Street", css: "linear-gradient(180deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)", img: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80" },
-  { name: "Ocean", css: "linear-gradient(180deg, #0c4a6e 0%, #0369a1 60%, #082f49 100%)", img: "https://images.unsplash.com/photo-1439405326854-014607f694d7?w=800&q=80" },
-  { name: "Flowers", css: "linear-gradient(180deg, #fce7f3 0%, #f9a8d4 50%, #ec4899 100%)", img: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=80" },
-  { name: "Northern Lights", css: "radial-gradient(circle at 30% 30%, #34d399 0%, transparent 50%), radial-gradient(circle at 70% 60%, #60a5fa 0%, transparent 50%), linear-gradient(135deg, #020617, #0f172a)", img: "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=800&q=80" },
-  { name: "Desert", css: "linear-gradient(180deg, #7c2d12 0%, #c2410c 50%, #431407 100%)", img: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=800&q=80" },
-  { name: "Library", css: "linear-gradient(180deg, #ecfdf5 0%, #6ee7b7 100%)", img: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80" },
-  { name: "Night Sky", css: "radial-gradient(circle at 50% 80%, #fbbf24 0%, transparent 40%), linear-gradient(135deg, #111827, #1f2937)", img: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80" },
-  { name: "Garden", css: "linear-gradient(180deg, #fdf4ff 0%, #e9d5ff 50%, #a855f7 100%)", img: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&q=80" },
-  { name: "Waterfall", css: "linear-gradient(180deg, #0f766e 0%, #042f2e 100%)", img: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80" },
-  { name: "Coffee Shop", css: "linear-gradient(180deg, #fff7ed 0%, #fdba74 60%, #ea580c 100%)", img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80" },
-  { name: "Galaxy", css: "radial-gradient(circle at 70% 30%, #8b5cf6 0%, transparent 50%), linear-gradient(135deg, #030014, #1e1b4b)", img: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80" },
-  { name: "Lake", css: "linear-gradient(180deg, #f0fdfa 0%, #99f6e4 100%)", img: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80" },
-  { name: "Vintage Car", css: "linear-gradient(180deg, #451a03 0%, #92400e 50%, #fbbf24 100%)", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80" },
-  { name: "Bridge", css: "linear-gradient(180deg, #1e293b 0%, #020617 100%)", img: "https://images.unsplash.com/photo-1449034446853-66c86144b0ad?w=800&q=80" },
-  { name: "Field", css: "linear-gradient(180deg, #fefce8 0%, #fef08a 50%, #eab308 100%)", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80" },
-  { name: "Taj Mahal", css: "linear-gradient(180deg, #fef3c7 0%, #f59e0b 100%)", img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80" },
-  { name: "Eiffel Tower", css: "linear-gradient(180deg, #1e1b4b 0%, #0f172a 100%)", img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800&q=80" },
-  { name: "Balloons", css: "linear-gradient(180deg, #fce7f3 0%, #ec4899 100%)", img: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=800&q=80" },
-  { name: "Snow", css: "linear-gradient(180deg, #f8fafc 0%, #cbd5e1 100%)", img: "https://images.unsplash.com/photo-1418985991508-e47386d96a71?w=800&q=80" },
-  { name: "Autumn", css: "linear-gradient(180deg, #7c2d12 0%, #fbbf24 100%)", img: "https://images.unsplash.com/photo-1507371341162-763b5e419408?w=800&q=80" },
-  { name: "Castle", css: "linear-gradient(180deg, #312e81 0%, #0f172a 100%)", img: "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=800&q=80" },
-  { name: "Island", css: "linear-gradient(180deg, #7dd3fc 0%, #0c4a6e 100%)", img: "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&q=80" },
-  { name: "Stadium", css: "linear-gradient(180deg, #166534 0%, #052e16 100%)", img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80" },
+const SCENE_CATEGORIES: { name: string; icon: string; scenes: { name: string; img: string }[] }[] = [
+  { name: "Cars", icon: "\ud83d\ude97", scenes: [
+    { name: "Sports Car", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80" },
+    { name: "Classic Car", img: "https://images.unsplash.com/photo-1494905998402-395d579af36f?w=800&q=80" },
+    { name: "Luxury Car", img: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=800&q=80" },
+    { name: "Red Car", img: "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&q=80" },
+    { name: "Car Night", img: "https://images.unsplash.com/photo-1502877338535-766e1452684a?w=800&q=80" },
+    { name: "Vintage", img: "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?w=800&q=80" },
+    { name: "Supercar", img: "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&q=80" },
+    { name: "Car Road", img: "https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?w=800&q=80" },
+    { name: "Muscle Car", img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?w=800&q=80" },
+    { name: "Car Sunset", img: "https://images.unsplash.com/photo-1493238792000-8113da705763?w=800&q=80" },
+    { name: "Black Car", img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&q=80" },
+    { name: "Car Interior", img: "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=800&q=80" },
+    { name: "Race Track", img: "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800&q=80" },
+    { name: "Convertible", img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=800&q=80" },
+    { name: "Car Desert", img: "https://images.unsplash.com/photo-1535732820275-9ffd998cac22?w=800&q=80" },
+    { name: "Electric Car", img: "https://images.unsplash.com/photo-1593941707882-a5bba14938c7?w=800&q=80" },
+    { name: "Car Show", img: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=800&q=80" },
+    { name: "Oldtimer", img: "https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?w=800&q=80" },
+    { name: "Car Lights", img: "https://images.unsplash.com/photo-1518987048-93e29699e79a?w=800&q=80" },
+    { name: "SUV", img: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?w=800&q=80" },
+  ]},
+  { name: "Animals", icon: "\ud83e\udd81", scenes: [
+    { name: "Lion", img: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=800&q=80" },
+    { name: "Tiger", img: "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=800&q=80" },
+    { name: "Elephant", img: "https://images.unsplash.com/photo-1557050543-4d5f4e07ef46?w=800&q=80" },
+    { name: "Dog", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&q=80" },
+    { name: "Cat", img: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=800&q=80" },
+    { name: "Horse", img: "https://images.unsplash.com/photo-1553284965-83fd3e82fa5a?w=800&q=80" },
+    { name: "Bird", img: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=800&q=80" },
+    { name: "Panda", img: "https://images.unsplash.com/photo-1564349683136-77e08dba1ef7?w=800&q=80" },
+    { name: "Wolf", img: "https://images.unsplash.com/photo-1547407139-3c921a66005c?w=800&q=80" },
+    { name: "Deer", img: "https://images.unsplash.com/photo-1484406566174-9da000fda645?w=800&q=80" },
+    { name: "Monkey", img: "https://images.unsplash.com/photo-1540573133985-87b6da6d54a9?w=800&q=80" },
+    { name: "Bear", img: "https://images.unsplash.com/photo-1530595467537-0b5996c41f2d?w=800&q=80" },
+    { name: "Fox", img: "https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=800&q=80" },
+    { name: "Rabbit", img: "https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=800&q=80" },
+    { name: "Parrot", img: "https://images.unsplash.com/photo-1552728089-57bdde30beb1?w=800&q=80" },
+    { name: "Owl", img: "https://images.unsplash.com/photo-1543549790-8b5f4a028cfb?w=800&q=80" },
+    { name: "Giraffe", img: "https://images.unsplash.com/photo-1547721064-da6cfb341d50?w=800&q=80" },
+    { name: "Zebra", img: "https://images.unsplash.com/photo-1501706362039-c06b2d715385?w=800&q=80" },
+    { name: "Kangaroo", img: "https://images.unsplash.com/photo-1551009175-8a68da93d5f9?w=800&q=80" },
+    { name: "Penguin", img: "https://images.unsplash.com/photo-1551986782-d0169b3f8fa7?w=800&q=80" },
+  ]},
+  { name: "Houses", icon: "\ud83c\udfe0", scenes: [
+    { name: "Modern House", img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80" },
+    { name: "Villa", img: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&q=80" },
+    { name: "Cottage", img: "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=800&q=80" },
+    { name: "Mansion", img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80" },
+    { name: "Cabin", img: "https://images.unsplash.com/photo-1449158743715-0a90ebb6d2d8?w=800&q=80" },
+    { name: "Beach House", img: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&q=80" },
+    { name: "Farmhouse", img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&q=80" },
+    { name: "Penthouse", img: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&q=80" },
+    { name: "Treehouse", img: "https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800&q=80" },
+    { name: "Castle Home", img: "https://images.unsplash.com/photo-1533154683836-84ea7a0bc310?w=800&q=80" },
+    { name: "White House", img: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?w=800&q=80" },
+    { name: "Brick House", img: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&q=80" },
+    { name: "Lake House", img: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80" },
+    { name: "Desert Home", img: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&q=80" },
+    { name: "Glass House", img: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800&q=80" },
+    { name: "Country Home", img: "https://images.unsplash.com/photo-1592595896551-12b371d546d5?w=800&q=80" },
+    { name: "City Apartment", img: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80" },
+    { name: "Wooden Hut", img: "https://images.unsplash.com/photo-1470770903676-69b98201ea1c?w=800&q=80" },
+    { name: "Luxury Villa", img: "https://images.unsplash.com/photo-1613977257363-707ba9348227?w=800&q=80" },
+    { name: "Small Cottage", img: "https://images.unsplash.com/photo-1595846519845-68e298c2edd8?w=800&q=80" },
+  ]},
+  { name: "Sea & Ocean", icon: "\ud83c\udf0a", scenes: [
+    { name: "Ocean Wave", img: "https://images.unsplash.com/photo-1439405326854-014607f694d7?w=800&q=80" },
+    { name: "Tropical Beach", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80" },
+    { name: "Sunset Sea", img: "https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=800&q=80" },
+    { name: "Island", img: "https://images.unsplash.com/photo-1559128010-7c1ad6e1b6a5?w=800&q=80" },
+    { name: "Coral Reef", img: "https://images.unsplash.com/photo-1546026423-cc4642628d2b?w=800&q=80" },
+    { name: "Deep Blue", img: "https://images.unsplash.com/photo-1551244072-5d12893278ab?w=800&q=80" },
+    { name: "Sailboat", img: "https://images.unsplash.com/photo-1500930287596-c1ecaa373bb2?w=800&q=80" },
+    { name: "Surf Wave", img: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800&q=80" },
+    { name: "Beach Palm", img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=800&q=80" },
+    { name: "Ocean Cliff", img: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=800&q=80" },
+    { name: "Sea Turtle", img: "https://images.unsplash.com/photo-1437622368342-7a3d73a34c8f?w=800&q=80" },
+    { name: "Dolphin", img: "https://images.unsplash.com/photo-1607153333879-c174d265f1d2?w=800&q=80" },
+    { name: "Beach Sunset", img: "https://images.unsplash.com/photo-1495954484750-af469f2f9be5?w=800&q=80" },
+    { name: "Aerial Ocean", img: "https://images.unsplash.com/photo-1515238152791-8216bfdf89a7?w=800&q=80" },
+    { name: "Rocky Shore", img: "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=800&q=80" },
+    { name: "Calm Sea", img: "https://images.unsplash.com/photo-1439405326854-014607f694d7?w=800&q=80" },
+    { name: "Storm Sea", img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80" },
+    { name: "Lagoon", img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80" },
+    { name: "Pier", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80" },
+    { name: "Underwater", img: "https://images.unsplash.com/photo-1559825481-12a05cc00344?w=800&q=80" },
+  ]},
+  { name: "Mountains", icon: "\u26f0", scenes: [
+    { name: "Snow Peak", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80" },
+    { name: "Alps", img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80" },
+    { name: "Mountain Lake", img: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=800&q=80" },
+    { name: "Rocky Peak", img: "https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800&q=80" },
+    { name: "Himalaya", img: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=800&q=80" },
+    { name: "Green Valley", img: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80" },
+    { name: "Misty Mount", img: "https://images.unsplash.com/photo-1476900543704-4312b78632f8?w=800&q=80" },
+    { name: "Sunrise Peak", img: "https://images.unsplash.com/photo-1465056836041-7f43ac27dcb5?w=800&q=80" },
+    { name: "Winter Mount", img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80" },
+    { name: "Canyon", img: "https://images.unsplash.com/photo-1474044159687-1ee9f3a51722?w=800&q=80" },
+    { name: "Volcano", img: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80" },
+    { name: "Cliff", img: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&q=80" },
+    { name: "Mountain Road", img: "https://images.unsplash.com/photo-1465447142348-e9952c393450?w=800&q=80" },
+    { name: "Peak Clouds", img: "https://images.unsplash.com/photo-1458668383970-8ddd3927deed?w=800&q=80" },
+    { name: "Forest Mount", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80" },
+    { name: "Desert Mount", img: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=800&q=80" },
+    { name: "Lake Peak", img: "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800&q=80" },
+    { name: "Night Mount", img: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80" },
+    { name: "Autumn Mount", img: "https://images.unsplash.com/photo-1507371341162-763b5e419408?w=800&q=80" },
+    { name: "Glacier", img: "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=800&q=80" },
+  ]},
+  { name: "City", icon: "\ud83c\udf06", scenes: [
+    { name: "New York", img: "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=800&q=80" },
+    { name: "Night City", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&q=80" },
+    { name: "Street", img: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80" },
+    { name: "Skyline", img: "https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=800&q=80" },
+    { name: "Downtown", img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80" },
+    { name: "Bridge City", img: "https://images.unsplash.com/photo-1449034446853-66c86144b0ad?w=800&q=80" },
+    { name: "Neon Street", img: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&q=80" },
+    { name: "Old Town", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80" },
+    { name: "Skyscraper", img: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80" },
+    { name: "City Park", img: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&q=80" },
+    { name: "Rooftop", img: "https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=800&q=80" },
+    { name: "Metro", img: "https://images.unsplash.com/photo-1474487548417-781cb71495f3?w=800&q=80" },
+    { name: "City Rain", img: "https://images.unsplash.com/photo-1428592953211-077101b2021b?w=800&q=80" },
+    { name: "Market", img: "https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=800&q=80" },
+    { name: "City Sunset", img: "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=800&q=80" },
+    { name: "Alley", img: "https://images.unsplash.com/photo-1517732306149-e8f829eb588a?w=800&q=80" },
+    { name: "Plaza", img: "https://images.unsplash.com/photo-1514565131-fce0801e5785?w=800&q=80" },
+    { name: "City Lights", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&q=80" },
+    { name: "Harbor", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=80" },
+    { name: "City Aerial", img: "https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=800&q=80" },
+  ]},
+  { name: "Nature", icon: "\ud83c\udf33", scenes: [
+    { name: "Forest", img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&q=80" },
+    { name: "Waterfall", img: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80" },
+    { name: "Meadow", img: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80" },
+    { name: "Flowers", img: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=80" },
+    { name: "Garden", img: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&q=80" },
+    { name: "Rainforest", img: "https://images.unsplash.com/photo-1440342359743-84fcb8c21f21?w=800&q=80" },
+    { name: "Sunflower", img: "https://images.unsplash.com/photo-1470509037663-253afd7f0f51?w=800&q=80" },
+    { name: "Lavender", img: "https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=800&q=80" },
+    { name: "Bamboo", img: "https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=800&q=80" },
+    { name: "Moss", img: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?w=800&q=80" },
+    { name: "Autumn Leaf", img: "https://images.unsplash.com/photo-1507371341162-763b5e419408?w=800&q=80" },
+    { name: "Cherry", img: "https://images.unsplash.com/photo-1522383225653-ed111181a951?w=800&q=80" },
+    { name: "Tulip", img: "https://images.unsplash.com/photo-1520763185298-1b434c919102?w=800&q=80" },
+    { name: "Daisy", img: "https://images.unsplash.com/photo-1560717789-0ac7c58ac90a?w=800&q=80" },
+    { name: "Rose", img: "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=800&q=80" },
+    { name: "Fern", img: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=800&q=80" },
+    { name: "Pine", img: "https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80" },
+    { name: "Jungle", img: "https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=800&q=80" },
+    { name: "Grass", img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80" },
+    { name: "Dew", img: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800&q=80" },
+  ]},
+  { name: "Sky & Space", icon: "\u2728", scenes: [
+    { name: "Galaxy", img: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80" },
+    { name: "Stars", img: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80" },
+    { name: "Milky Way", img: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80" },
+    { name: "Aurora", img: "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=800&q=80" },
+    { name: "Clouds", img: "https://images.unsplash.com/photo-1534088568595-a066f6db0478?w=800&q=80" },
+    { name: "Sunset Sky", img: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800&q=80" },
+    { name: "Blue Sky", img: "https://images.unsplash.com/photo-1419833173245-f59e1b93f9ee?w=800&q=80" },
+    { name: "Storm", img: "https://images.unsplash.com/photo-1534088568595-a066f6db0478?w=800&q=80" },
+    { name: "Rainbow", img: "https://images.unsplash.com/photo-1501436513145-30f24e19fcc8?w=800&q=80" },
+    { name: "Moon", img: "https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=800&q=80" },
+    { name: "Sunrise", img: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=800&q=80" },
+    { name: "Nebula", img: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80" },
+    { name: "Lightning", img: "https://images.unsplash.com/photo-1461511669078-d46bf351cd6e?w=800&q=80" },
+    { name: "Eclipse", img: "https://images.unsplash.com/photo-1532693322450-2cb5c511067d?w=800&q=80" },
+    { name: "Comet", img: "https://images.unsplash.com/photo-1419242902214-272b3f66ee7a?w=800&q=80" },
+    { name: "Planet", img: "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=800&q=80" },
+    { name: "Balloon Sky", img: "https://images.unsplash.com/photo-1507608616759-54f48f0af0ee?w=800&q=80" },
+    { name: "Kite Sky", img: "https://images.unsplash.com/photo-1501436513145-30f24e19fcc8?w=800&q=80" },
+    { name: "Birds Sky", img: "https://images.unsplash.com/photo-1444464666168-49d633b86797?w=800&q=80" },
+    { name: "Night Sky", img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&q=80" },
+  ]},
+  { name: "Office", icon: "\ud83d\udcbc", scenes: [
+    { name: "Modern Office", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" },
+    { name: "Workspace", img: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80" },
+    { name: "Desk", img: "https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?w=800&q=80" },
+    { name: "Meeting", img: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=800&q=80" },
+    { name: "Laptop Desk", img: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=800&q=80" },
+    { name: "Creative", img: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80" },
+    { name: "Studio Desk", img: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&q=80" },
+    { name: "Library", img: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80" },
+    { name: "Cafe Work", img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=800&q=80" },
+    { name: "Home Office", img: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80" },
+    { name: "Boardroom", img: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=800&q=80" },
+    { name: "Cowork", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" },
+    { name: "Minimal Desk", img: "https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?w=800&q=80" },
+    { name: "Plant Office", img: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800&q=80" },
+    { name: "Window Desk", img: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=800&q=80" },
+    { name: "Team", img: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&q=80" },
+    { name: "Presentation", img: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=800&q=80" },
+    { name: "Lounge", img: "https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800&q=80" },
+    { name: "Dark Office", img: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800&q=80" },
+    { name: "Bright Office", img: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=800&q=80" },
+  ]},
+  { name: "Food", icon: "\ud83c\udf54", scenes: [
+    { name: "Pizza", img: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80" },
+    { name: "Burger", img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80" },
+    { name: "Sushi", img: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=800&q=80" },
+    { name: "Pasta", img: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&q=80" },
+    { name: "Dessert", img: "https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&q=80" },
+    { name: "Coffee", img: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&q=80" },
+    { name: "Breakfast", img: "https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=800&q=80" },
+    { name: "Salad", img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80" },
+    { name: "Steak", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?w=800&q=80" },
+    { name: "Ice Cream", img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=800&q=80" },
+    { name: "Cake", img: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=800&q=80" },
+    { name: "Fruit", img: "https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=800&q=80" },
+    { name: "BBQ", img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80" },
+    { name: "Noodles", img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&q=80" },
+    { name: "Tacos", img: "https://images.unsplash.com/photo-1551504734-5ee1c4a1479b?w=800&q=80" },
+    { name: "Pancake", img: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&q=80" },
+    { name: "Sandwich", img: "https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=800&q=80" },
+    { name: "Donut", img: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&q=80" },
+    { name: "Tea", img: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?w=800&q=80" },
+    { name: "Juice", img: "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=800&q=80" },
+  ]},
+  { name: "Travel", icon: "\u2708", scenes: [
+    { name: "Eiffel Tower", img: "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=800&q=80" },
+    { name: "Taj Mahal", img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=800&q=80" },
+    { name: "Santorini", img: "https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=800&q=80" },
+    { name: "Dubai", img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80" },
+    { name: "Bali", img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80" },
+    { name: "Paris Street", img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=800&q=80" },
+    { name: "London", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=800&q=80" },
+    { name: "Tokyo", img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&q=80" },
+    { name: "Maldives", img: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80" },
+    { name: "Swiss Alps", img: "https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=800&q=80" },
+    { name: "Egypt", img: "https://images.unsplash.com/photo-1503177119275-0aa32b3a9368?w=800&q=80" },
+    { name: "Greece", img: "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800&q=80" },
+    { name: "Venice", img: "https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=800&q=80" },
+    { name: "Airport", img: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=800&q=80" },
+    { name: "Road Trip", img: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80" },
+    { name: "Cruise", img: "https://images.unsplash.com/photo-1548574505-5e239809ee19?w=800&q=80" },
+    { name: "Desert Safari", img: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=800&q=80" },
+    { name: "Northern Trip", img: "https://images.unsplash.com/photo-1483347756197-71ef80e95f73?w=800&q=80" },
+    { name: "Waterfall Trip", img: "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&q=80" },
+    { name: "City Tour", img: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&q=80" },
+  ]},
+  { name: "Sports", icon: "\u26bd", scenes: [
+    { name: "Stadium", img: "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800&q=80" },
+    { name: "Football", img: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80" },
+    { name: "Basketball", img: "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80" },
+    { name: "Tennis", img: "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&q=80" },
+    { name: "Cricket", img: "https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&q=80" },
+    { name: "Gym", img: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80" },
+    { name: "Running", img: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&q=80" },
+    { name: "Swimming", img: "https://images.unsplash.com/photo-1530549387789-4c1017266635?w=800&q=80" },
+    { name: "Cycling", img: "https://images.unsplash.com/photo-1541625602330-2277a4c46182?w=800&q=80" },
+    { name: "Boxing", img: "https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?w=800&q=80" },
+    { name: "Yoga", img: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=800&q=80" },
+    { name: "Skiing", img: "https://images.unsplash.com/photo-1551524559-8af4e6624178?w=800&q=80" },
+    { name: "Surfing", img: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?w=800&q=80" },
+    { name: "Golf", img: "https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=800&q=80" },
+    { name: "Skateboard", img: "https://images.unsplash.com/photo-1547447134-cd3f5c716030?w=800&q=80" },
+    { name: "Climbing", img: "https://images.unsplash.com/photo-1522163182402-834f871fd851?w=800&q=80" },
+    { name: "Racing", img: "https://images.unsplash.com/photo-1553440569-bcc63803a83d?w=800&q=80" },
+    { name: "Volleyball", img: "https://images.unsplash.com/photo-1592656094267-764a45160876?w=800&q=80" },
+    { name: "Badminton", img: "https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=800&q=80" },
+    { name: "Marathon", img: "https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&q=80" },
+  ]},
 ];
+
+// Flat list for canvas rendering (category-scene index mapping)
+const PRESETS: { name: string; css: string; img: string }[] =
+  SCENE_CATEGORIES.flatMap((c) => c.scenes.map((s) => ({ name: `${c.name} - ${s.name}`, css: "", img: s.img })));
+
 
 export default function BackgroundStudio() {
   const [file, setFile] = useState<File | null>(null);
@@ -82,6 +321,7 @@ export default function BackgroundStudio() {
   const [gradAngle, setGradAngle] = useState(135);
   const [blurAmt, setBlurAmt] = useState(12);
   const [presetIdx, setPresetIdx] = useState(0);
+  const [sceneCat, setSceneCat] = useState(0);
   const [, setSceneTick] = useState(0);
 
   // Preload scene photos so canvas shows real images, not fallback
@@ -460,14 +700,33 @@ export default function BackgroundStudio() {
           </label>
         )}
         {bgKind === "preset" && (
-          <div className="grid grid-cols-3 gap-1.5 max-h-64 overflow-y-auto">
-            {PRESETS.map((p, i) => (
-              <button key={p.name} onClick={() => setPresetIdx(i)}
-                className={`relative h-16 rounded-lg text-[11px] font-bold text-white ring-2 transition overflow-hidden ${presetIdx === i ? "ring-fuchsia-400 scale-[1.03]" : "ring-white/10"}`}>
-                <img src={p.img} alt={p.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
-                <span className="absolute inset-x-0 bottom-0 bg-black/50 text-[10px] py-0.5">{p.name}</span>
-              </button>
-            ))}
+          <div className="space-y-3">
+            {/* Category tabs */}
+            <div className="flex flex-wrap gap-1.5">
+              {SCENE_CATEGORIES.map((c, ci) => (
+                <button key={c.name} onClick={() => { setSceneCat(ci); }}
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                    sceneCat === ci ? "bg-fuchsia-600 text-white shadow-lg" : "bg-white/5 text-zinc-400 hover:bg-white/10"
+                  }`}>
+                  {c.icon} {c.name}
+                </button>
+              ))}
+            </div>
+            {/* Scenes in selected category */}
+            <div className="grid grid-cols-3 gap-1.5 max-h-72 overflow-y-auto">
+              {SCENE_CATEGORIES[sceneCat].scenes.map((s) => {
+                const flatIdx = SCENE_CATEGORIES.slice(0, sceneCat).reduce((n, c) => n + c.scenes.length, 0)
+                  + SCENE_CATEGORIES[sceneCat].scenes.indexOf(s);
+                return (
+                  <button key={s.name} onClick={() => setPresetIdx(flatIdx)}
+                    className={`relative h-16 rounded-lg text-[11px] font-bold text-white ring-2 transition overflow-hidden ${presetIdx === flatIdx ? "ring-fuchsia-400 scale-[1.03]" : "ring-white/10"}`}>
+                    <img src={s.img} alt={s.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+                    <span className="absolute inset-x-0 bottom-0 bg-black/50 text-[10px] py-0.5 px-1 truncate">{s.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[11px] text-zinc-500">{SCENE_CATEGORIES[sceneCat].scenes.length} scenes in {SCENE_CATEGORIES[sceneCat].name} · {PRESETS.length} total</p>
           </div>
         )}
         {bgKind === "transparent" && (
