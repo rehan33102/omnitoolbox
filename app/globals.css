@@ -223,9 +223,8 @@
 .brand-name {
   font-family: var(--font-display), system-ui, sans-serif;
   font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  font-size: 1.15rem;
   background: linear-gradient(100deg, #f472b6 0%, #a855f7 35%, #6366f1 60%, #22d3ee 100%);
   -webkit-background-clip: text;
   background-clip: text;
