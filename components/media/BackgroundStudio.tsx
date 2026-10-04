@@ -40,6 +40,25 @@ const PRESETS: { name: string; css: string }[] = [
   { name: "Neon", css: "radial-gradient(circle at 20% 20%, #d946ef 0%, transparent 50%), radial-gradient(circle at 80% 80%, #06b6d4 0%, transparent 50%), linear-gradient(135deg, #0f172a, #1e1b4b)" },
   { name: "Sunset", css: "linear-gradient(180deg, #312e81 0%, #be185d 55%, #fb923c 100%)" },
   { name: "Forest", css: "radial-gradient(circle at 50% 100%, #166534 0%, #052e16 70%)" },
+  { name: "Midnight", css: "linear-gradient(180deg, #1e1b4b 0%, #4c1d95 50%, #0f172a 100%)" },
+  { name: "Golden Hour", css: "linear-gradient(180deg, #fef3c7 0%, #fcd34d 50%, #f59e0b 100%)" },
+  { name: "Deep Ocean", css: "linear-gradient(180deg, #0c4a6e 0%, #0369a1 60%, #082f49 100%)" },
+  { name: "Cotton Candy", css: "linear-gradient(180deg, #fce7f3 0%, #f9a8d4 50%, #ec4899 100%)" },
+  { name: "Aurora", css: "radial-gradient(circle at 30% 30%, #34d399 0%, transparent 50%), radial-gradient(circle at 70% 60%, #60a5fa 0%, transparent 50%), linear-gradient(135deg, #020617, #0f172a)" },
+  { name: "Desert Dusk", css: "linear-gradient(180deg, #7c2d12 0%, #c2410c 50%, #431407 100%)" },
+  { name: "Mint Fresh", css: "linear-gradient(180deg, #ecfdf5 0%, #6ee7b7 100%)" },
+  { name: "City Lights", css: "radial-gradient(circle at 50% 80%, #fbbf24 0%, transparent 40%), radial-gradient(circle at 20% 30%, #ef4444 0%, transparent 40%), radial-gradient(circle at 80% 20%, #3b82f6 0%, transparent 40%), linear-gradient(135deg, #111827, #1f2937)" },
+  { name: "Lavender", css: "linear-gradient(180deg, #fdf4ff 0%, #e9d5ff 50%, #a855f7 100%)" },
+  { name: "Teal Depth", css: "linear-gradient(180deg, #0f766e 0%, #042f2e 100%)" },
+  { name: "Peach Glow", css: "linear-gradient(180deg, #fff7ed 0%, #fdba74 60%, #ea580c 100%)" },
+  { name: "Galaxy", css: "radial-gradient(circle at 70% 30%, #8b5cf6 0%, transparent 50%), radial-gradient(circle at 30% 70%, #ec4899 0%, transparent 50%), linear-gradient(135deg, #030014, #1e1b4b)" },
+  { name: "Aqua Mist", css: "linear-gradient(180deg, #f0fdfa 0%, #99f6e4 100%)" },
+  { name: "Coffee Gold", css: "linear-gradient(180deg, #451a03 0%, #92400e 50%, #fbbf24 100%)" },
+  { name: "Dark Slate", css: "linear-gradient(180deg, #1e293b 0%, #020617 100%)" },
+  { name: "Lemon Shine", css: "linear-gradient(180deg, #fefce8 0%, #fef08a 50%, #eab308 100%)" },
+  { name: "Rose Night", css: "radial-gradient(circle at 50% 40%, #f43f5e 0%, transparent 60%), linear-gradient(135deg, #1c0a0a, #450a0a)" },
+  { name: "Sky Blue", css: "linear-gradient(180deg, #eff6ff 0%, #93c5fd 100%)" },
+  { name: "Clean White", css: "radial-gradient(circle at 50% 50%, #ffffff 0%, #f1f5f9 70%, #cbd5e1 100%)" },
 ];
 
 export default function BackgroundStudio() {
@@ -496,28 +515,65 @@ function paintPreset(cv: HTMLCanvasElement, idx: number) {
     stops.forEach(([o, c]) => g.addColorStop(o, c));
     ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
   };
+  const radial = (x: number, y: number, stops: [number, string][]) => {
+    const g = ctx.createRadialGradient(w*x, h*y, 10, w*x, h*y, Math.max(w, h)*0.85);
+    stops.forEach(([o, c]) => g.addColorStop(o, c));
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  };
+  const glow = (x: number, y: number, color: string, alpha: number) => {
+    const g = ctx.createRadialGradient(w*x, h*y, 10, w*x, h*y, w*0.5);
+    g.addColorStop(0, color.replace("A", String(alpha)));
+    g.addColorStop(1, color.replace("A", "0"));
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  };
   switch (idx) {
-    case 0: { // Studio
-      const g = ctx.createRadialGradient(w/2, h*0.35, 10, w/2, h*0.35, Math.max(w, h)*0.8);
-      g.addColorStop(0, "#f8fafc"); g.addColorStop(0.55, "#cbd5e1"); g.addColorStop(1, "#94a3b8");
-      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h); break;
-    }
+    case 0: radial(0.5, 0.35, [[0, "#f8fafc"], [0.55, "#cbd5e1"], [1, "#94a3b8"]]); break; // Studio
     case 1: lin([[0, "#7dd3fc"], [0.45, "#bae6fd"], [0.75, "#fde68a"], [1, "#fcd34d"]]); break; // Beach
     case 2: lin([[0, "#e2e8f0"], [0.6, "#cbd5e1"], [1, "#94a3b8"]]); break; // Office
     case 3: { // Neon
       ctx.fillStyle = "#0f172a"; ctx.fillRect(0, 0, w, h);
-      const a = ctx.createRadialGradient(w*0.2, h*0.2, 10, w*0.2, h*0.2, w*0.5);
-      a.addColorStop(0, "rgba(217,70,239,0.8)"); a.addColorStop(1, "rgba(217,70,239,0)");
-      ctx.fillStyle = a; ctx.fillRect(0, 0, w, h);
-      const b = ctx.createRadialGradient(w*0.8, h*0.8, 10, w*0.8, h*0.8, w*0.5);
-      b.addColorStop(0, "rgba(6,182,212,0.8)"); b.addColorStop(1, "rgba(6,182,212,0)");
-      ctx.fillStyle = b; ctx.fillRect(0, 0, w, h); break;
+      glow(0.2, 0.2, "rgba(217,70,239,A)", 0.8); glow(0.8, 0.8, "rgba(6,182,212,A)", 0.8); break;
     }
     case 4: lin([[0, "#312e81"], [0.55, "#be185d"], [1, "#fb923c"]]); break; // Sunset
-    default: { // Forest
-      const g = ctx.createRadialGradient(w/2, h, 10, w/2, h, h);
-      g.addColorStop(0, "#166534"); g.addColorStop(1, "#052e16");
-      ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    case 5: radial(0.5, 1, [[0, "#166534"], [1, "#052e16"]]); break; // Forest
+    case 6: lin([[0, "#1e1b4b"], [0.5, "#4c1d95"], [1, "#0f172a"]]); break; // Midnight Purple
+    case 7: lin([[0, "#fef3c7"], [0.5, "#fcd34d"], [1, "#f59e0b"]]); break; // Golden Hour
+    case 8: lin([[0, "#0c4a6e"], [0.6, "#0369a1"], [1, "#082f49"]]); break; // Deep Ocean
+    case 9: lin([[0, "#fce7f3"], [0.5, "#f9a8d4"], [1, "#ec4899"]]); break; // Cotton Candy
+    case 10: { // Aurora
+      ctx.fillStyle = "#020617"; ctx.fillRect(0, 0, w, h);
+      glow(0.3, 0.3, "rgba(52,211,153,A)", 0.7); glow(0.7, 0.6, "rgba(96,165,250,A)", 0.6); break;
     }
+    case 11: lin([[0, "#7c2d12"], [0.5, "#c2410c"], [1, "#431407"]]); break; // Desert Dusk
+    case 12: lin([[0, "#ecfdf5"], [1, "#6ee7b7"]]); break; // Mint Fresh
+    case 13: { // City Lights
+      ctx.fillStyle = "#111827"; ctx.fillRect(0, 0, w, h);
+      glow(0.5, 0.8, "rgba(251,191,36,A)", 0.5); glow(0.2, 0.3, "rgba(239,68,68,A)", 0.4); glow(0.8, 0.2, "rgba(59,130,246,A)", 0.4); break;
+    }
+    case 14: lin([[0, "#fdf4ff"], [0.5, "#e9d5ff"], [1, "#a855f7"]]); break; // Lavender Dream
+    case 15: lin([[0, "#0f766e"], [1, "#042f2e"]]); break; // Teal Depth
+    case 16: lin([[0, "#fff7ed"], [0.6, "#fdba74"], [1, "#ea580c"]]); break; // Peach Glow
+    case 17: { // Galaxy
+      ctx.fillStyle = "#030014"; ctx.fillRect(0, 0, w, h);
+      glow(0.7, 0.3, "rgba(139,92,246,A)", 0.8); glow(0.3, 0.7, "rgba(236,72,153,A)", 0.6); break;
+    }
+    case 18: lin([[0, "#f0fdfa"], [1, "#99f6e4"]]); break; // Aqua Mist
+    case 19: lin([[0, "#451a03"], [0.5, "#92400e"], [1, "#fbbf24"]]); break; // Coffee Gold
+    case 20: lin([[0, "#1e293b"], [1, "#020617"]]); break; // Dark Slate
+    case 21: lin([[0, "#fefce8"], [0.5, "#fef08a"], [1, "#eab308"]]); break; // Lemon Shine
+    case 22: { // Rose Night
+      ctx.fillStyle = "#1c0a0a"; ctx.fillRect(0, 0, w, h);
+      glow(0.5, 0.4, "rgba(244,63,94,A)", 0.7); break;
+    }
+    case 23: lin([[0, "#eff6ff"], [1, "#93c5fd"]]); break; // Sky Blue
+    case 24: radial(0.5, 0.5, [[0, "#ffffff"], [0.7, "#f1f5f9"], [1, "#cbd5e1"]]); break; // Clean White
+    default: radial(0.5, 1, [[0, "#166534"], [1, "#052e16"]]); break; // Forest
   }
 }
+
+export const PRESET_SCENES = [
+  "Studio", "Beach", "Office", "Neon", "Sunset", "Forest",
+  "Midnight", "Golden Hour", "Deep Ocean", "Cotton Candy", "Aurora", "Desert Dusk",
+  "Mint Fresh", "City Lights", "Lavender", "Teal Depth", "Peach Glow", "Galaxy",
+  "Aqua Mist", "Coffee Gold", "Dark Slate", "Lemon Shine", "Rose Night", "Sky Blue", "Clean White",
+];
