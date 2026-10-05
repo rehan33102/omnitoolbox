@@ -13,7 +13,6 @@ const ImageCompressor = lazyTool(() => import("@/components/media/ImageCompresso
 const SvgCleaner = lazyTool(() => import("@/components/media/SvgCleaner"));
 const BackgroundStudio = lazyTool(() => import("@/components/media/BackgroundStudio"));
 const WatermarkRemover = lazyTool(() => import("@/components/media/WatermarkRemover"));
-const ThumbnailMaker = lazyTool(() => import("@/components/media/ThumbnailMaker"));
 
 export default function MediaToolTabs() {
   return (
@@ -24,14 +23,12 @@ export default function MediaToolTabs() {
         <TabsTrigger value="svg">SVG Cleaner</TabsTrigger>
         <TabsTrigger value="studio">🎨 BG Studio</TabsTrigger>
         <TabsTrigger value="watermark">Watermark Remover</TabsTrigger>
-        <TabsTrigger value="thumbnail">🖼️ Thumbnail Maker</TabsTrigger>
       </TabsList>
       <TabsContent value="converter" id="converter"><ImageConverter /></TabsContent>
       <TabsContent value="compressor" id="compressor"><ImageCompressor /></TabsContent>
       <TabsContent value="svg" id="svg-cleaner"><SvgCleaner /></TabsContent>
       <TabsContent value="studio" id="background-studio"><BackgroundStudio /></TabsContent>
       <TabsContent value="watermark" id="watermark-remover"><WatermarkRemover /></TabsContent>
-      <TabsContent value="thumbnail" id="thumbnail-maker"><ThumbnailMaker /></TabsContent>
     </Tabs>
   );
 }
