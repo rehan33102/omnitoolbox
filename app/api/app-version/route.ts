@@ -10,9 +10,8 @@ const LATEST = {
   apkUrl: "https://omnitoolbox-zeta.vercel.app/downloads/omnibox-app.apk",
   changelog:
     "• v11 — AUTO-UPDATE! 🔄\n" +
-    "• App ab khud update download karega\n" +
-    "• Koi button dabane ki zaroorat nahi\n" +
-    "• Sab kuch automatic!",
+    "• The app now downloads updates automatically\n" +
+    "• No buttons to press — everything is automatic!",
 };
 
 export async function GET() {

@@ -91,10 +91,10 @@ export default function AdminOverviewPage() {
       const res = await fetch("/api/admin/setup-database", { method: "POST" });
       const json = await res.json();
       if (json.ok) {
-        alert("Database setup ho gaya! ✅ Ab real readings ayengi.");
+        alert("Database setup complete! ✅ Live readings will now appear.");
         window.location.reload();
       } else {
-        alert("Kuch tables nahi bane. Supabase dashboard mein SQL manually run karna hoga.");
+        alert("Some tables could not be created. Please run the SQL manually in the Supabase dashboard.");
       }
     } catch {
       alert("Setup failed. Try again.");
@@ -129,9 +129,9 @@ export default function AdminOverviewPage() {
         <Card className="border-2 border-amber-500/30 bg-amber-500/5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h3 className="font-bold text-amber-700 dark:text-amber-400">⚠️ Database Setup Chahiye</h3>
+              <h3 className="font-bold text-amber-700 dark:text-amber-400">⚠️ Database Setup Required</h3>
               <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                Ye tables missing hain: {missingTables.join(", ")}. Bina inke dashboard mein real readings nahi ayengi.
+                These tables are missing: {missingTables.join(", ")}. Without them, the dashboard cannot show real readings.
               </p>
             </div>
             <button
@@ -139,7 +139,7 @@ export default function AdminOverviewPage() {
               disabled={dbBusy}
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-lg hover:shadow-xl transition disabled:opacity-50 whitespace-nowrap"
             >
-              {dbBusy ? "Setup ho raha..." : "🔧 Database Setup Karo"}
+              {dbBusy ? "Setting up..." : "🔧 Set Up Database"}
             </button>
           </div>
         </Card>

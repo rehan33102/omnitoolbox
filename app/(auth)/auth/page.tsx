@@ -117,7 +117,7 @@ function AuthForm() {
         });
         if (loginError) throw loginError;
         toast({
-          title: "Account ban gaya! 🎉",
+          title: "Account created! 🎉",
           description: "Welcome to Omni Tool Box!",
           variant: "success",
         });
@@ -127,7 +127,7 @@ function AuthForm() {
 
       // ---- LOGIN (smart, case-insensitive) ----
       if (!cleanEmail || !password) {
-        toast({ title: "Email aur password dalo", variant: "error" });
+        toast({ title: "Please enter your email and password", variant: "error" });
         return;
       }
       const { error } = await supabase.auth.signInWithPassword({
@@ -218,7 +218,7 @@ function AuthForm() {
         <div className="mt-6">
           <div className="text-center mb-6">
             <p className="text-sm text-zinc-500 mt-1">
-              Account ban raha hai...
+              Creating your account...
             </p>
           </div>
         </div>
@@ -305,7 +305,7 @@ function AuthForm() {
 
           <p className="text-xs text-zinc-500 text-center mt-6">
             {mode === "signup" ? (
-              <>Account turant ban jayega — koi OTP nahi! Already registered?{" "}
+              <>Your account will be created instantly — no OTP required! Already registered?{" "}
                 <button onClick={() => setMode("login")} className="text-brand-700 dark:text-brand-400 font-semibold hover:underline">Log in</button></>
             ) : (
               <>New here?{" "}

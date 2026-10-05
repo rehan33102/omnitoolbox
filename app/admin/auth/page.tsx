@@ -41,11 +41,11 @@ export default function AdminAuthPage() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim() || !password) {
-      toast({ title: "Email aur password dalo", variant: "error" });
+      toast({ title: "Please enter your email and password", variant: "error" });
       return;
     }
     if (mode === "signup" && password.length < 6) {
-      toast({ title: "Password kam se kam 6 characters ka ho", variant: "error" });
+      toast({ title: "Password must be at least 6 characters", variant: "error" });
       return;
     }
     setBusy(true);
@@ -81,7 +81,7 @@ export default function AdminAuthPage() {
         if (error) {
           // Helpful message if email not yet verified
           if (error.message.toLowerCase().includes("email not confirmed")) {
-            throw new Error("Email verify nahi hui. Signup tab se dobara OTP verify karo.");
+            throw new Error("Email not verified. Please sign up again.");
           }
           throw error;
         }
@@ -101,7 +101,7 @@ export default function AdminAuthPage() {
   const handleOtpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.trim().length < 6) {
-      toast({ title: "6-digit OTP dalo", variant: "error" });
+      toast({ title: "Please enter the 6-digit OTP.", variant: "error" });
       return;
     }
     setBusy(true);
@@ -115,7 +115,7 @@ export default function AdminAuthPage() {
       if (error) throw error;
       await finishAuth();
     } catch (err) {
-      toast({ title: "OTP ghalat hai", description: (err as Error).message, variant: "error" });
+      toast({ title: "Incorrect OTP", description: (err as Error).message, variant: "error" });
     } finally {
       setBusy(false);
     }
@@ -130,7 +130,7 @@ export default function AdminAuthPage() {
         email: email.trim(),
       });
       if (error) throw error;
-      toast({ title: "OTP dobara bhej diya! 📧", variant: "success" });
+      toast({ title: "OTP resent! 📧", variant: "success" });
     } catch (err) {
       toast({ title: "Resend failed", description: (err as Error).message, variant: "error" });
     } finally {
@@ -152,7 +152,7 @@ export default function AdminAuthPage() {
           </span>
           <div>
             <h1 className="font-display text-2xl font-bold">Admin Panel</h1>
-            <p className="text-sm text-zinc-500">Sirf owner ke liye 🔐</p>
+            <p className="text-sm text-zinc-500">Owner access only 🔐</p>
           </div>
         </div>
 
@@ -163,10 +163,10 @@ export default function AdminAuthPage() {
               <span className="inline-flex p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-3">
                 <CheckCircle2 size={24} />
               </span>
-              <h2 className="font-bold text-lg">Email Verify Karo</h2>
+              <h2 className="font-bold text-lg">Verify Your Email</h2>
               <p className="text-sm text-zinc-500 mt-1">
-                <b>{email}</b> par 6-digit OTP bheja hai.
-                <br />Woh code yahan dalo:
+                We&apos;ve sent a 6-digit OTP to <b>{email}</b>.
+                <br />Enter the code here:
               </p>
             </div>
             <form onSubmit={handleOtpSubmit} className="space-y-4">
@@ -182,19 +182,19 @@ export default function AdminAuthPage() {
                 autoFocus
               />
               <Button type="submit" disabled={busy} className="w-full" size="lg">
-                {busy ? "Verify ho raha..." : "Verify & Dashboard Kholo 🚀"}
+                {busy ? "Verifying..." : "Verify & Open Dashboard 🚀"}
               </Button>
             </form>
             <div className="flex justify-between mt-4 text-sm">
               <button onClick={backToForm} className="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200">
-                ← Wapis
+                ← Back
               </button>
               <button
                 onClick={resendOtp}
                 disabled={busy}
                 className="text-amber-600 dark:text-amber-400 font-semibold hover:underline disabled:opacity-50"
               >
-                OTP dobara bhejo
+                Resend OTP
               </button>
             </div>
           </div>
@@ -244,15 +244,15 @@ export default function AdminAuthPage() {
                 />
               </div>
               <Button type="submit" disabled={busy} className="w-full" size="lg">
-                {busy ? "Ruko..." : mode === "login" ? "Dashboard Kholo 🚀" : "OTP Bhejo ✨"}
+                {busy ? "Please wait..." : mode === "login" ? "Open Dashboard 🚀" : "Create Account ✨"}
               </Button>
             </form>
 
             <p className="text-xs text-zinc-500 text-center mt-6">
               {mode === "signup" ? (
-                <>Signup par tumhare email par <b>6-digit OTP</b> ayega — verify karte hi dashboard khul jayega!</>
+                <>Your account will be created instantly — the dashboard opens right away!</>
               ) : (
-                <>Pehli baar? <b>Signup</b> tab se account banao (OTP verify hoga), phir <b>Login</b> karo.</>
+                <>First time here? Create an account from the <b>Signup</b> tab, then <b>Log in</b>.</>
               )}
             </p>
           </>

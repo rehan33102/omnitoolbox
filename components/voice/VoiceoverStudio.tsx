@@ -398,7 +398,7 @@ export default function VoiceoverStudio() {
             <Languages size={15} className="text-brand-700 dark:text-brand-400" /> Language
           </label>
           <select id="vo-lang" value={lang} onChange={(e) => setLang(e.target.value)} className="input-base w-full">
-            <optgroup label="Neural Voices">
+            <optgroup label="HD AI Voices">
               {edgeLangs.map((l) => (
                 <option key={l.code} value={l.code}>
                   {l.flag} {l.label}
@@ -415,7 +415,7 @@ export default function VoiceoverStudio() {
           </select>
           <p className="text-xs text-zinc-500 mt-1.5 flex items-center gap-1.5">
             {isEdgeLang ? (
-              <><Sparkles size={12} className="text-brand-700 dark:text-brand-400" /> Microsoft neural voice · male/female · styles · free</>
+              <><Sparkles size={12} className="text-brand-700 dark:text-brand-400" /> HD AI voice · male/female · styles · free</>
             ) : (
               <>Basic free voice · MP3 download</>
             )}
@@ -541,11 +541,11 @@ export default function VoiceoverStudio() {
           <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4 space-y-3 animate-fade-up">
             {engine === "edge" || engine === "elevenlabs" ? (
               <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1">
-                ✨ {engine === "edge" ? "Neural Voice" : "Premium Neural Voice"}
+                ✨ {engine === "edge" ? "HD AI Voice" : "Premium AI Voice"}
               </p>
             ) : engine === "google-fallback" || engine === "google" ? (
               <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1">
-                ⚠️ Basic voice — neural was unavailable, try again
+                ⚠️ Basic voice — HD voice was unavailable, please try again
               </p>
             ) : null}
             <audio controls src={audioUrl} className="w-full" />
