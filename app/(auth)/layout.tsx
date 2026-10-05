@@ -1,5 +1,13 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Sign In — Omni Tool Box",
+  description: "Sign in to your Omni Tool Box account to sync your library and settings across devices.",
+  path: "/login",
+  noIndex: true,
+});
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (

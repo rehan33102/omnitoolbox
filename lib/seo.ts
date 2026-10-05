@@ -58,6 +58,17 @@ export function buildMetadata({ title, description, path = "/", keywords = [], i
   };
 }
 
+export function organizationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: SITE_NAME,
+    url: serverSiteUrl(),
+    logo: serverSiteUrl("/icons/icon-512.png"),
+    sameAs: [],
+  };
+}
+
 export function websiteJsonLd() {
   return {
     "@context": "https://schema.org",

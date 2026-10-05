@@ -62,11 +62,14 @@ export const metadata: Metadata = {
 
 import ErrorBoundary from "@/components/ErrorBoundary";
 import GlobalErrorHooks from "@/components/GlobalErrorHooks";
+import JsonLd from "@/components/seo/JsonLd";
+import { websiteJsonLd, organizationJsonLd } from "@/lib/seo";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${display.variable} ${condensed.variable} min-h-screen flex flex-col`}>
+        <JsonLd data={[websiteJsonLd(), organizationJsonLd()]} />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ToastProvider>
             <ServiceWorkerRegister />

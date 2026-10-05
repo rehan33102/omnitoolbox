@@ -15,10 +15,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { route: "/social-tools", priority: 0.9, freq: "weekly" },
     { route: "/web-tools", priority: 0.9, freq: "weekly" },
     { route: "/ai-directory", priority: 0.9, freq: "daily" },
+    { route: "/calculators", priority: 0.9, freq: "weekly" },
+    { route: "/download", priority: 0.8, freq: "weekly" },
+    { route: "/tutorial", priority: 0.7, freq: "weekly" },
+    { route: "/spotlight/voiceover", priority: 0.7, freq: "monthly" },
     { route: "/blog", priority: 0.8, freq: "daily" },
+    { route: "/library", priority: 0.5, freq: "monthly" },
+    { route: "/hire-me", priority: 0.4, freq: "monthly" },
+    { route: "/contact", priority: 0.4, freq: "monthly" },
     { route: "/privacy", priority: 0.3, freq: "monthly" },
     { route: "/terms", priority: 0.3, freq: "monthly" },
-    { route: "/contact", priority: 0.4, freq: "monthly" },
   ];
 
   const urls: MetadataRoute.Sitemap = staticRoutes.map(({ route, priority, freq }) => ({

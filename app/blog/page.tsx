@@ -8,7 +8,7 @@ export const revalidate = 600;
 
 export const metadata = buildMetadata({
   title: "Blog — Guides, Tutorials & AI Tool Reviews",
-  description: "Actionable guides on AI prompts, image optimization, social media growth and the best new AI tools.",
+  description: "Actionable guides on AI prompts, image optimization, social media growth and the best new AI tools — practical tutorials that actually help.",
   path: "/blog",
   keywords: ["ai blog", "prompt engineering guide", "image optimization", "social media tips"],
 });

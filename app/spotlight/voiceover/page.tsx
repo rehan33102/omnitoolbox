@@ -10,7 +10,7 @@ import Card from "@/components/ui/Card";
 
 export const metadata = buildMetadata({
   title: "Voiceover Studio Showcase — Free Neural Text to Speech",
-  description: "See the OmniToolBox Voiceover Studio in action: free Microsoft neural voices in 38 languages, real MP3 + SRT downloads, and a private on-device library.",
+  description: "See the OmniToolBox Voiceover Studio in action: free neural voices in 38 languages, real MP3 downloads, and a private on-device library.",
   path: "/spotlight/voiceover",
   keywords: ["voiceover studio", "neural text to speech", "free tts", "ai voiceover showcase"],
 });

@@ -9,7 +9,7 @@ import Badge from "@/components/ui/Badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 
 export const metadata = buildMetadata({
-  title: "Free Social Media Tools — Fancy Text, Bio Generator & Hashtag Finder",
+  title: "Free Social Tools — Fancy Text, Bios & Hashtags",
   description: "Style text with 12 unicode fonts, generate converting Instagram/TikTok bios, and find high-reach hashtags. Free, no signup.",
   path: "/social-tools",
   keywords: ["fancy text generator", "instagram bio generator", "tiktok bio ideas", "hashtag generator", "unicode text styler"],

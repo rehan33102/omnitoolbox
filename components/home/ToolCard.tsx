@@ -112,7 +112,7 @@ export default function ToolCard({ tool }: { tool: Tool }) {
               <Image
                 // ?v=2 cache-busts old tool card images stuck in browser/CDN cache
                 src={`${tool.image}?v=2`}
-                alt=""
+                alt={`${tool.title} — free online tool`}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="object-cover tool-img-drift transition-transform duration-500 group-hover:scale-[1.06]"

@@ -4,7 +4,7 @@ import { Smartphone, MonitorDown, Download, Check } from "lucide-react";
 
 export const metadata = buildMetadata({
   title: "Download Omni Tool Box — Android & PC Apps",
-  description: "Download Omni Tool Box for Android and Windows PC. Free forever.",
+  description: "Download Omni Tool Box for Android and Windows PC. Free app with 50+ AI tools, image utilities, PDF tools and more — always up to date.",
   path: "/download",
   keywords: ["download", "android app", "pc app", "windows app"],
 });
