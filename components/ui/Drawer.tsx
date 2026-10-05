@@ -1,58 +1,50 @@
 "use client";
 
 import { X } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-/** CSS-transition drawer (no framer-motion): GPU-friendly translate-x slide. */
+/** Simple reliable drawer — renders immediately when open, no complex animation state. */
 export default function Drawer({
   open, onClose, children, title,
 }: { open: boolean; onClose: () => void; children: ReactNode; title?: string }) {
-  const [render, setRender] = useState(open);
-  const [shown, setShown] = useState(false);
-
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open ]);
 
+  // Close on Escape key
   useEffect(() => {
-    if (open) {
-      setRender(true);
-      const raf = requestAnimationFrame(() => requestAnimationFrame(() => setShown(true)));
-      return () => cancelAnimationFrame(raf);
-    }
-    setShown(false);
-    const t = setTimeout(() => setRender(false), 250);
-    return () => clearTimeout(t);
-  }, [open ]);
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onClose]);
 
-  if (!render) return null;
+  if (!open) return null;
 
   return (
     <div className="fixed inset-0 z-[90]">
       <div
-        className={cn(
-          "absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-250",
-          shown ? "opacity-100" : "opacity-0"
-        )}
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
         onClick={onClose}
       />
       <aside
         className={cn(
-          "absolute right-0 top-0 h-full w-[300px] glass-strong border-l border-black/10 dark:border-white/10 p-5 overflow-y-auto",
-          "transition-transform duration-250 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform",
-          shown ? "translate-x-0" : "translate-x-full"
+          "absolute right-0 top-0 h-full w-[300px] max-w-[85vw] overflow-y-auto p-5",
+          "bg-white dark:bg-zinc-900 border-l border-black/10 dark:border-white/10 shadow-2xl",
+          "animate-[drawer-slide-in_0.25s_ease-out]"
         )}
       >
         <div className="flex items-center justify-between mb-6">
-          {title ? <h3 className="font-display font-semibold">{title}</h3> : <span />}
-          <button onClick={onClose} aria-label="Close menu" className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition">
+          {title ? <h3 className="font-display font-semibold text-zinc-900 dark:text-white">{title}</h3> : <span />}
+          <button onClick={onClose} aria-label="Close menu" className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition text-zinc-900 dark:text-white">
             <X size={18} />
           </button>
         </div>
         {children}
       </aside>
+      <style>{`@keyframes drawer-slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
     </div>
   );
 }
