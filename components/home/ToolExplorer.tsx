@@ -85,7 +85,7 @@ function ExplorerInner({ tools }: { tools: Tool[] }) {
       </Reveal>
 
       {filtered.length > 0 ? (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 cv-auto">
+        <div key={query + cat} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
           {filtered.map((t) => <ToolCard key={t.slug} tool={t} />)}
         </div>
       ) : (
