@@ -148,6 +148,18 @@ export default function AdminUsersPage() {
       </div>
 
       <Card className="!p-0 overflow-hidden">
+        {/* Admin Actions Guide */}
+        <div className="p-4 border-b border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">What you can do with each user</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-zinc-600 dark:text-zinc-400">
+            <div><span className="font-medium text-zinc-900 dark:text-white">Click user row</span> — Expand to see what they created (images, voiceovers, QR codes, PDFs, videos) from the database</div>
+            <div><span className="font-medium text-zinc-900 dark:text-white">Suspend / Unsuspend</span> — Temporarily block or restore user access without deleting</div>
+            <div><span className="font-medium text-zinc-900 dark:text-white">Make Admin</span> — Grant full admin dashboard access (crown icon)</div>
+            <div><span className="font-medium text-zinc-900 dark:text-white">Verify Email</span> — Manually confirm email without sending verification link</div>
+            <div><span className="font-medium text-zinc-900 dark:text-white">Reset Password</span> — Send password reset email to the user</div>
+            <div><span className="font-medium text-zinc-900 dark:text-white">Delete User</span> — Permanently remove account (cannot be undone)</div>
+          </div>
+        </div>
         {loading ? (
           <div className="p-4 space-y-2">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-16" />)}</div>
         ) : filtered.length === 0 ? (
@@ -164,6 +176,7 @@ export default function AdminUsersPage() {
                 onSuspend={toggleSuspend}
                 onResetPassword={resetPassword}
                 onDelete={(user) => setConfirmDelete(user)}
+                onRefresh={load}
               />
             ))}
           </div>
