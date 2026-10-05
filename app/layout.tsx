@@ -4,7 +4,6 @@ import Script from "next/script";
 import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import AutoUpdater from "@/components/AutoUpdater";
@@ -77,7 +76,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <main className="flex-1">{children}</main>
               <Footer />
             </ErrorBoundary>
-            <WhatsAppFloat />
             <Toaster />
           </ToastProvider>
           {(() => {
