@@ -140,7 +140,7 @@ export default function SmartSearch({
     }
   };
 
-  const showDropdown = open && query.trim().length > 0;
+  const showDropdown = open && query.trim().length > 0 && !hero;
 
   // Notify parent when dropdown opens/closes (to hide overlapping UI)
   useEffect(() => {
