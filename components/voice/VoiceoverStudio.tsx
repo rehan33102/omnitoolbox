@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { deleteBlob, getBlob, saveBlob } from "@/lib/db";
 import { saveToLibrary } from "@/lib/library-save";
+import { downloadBlob as downloadBlobFile } from "@/lib/download";
 
 const MAX_CHARS = 100000; // effectively unlimited — chunked server-side
 const PART_CHARS = 500; // per server request; server chunks further internally
@@ -116,11 +117,7 @@ function chunkText(text: string, maxLen = PART_CHARS): string[] {
 }
 
 function downloadBlob(blob: Blob, filename: string) {
-  const a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = filename;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  downloadBlobFile(blob, filename);
 }
 
 export default function VoiceoverStudio() {

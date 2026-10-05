@@ -21,6 +21,7 @@ import { useToast } from "@/components/ui/Toast";
 import { autoRemoveGeminiWatermark, getAlphaMap, removeWatermarkReverseAlpha } from "@/lib/gemini-watermark";
 import { saveBlob } from "@/lib/db";
 import { saveToLibrary } from "@/lib/library-save";
+import { downloadUrl } from "@/lib/download";
 
 /* ---------------- manual inpainting fallback (non-Gemini marks) -------- */
 
@@ -317,10 +318,7 @@ export default function WatermarkRemover() {
 
   const downloadImage = () => {
     if (!afterUrl) return;
-    const a = document.createElement("a");
-    a.href = afterUrl;
-    a.download = "watermark-removed.png";
-    a.click();
+    downloadUrl(afterUrl, "watermark-removed.png");
   };
 
   /* ---------------- VIDEO: per-frame reverse alpha ---------------- */

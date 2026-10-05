@@ -16,6 +16,7 @@ import { useToast } from "@/components/ui/Toast";
 import { loadBgEngine, removeBackgroundSmart, type RemoveFn } from "@/lib/bg-engine";
 import { saveBlob } from "@/lib/db";
 import { saveToLibrary } from "@/lib/library-save";
+import { downloadUrl } from "@/lib/download";
 
 const W = 1280, H = 720;
 
@@ -236,10 +237,7 @@ export default function ThumbnailMaker() {
   const download = (fmt: "png" | "jpg") => {
     const cv = canvasRef.current;
     if (!cv) return;
-    const a = document.createElement("a");
-    a.download = `thumbnail.${fmt}`;
-    a.href = cv.toDataURL(fmt === "png" ? "image/png" : "image/jpeg", 0.92);
-    a.click();
+    downloadUrl(cv.toDataURL(fmt === "png" ? "image/png" : "image/jpeg", 0.92), `thumbnail.${fmt}`);
     toast({ title: `Downloaded ${fmt.toUpperCase()}!`, variant: "success" });
   };
 

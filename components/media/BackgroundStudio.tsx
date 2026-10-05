@@ -14,6 +14,7 @@ import { loadBgEngine, removeBackgroundSmart, type ProgressCb, type RemoveFn } f
 import { formatBytes } from "@/lib/utils";
 import { saveBlob } from "@/lib/db";
 import { saveToLibrary } from "@/lib/library-save";
+import { downloadBlob } from "@/lib/download";
 
 type BgKind = "transparent" | "color" | "gradient" | "blur" | "image" | "preset";
 
@@ -586,12 +587,7 @@ export default function BackgroundStudio() {
       } catch {
         /* library save is non-critical */
       }
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = hd ? "background-studio-hd.png" : "background-studio.png";
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
+      downloadBlob(blob, hd ? "background-studio-hd.png" : "background-studio.png");
       toast({ title: `Downloaded ${hd ? "HD " : ""}PNG (${formatBytes(blob.size)})`, variant: "success" });
     } catch {
       toast({ title: "Export failed.", variant: "error" });
