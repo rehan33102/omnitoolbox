@@ -177,14 +177,6 @@ export const TOOLS: Tool[] = [
     enabled: true, sortOrder: 20, usageCount: 0, updatedAt: "2026-10-04",
     keywords: ["watermark remover", "remove watermark", "gemini watermark", "ai watermark remover", "logo remover", "remove logo from photo", "erase watermark", "watermark eraser", "text remover", "remove text from image", "clean image", "photo watermark remover", "free watermark remover", "video watermark remover", "remove watermark from video", "gemini video watermark"],
   },
-  {
-    id: "t21", slug: "video-generator", title: "Video Generator",
-    tagline: "Create news videos & slideshows from images + text - free",
-    description: "Turn images and headlines into pro videos right in your browser: add slides, write headlines, preview with Ken Burns motion, then generate a WebM video. Perfect for news clips, shorts and slideshows. 100% client-side — nothing uploaded, forever free.",
-    category: "ai", href: "/tools/video-generator", icon: "Clapperboard", image: "/images/tools/video-generator.jpg", badge: "new",
-    enabled: true, sortOrder: 21, usageCount: 0, updatedAt: "2026-10-05",
-    keywords: ["video generator", "slideshow maker", "news video maker", "create video from images", "image to video", "slideshow video", "free video maker", "online video generator", "text to video", "photo slideshow", "video maker online free", "ken burns", "shorts maker", "reels maker"],
-  },
 ];
 
 export const getEnabledTools = (): Tool[] =>
