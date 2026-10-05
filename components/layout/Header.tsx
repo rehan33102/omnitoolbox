@@ -42,7 +42,7 @@ export default function Header() {
         </Link>
 
         <nav className="hidden 2xl:flex items-center gap-1 ml-4 max-w-full overflow-hidden">
-          {NAV_LINKS.slice(0, 7).map((l) => {
+          {NAV_LINKS.slice(0, 5).map((l) => {
             const active = pathname === l.href;
             return (
               <Link
@@ -80,7 +80,7 @@ export default function Header() {
             </button>
             <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
               <div className="bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl p-2 min-w-[200px]">
-                {NAV_LINKS.slice(7).map((l) => {
+                {NAV_LINKS.slice(5).map((l) => {
                   const active = pathname === l.href;
                   return (
                     <Link
