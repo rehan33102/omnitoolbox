@@ -146,33 +146,33 @@ export default function Header() {
       </div>
 
       <Drawer open={drawer} onClose={() => setDrawer(false)} title={settings.siteName}>
-        {/* Mobile-style premium tools grid — same on all devices */}
+        {/* Mobile-style premium tools grid — all visible, no scroll */}
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-4 px-1">
           All Tools
         </p>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           {NAV_LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setDrawer(false)}
               className={cn(
-                "group flex flex-col items-center gap-2.5 p-4 rounded-2xl transition-all duration-200 text-center",
+                "group flex flex-col items-center gap-2 p-3.5 rounded-2xl transition-all duration-200 text-center",
                 pathname === l.href
                   ? "bg-gradient-to-br from-brand-600/20 to-accent-500/10 border border-brand-500/30"
-                  : "bg-black/[0.03] dark:bg-white/[0.04] border border-black/10 dark:border-white/10 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] hover:scale-[1.03] active:scale-[0.98]"
+                  : "bg-black/[0.03] dark:bg-white/[0.04] border border-black/10 dark:border-white/10 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] hover:scale-[1.04] active:scale-[0.97]"
               )}
             >
               <span className={cn(
-                "grid size-12 place-items-center rounded-2xl transition-transform duration-200 group-hover:scale-110",
+                "grid size-11 place-items-center rounded-2xl transition-transform duration-200 group-hover:scale-110",
                 pathname === l.href
                   ? "bg-gradient-to-br from-brand-500 to-accent-500 text-white shadow-lg"
                   : "bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-700 dark:to-zinc-800 text-zinc-700 dark:text-zinc-200 shadow-sm"
               )}>
-                <ToolIcon name={l.icon} size={22} />
+                <ToolIcon name={l.icon} size={20} />
               </span>
               <span className={cn(
-                "text-xs font-semibold leading-tight",
+                "text-[11px] font-semibold leading-tight",
                 pathname === l.href ? "text-zinc-900 dark:text-white" : "text-zinc-700 dark:text-zinc-300"
               )}>
                 {l.label}
