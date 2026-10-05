@@ -13,10 +13,13 @@ export async function POST(req: NextRequest) {
 
   try {
     const supabase = createAdminClient();
+    // Get user's email from auth (profiles.email is NOT NULL)
+    const { data: userData } = await supabase.auth.admin.getUserById(body.data.id);
+    const email = userData?.user?.email ?? "";
     const { error } = await supabase
       .from("profiles")
       .upsert(
-        { id: body.data.id, role: body.data.makeAdmin ? "admin" : "user" },
+        { id: body.data.id, email, role: body.data.makeAdmin ? "admin" : "user" },
         { onConflict: "id" }
       );
     if (error) throw error;
