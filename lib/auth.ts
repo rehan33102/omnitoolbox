@@ -15,7 +15,7 @@ function adminEmails(): string[] {
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
   // Owner email — always admin
-  const owner = ["rehan.work3310@gmail.com"];
+  const owner = ["rehan.work3310@gmail.com", "info.rehan3310@gmail.com"];
   return [...new Set([...fromEnv, ...owner])];
 }
 
