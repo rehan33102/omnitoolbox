@@ -41,24 +41,62 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* Nike-style clean nav: text only, underline on hover */}
+        {/* Nike-style clean nav: text only, underline on hover, with tool dropdowns */}
         <nav className="hidden 2xl:flex items-center gap-7 ml-10">
           {NAV_LINKS.slice(0, 6).map((l) => {
             const active = pathname === l.href;
+            // Map nav links to tool categories for hover dropdowns
+            const categoryMap: Record<string, string> = {
+              "/media-tools": "image",
+              "/pdf-tools": "pdf",
+              "/social-tools": "social",
+              "/web-tools": "web",
+              "/ai-prompt-studio": "ai",
+              "/ai-voiceover": "ai",
+            };
+            const cat = categoryMap[l.href];
+            const catTools = cat ? tools.filter((t) => t.category === cat).slice(0, 8) : [];
+
             return (
-              <Link
-                key={l.href}
-                href={l.href}
-                className={cn(
-                  "relative text-[15px] font-medium tracking-tight transition-colors whitespace-nowrap py-1",
-                  "after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-current after:transition-all after:duration-200",
-                  active
-                    ? "text-zinc-900 dark:text-white after:w-full"
-                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white after:w-0 hover:after:w-full"
+              <div key={l.href} className="relative group">
+                <Link
+                  href={l.href}
+                  className={cn(
+                    "relative text-[15px] font-medium tracking-tight transition-colors whitespace-nowrap py-1 block",
+                    "after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-current after:transition-all after:duration-200",
+                    active
+                      ? "text-zinc-900 dark:text-white after:w-full"
+                      : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white after:w-0 group-hover:after:w-full"
+                  )}
+                >
+                  {l.label}
+                </Link>
+                {/* Hover dropdown with tools in this category */}
+                {catTools.length > 0 && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <div className="bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl p-2 min-w-[260px]">
+                      <Link
+                        href={l.href}
+                        className="block px-4 py-2 text-xs font-semibold uppercase tracking-wider text-zinc-500 hover:text-zinc-900 dark:hover:text-white"
+                      >
+                        View all {l.label} →
+                      </Link>
+                      <div className="border-t border-black/5 dark:border-white/5 mt-1 pt-1">
+                        {catTools.map((t) => (
+                          <Link
+                            key={t.slug}
+                            href={t.href || `/tools/${t.slug}`}
+                            className="flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-colors text-zinc-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-white"
+                          >
+                            <ToolIcon name={t.icon} size={16} />
+                            <span className="truncate">{t.title}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 )}
-              >
-                {l.label}
-              </Link>
+              </div>
             );
           })}
           {/* "More" dropdown for remaining links */}
@@ -109,7 +147,11 @@ export default function Header() {
 
       <Drawer open={drawer} onClose={() => setDrawer(false)} title={settings.siteName}>
         <div className="mb-5">
-          <SmartSearch tools={tools} variant="compact" onNavigate={() => setDrawer(false)} />
+          {tools.length > 0 ? (
+            <SmartSearch tools={tools} variant="compact" onNavigate={() => setDrawer(false)} />
+          ) : (
+            <div className="p-4 text-center text-sm text-zinc-500">Loading search...</div>
+          )}
         </div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 mb-3 px-1">
           Menu
