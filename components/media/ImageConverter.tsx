@@ -9,6 +9,7 @@ import { formatBytes } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 import { saveBlob } from "@/lib/db";
 import { saveToLibrary } from "@/lib/library-save";
+import { downloadBlob } from "@/lib/download";
 
 type OutFormat = "png" | "jpeg" | "webp";
 const FORMATS: { id: OutFormat; label: string }[] = [
@@ -26,6 +27,7 @@ export default function ImageConverter() {
   const [busy, setBusy] = useState(false);
   const [drag, setDrag] = useState(false);
   const [savedNote, setSavedNote] = useState(false);
+  const [resultBlob, setResultBlob] = useState<Blob | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -41,12 +43,40 @@ export default function ImageConverter() {
     setPreview(URL.createObjectURL(f));
   };
 
+  /** Load image with fallback: createImageBitmap → HTMLImageElement */
+  const loadImage = async (f: File): Promise<{ w: number; h: number; draw: (ctx: CanvasRenderingContext2D, w: number, h: number) => void }> => {
+    // Try createImageBitmap first (fast)
+    try {
+      const bitmap = await createImageBitmap(f);
+      return {
+        w: bitmap.width, h: bitmap.height,
+        draw: (ctx, w, h) => { ctx.drawImage(bitmap, 0, 0, w, h); bitmap.close(); },
+      };
+    } catch { /* fall through to Image element */ }
+    // Fallback: HTML Image element (works everywhere)
+    const url = URL.createObjectURL(f);
+    try {
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const el = new Image();
+        el.onload = () => resolve(el);
+        el.onerror = () => reject(new Error("Image load failed"));
+        el.src = url;
+      });
+      return {
+        w: img.naturalWidth, h: img.naturalHeight,
+        draw: (ctx, w, h) => ctx.drawImage(img, 0, 0, w, h),
+      };
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  };
+
   const convert = async () => {
     if (!file) return;
     setBusy(true);
     try {
-      const bitmap = await createImageBitmap(file);
-      let { width, height } = bitmap;
+      const { w: srcW, h: srcH, draw } = await loadImage(file);
+      let width = srcW, height = srcH;
       // Safety: cap gigantic images (e.g. 50MP phone photos) so mobile browsers don't crash.
       const MAX_PIXELS = 16_000_000;
       const pixels = width * height;
@@ -63,12 +93,12 @@ export default function ImageConverter() {
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
-      ctx.drawImage(bitmap, 0, 0, width, height);
-      bitmap.close();
+      draw(ctx, width, height);
       const blob = await new Promise<Blob | null>((res) =>
         canvas.toBlob(res, `image/${format}`, quality / 100)
       );
       if (!blob) throw new Error("encode failed");
+      setResultBlob(blob);
       setResult({ url: URL.createObjectURL(blob), size: blob.size });
       // Auto-save to My Library — best-effort.
       try {
@@ -77,12 +107,18 @@ export default function ImageConverter() {
       } catch {
         /* library save is non-critical */
       }
-      toast({ title: "Converted", variant: "success", description: `${file.name} → ${format.toUpperCase()}` });
+      toast({ title: "Converted ✅", variant: "success", description: `${file.name} → ${format.toUpperCase()}` });
     } catch {
-      toast({ title: "Conversion failed", variant: "error", description: "Try a smaller image" });
+      toast({ title: "Conversion failed", variant: "error", description: "Try a different image" });
     } finally {
       setBusy(false);
     }
+  };
+
+  const handleDownload = () => {
+    if (!resultBlob || !file) return;
+    const name = `${file.name.replace(/\.[^.]+$/, "")}.${format}`;
+    downloadBlob(resultBlob, name);
   };
 
   const reset = () => {
@@ -160,9 +196,7 @@ export default function ImageConverter() {
                 <p className="text-zinc-500 text-xs">{formatBytes(file.size)} → {formatBytes(result.size)}</p>
                 {savedNote && <p className="text-emerald-700 dark:text-emerald-400 text-xs mt-1">Saved to Library ✓</p>}
               </div>
-              <a href={result.url} download={`${file.name.replace(/\.[^.]+$/, "")}.${format}`}>
-                <Button size="sm"><Download size={14} /> Download</Button>
-              </a>
+              <Button size="sm" onClick={handleDownload}><Download size={14} /> Download</Button>
             </div>
           )}
         </>
