@@ -89,22 +89,42 @@ export default function Header() {
       </div>
 
       <Drawer open={drawer} onClose={() => setDrawer(false)} title={settings.siteName}>
-        <div className="mb-4">
+        <div className="mb-5">
           <SmartSearch tools={tools} variant="compact" onNavigate={() => setDrawer(false)} />
         </div>
-        <nav className="flex flex-col gap-1">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 mb-3 px-1">
+          Menu
+        </p>
+        <nav className="flex flex-col gap-2">
           {NAV_LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setDrawer(false)}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition-colors",
-                pathname === l.href ? "bg-brand-600/20 text-zinc-900 dark:text-white" : "text-zinc-600 dark:text-zinc-400 hover:bg-black/[0.03] dark:hover:bg-white/5"
+                "group flex items-center gap-3.5 px-3 py-2.5 rounded-2xl transition-all duration-200",
+                pathname === l.href
+                  ? "bg-gradient-to-r from-brand-600/20 to-accent-500/10 border border-brand-500/30"
+                  : "border border-transparent hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:border-black/10 dark:hover:border-white/10 hover:translate-x-1"
               )}
             >
-              <ToolIcon name={l.icon} size={17} />
-              {l.label}
+              <span className={cn(
+                "grid size-11 shrink-0 place-items-center rounded-xl border transition-transform duration-200 group-hover:scale-110",
+                pathname === l.href
+                  ? "bg-gradient-to-br from-brand-500 to-accent-500 border-brand-400/40 text-white shadow-lg"
+                  : "bg-black/[0.04] dark:bg-white/[0.07] border-black/10 dark:border-white/10 text-zinc-600 dark:text-zinc-300"
+              )}>
+                <ToolIcon name={l.icon} size={19} />
+              </span>
+              <span className={cn(
+                "font-display font-semibold text-[15px] tracking-tight",
+                pathname === l.href ? "text-zinc-900 dark:text-white" : "text-zinc-700 dark:text-zinc-200"
+              )}>
+                {l.label}
+              </span>
+              {pathname === l.href && (
+                <span className="ml-auto size-2 rounded-full bg-brand-500" />
+              )}
             </Link>
           ))}
         </nav>
