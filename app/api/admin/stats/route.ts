@@ -1,11 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdminApi } from "@/lib/auth";
+import { guardApi } from "@/lib/api-security";
 import { TOOLS } from "@/lib/tools-registry";
 
 const DAY = 86_400_000;
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const sec = guardApi(req, { key: "admin:stats", max: 30 });
+  if (sec) return sec;
   if (!(await requireAdminApi())) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -28,6 +31,21 @@ export async function GET() {
   const cur = inWindow(mid);
   const prev = rows.filter((r) => r.created_at < mid);
   const pct = (a: number, b: number) => (b === 0 ? (a > 0 ? 100 : 0) : Math.round(((a - b) / b) * 100));
+
+  // Live visitors: distinct viewers active in the last 5 minutes.
+  const liveCutoff = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+  const liveVisitors = new Set(
+    rows.filter((r) => r.created_at >= liveCutoff).map((r) => r.viewer).filter(Boolean)
+  ).size;
+
+  // Total registered users (auth.users via admin client).
+  let totalUsers = 0;
+  try {
+    const { data: userList } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1 });
+    totalUsers = (userList && "total" in userList ? userList.total : 0) ?? 0;
+  } catch {
+    /* table/API unavailable — leave 0 */
+  }
 
   const ctr = (rs: typeof rows) => {
     const pv = pageViews(rs);
@@ -72,5 +90,7 @@ export async function GET() {
     },
     daily,
     topTools,
+    liveVisitors,
+    totalUsers,
   });
 }

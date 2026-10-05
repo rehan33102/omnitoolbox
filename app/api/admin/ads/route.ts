@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdminApi } from "@/lib/auth";
+import { guardApi } from "@/lib/api-security";
 
 const adSchema = z.object({
   placement: z.string().min(1).max(80),
@@ -12,13 +13,17 @@ const adSchema = z.object({
   html: z.string().max(5000).optional().default(""),
 });
 
-async function guard() {
+async function guard(req: NextRequest) {
+  // 3.3 hardening first: 30 req/min per IP + same-origin enforcement,
+  // so unauthenticated floods are throttled before any auth/DB work.
+  const sec = guardApi(req, { key: "admin:ads", max: 30 });
+  if (sec) return sec;
   if (!(await requireAdminApi())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   return null;
 }
 
-export async function GET() {
-  const denied = await guard();
+export async function GET(req: NextRequest) {
+  const denied = await guard(req);
   if (denied) return denied;
   const supabase = createAdminClient();
   const { data } = await supabase.from("ad_configs").select("*").order("created_at", { ascending: false });
@@ -36,7 +41,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const denied = await guard();
+  const denied = await guard(req);
   if (denied) return denied;
   const parsed = adSchema.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -55,7 +60,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const denied = await guard();
+  const denied = await guard(req);
   if (denied) return denied;
   const { id, enabled } = await req.json().catch(() => ({}));
   if (!id || typeof enabled !== "boolean") {
@@ -68,7 +73,7 @@ export async function PATCH(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const denied = await guard();
+  const denied = await guard(req);
   if (denied) return denied;
   const id = req.nextUrl.searchParams.get("id");
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });

@@ -1,6 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
+import { guardApi } from "@/lib/api-security";
+
+/** Allowed library asset kinds — anything else is rejected. */
+const KIND_ALLOWLIST = new Set(["image", "audio", "video", "pdf", "document", "text"]);
+/** Safe filename extensions for stored objects (prevents .html/.svg script execution). */
+const EXT_ALLOWLIST = new Set([
+  "png", "jpg", "jpeg", "webp", "gif", "avif", "bmp",
+  "mp3", "wav", "ogg", "m4a", "aac",
+  "mp4", "webm",
+  "pdf", "txt", "md", "json", "csv", "srt",
+]);
+
+/** Strip path tricks, control chars and quotes from a user-supplied filename. */
+function sanitizeFileName(raw: string): string {
+  return raw
+    .replace(/[\\/:*?"<>|\u0000-\u001f\u007f]/g, "")
+    .replace(/^\.+/, "")
+    .trim()
+    .slice(0, 120);
+}
 
 /**
  * POST /api/library/upload
@@ -12,12 +32,16 @@ export async function POST(req: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Sign in to save to cloud library" }, { status: 401 });
   }
+  // 3.3 hardening: 20 uploads/min per IP + same-origin enforcement
+  const sec = guardApi(req, { key: "api:library-upload", max: 20 });
+  if (sec) return sec;
 
   try {
     const form = await req.formData();
     const file = form.get("file") as Blob | null;
-    const kind = (form.get("kind") as string) || "image";
-    const name = (form.get("name") as string) || `file-${Date.now()}`;
+    const kindRaw = ((form.get("kind") as string) || "image").toLowerCase().trim();
+    const kind = KIND_ALLOWLIST.has(kindRaw) ? kindRaw : "image";
+    const name = sanitizeFileName((form.get("name") as string) || `file-${Date.now()}`) || `file-${Date.now()}`;
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -29,7 +53,10 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = createClient();
-    const ext = name.split(".").pop() || "bin";
+    // Extension allowlist: unknown/dangerous extensions (html, svg, js…)
+    // fall back to "bin" so stored objects can never execute as scripts.
+    const rawExt = (name.split(".").pop() || "").toLowerCase().slice(0, 10);
+    const ext = EXT_ALLOWLIST.has(rawExt) ? rawExt : "bin";
     const storagePath = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
 
     // Upload to storage bucket
@@ -77,7 +104,9 @@ export async function POST(req: NextRequest) {
  * GET /api/library/list
  * List the signed-in user's cloud library.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const sec = guardApi(req, { key: "api:library-list", max: 60, skipOriginCheck: true });
+  if (sec) return sec;
   const user = await getSessionUser();
   if (!user) {
     return NextResponse.json({ items: [] });

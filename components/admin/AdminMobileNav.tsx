@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { DollarSign, Globe, LayoutDashboard, Newspaper, Settings, Wrench } from "lucide-react";
+import { DollarSign, Globe, LayoutDashboard, Newspaper, Settings, Users, Wrench } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/tools", label: "Tools", icon: Wrench },
   { href: "/admin/blog", label: "Blog", icon: Newspaper },
   { href: "/admin/settings", label: "Settings", icon: Settings },

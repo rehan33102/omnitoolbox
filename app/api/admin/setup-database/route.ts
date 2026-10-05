@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSessionUser } from "@/lib/auth";
+import { guardApi } from "@/lib/api-security";
 
 export const dynamic = "force-dynamic";
 
@@ -70,7 +71,9 @@ const MIGRATIONS = [
   )`,
 ];
 
-export async function POST() {
+export async function POST(req: NextRequest) {
+  const sec = guardApi(req, { key: "admin:setupdb", max: 10 });
+  if (sec) return sec;
   const user = await getSessionUser();
   if (!user || user.role !== "admin") {
     return NextResponse.json({ error: "Admin only" }, { status: 403 });
@@ -108,7 +111,9 @@ export async function POST() {
   return NextResponse.json({ ok: allOk, results });
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const sec = guardApi(req, { key: "admin:setupdb", max: 30 });
+  if (sec) return sec;
   const user = await getSessionUser();
   if (!user || user.role !== "admin") {
     return NextResponse.json({ error: "Admin only" }, { status: 403 });

@@ -101,7 +101,7 @@ export default function ToolCard({ tool }: { tool: Tool }) {
     <Link href={tool.href} onClick={() => track(tool.slug, "use")} className="block h-full">
       <Card
         className={cn(
-          "h-full !p-0 group overflow-hidden relative flex flex-col",
+          "h-full !p-0 group overflow-hidden relative flex flex-col tool-card-hover",
           "transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl"
         )}
       >

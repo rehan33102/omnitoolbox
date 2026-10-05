@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { requireAdminApi } from "@/lib/auth";
+import { guardApi } from "@/lib/api-security";
 import { mergeTools } from "@/lib/tools-registry";
 import { slugify } from "@/lib/utils";
 
@@ -46,13 +47,17 @@ async function resilientUpsert(payload: Record<string, unknown>) {
   return res;
 }
 
-async function guard() {
+async function guard(req: NextRequest) {
+  // 3.3 hardening first: 30 req/min per IP + same-origin enforcement,
+  // so unauthenticated floods are throttled before any auth/DB work.
+  const sec = guardApi(req, { key: "admin:tools", max: 30 });
+  if (sec) return sec;
   if (!(await requireAdminApi())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   return null;
 }
 
-export async function GET() {
-  const denied = await guard();
+export async function GET(req: NextRequest) {
+  const denied = await guard(req);
   if (denied) return denied;
   const supabase = createAdminClient();
   const { data } = await supabase.from("tools").select("*").order("sort_order");
@@ -61,7 +66,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const denied = await guard();
+  const denied = await guard(req);
   if (denied) return denied;
   const parsed = toolSchema.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -88,7 +93,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PATCH(req: NextRequest) {
-  const denied = await guard();
+  const denied = await guard(req);
   if (denied) return denied;
   const parsed = patchSchema.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -109,7 +114,7 @@ export async function PATCH(req: NextRequest) {
  * enabled=false when the CMS migration hasn't been applied yet.
  */
 export async function DELETE(req: NextRequest) {
-  const denied = await guard();
+  const denied = await guard(req);
   if (denied) return denied;
   const slug = req.nextUrl.searchParams.get("slug")?.trim();
   if (!slug) return NextResponse.json({ error: "Missing slug" }, { status: 400 });

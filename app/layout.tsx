@@ -60,6 +60,9 @@ export const metadata: Metadata = {
   },
 };
 
+import ErrorBoundary from "@/components/ErrorBoundary";
+import GlobalErrorHooks from "@/components/GlobalErrorHooks";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -68,9 +71,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ToastProvider>
             <ServiceWorkerRegister />
             <AutoUpdater />
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
+            <GlobalErrorHooks />
+            <ErrorBoundary name="root">
+              <Header />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </ErrorBoundary>
             <WhatsAppFloat />
             <Toaster />
           </ToastProvider>

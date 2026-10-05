@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Activity, Eye, MousePointerClick, Users } from "lucide-react";
+import { Activity, Eye, MousePointerClick, Radio, Users } from "lucide-react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
@@ -15,6 +15,8 @@ interface StatsData {
   totals: { visitors: number; pageViews: number; toolUses: number; ctr: number; deltas: Record<string, number> };
   daily: { date: string; views: number; uses: number }[];
   topTools: { slug: string; title: string; uses: number }[];
+  liveVisitors?: number;
+  totalUsers?: number;
 }
 
 const tooltipStyle = {
@@ -24,32 +26,63 @@ const tooltipStyle = {
   fontSize: "12px",
 };
 
+interface LiveStats {
+  liveVisitors: number;
+  hourlyUses: number;
+  hourlyViews: number;
+  signups24h: number;
+  totalUsers: number;
+}
+
 export default function AdminOverviewPage() {
   const [data, setData] = useState<StatsData | null>(null);
-
-  useEffect(() => {
-    fetch("/api/admin/stats").then((r) => r.json()).then(setData).catch(() => {});
-  }, []);
-
-  if (!data) {
-    return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-28" />)}
-        </div>
-        <Skeleton className="h-72" />
-      </div>
-    );
-  }
-
-  const totals = data?.totals ?? { visitors: 0, pageViews: 0, toolUses: 0, ctr: 0, deltas: {} };
-  const daily = data?.daily ?? [];
-  const topTools = data?.topTools ?? [];
+  const [live, setLive] = useState<LiveStats | null>(null);
+  const [liveConnected, setLiveConnected] = useState(false);
   const [dbStatus, setDbStatus] = useState<Record<string, boolean> | null>(null);
   const [dbBusy, setDbBusy] = useState(false);
 
+  const loadStats = async () => {
+    try {
+      const res = await fetch("/api/admin/stats");
+      const json = await res.json();
+      if (res.ok) setData(json);
+    } catch {
+      /* keep old data on poll failure */
+    }
+  };
+
   useEffect(() => {
-    fetch("/api/admin/setup-database").then((r) => r.json()).then((j) => setDbStatus(j.tables)).catch(() => {});
+    loadStats();
+    // Full stats refresh every 60s as a fallback; live numbers come via SSE.
+    const t = setInterval(loadStats, 60_000);
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Real-time live stats via Server-Sent Events (no manual reload needed).
+  useEffect(() => {
+    const es = new EventSource("/api/admin/live-stats");
+    es.onopen = () => setLiveConnected(true);
+    es.onmessage = (e) => {
+      try {
+        const json = JSON.parse(e.data);
+        if (json.type === "live-stats") {
+          setLive(json);
+          setLiveConnected(true);
+        }
+      } catch {
+        /* ignore malformed chunks */
+      }
+    };
+    es.onerror = () => setLiveConnected(false);
+    return () => es.close();
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/admin/setup-database")
+      .then((r) => r.json())
+      .then((j) => setDbStatus(j.tables))
+      .catch(() => {});
   }, []);
 
   const setupDb = async () => {
@@ -69,6 +102,24 @@ export default function AdminOverviewPage() {
       setDbBusy(false);
     }
   };
+
+  if (!data) {
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-28" />)}
+        </div>
+        <Skeleton className="h-72" />
+      </div>
+    );
+  }
+
+  const totals = data.totals ?? { visitors: 0, pageViews: 0, toolUses: 0, ctr: 0, deltas: {} };
+  const daily = data.daily ?? [];
+  const topTools = data.topTools ?? [];
+  // Prefer SSE live numbers when connected; fall back to polled stats.
+  const liveVisitors = live?.liveVisitors ?? data.liveVisitors ?? 0;
+  const totalUsers = live?.totalUsers ?? data.totalUsers ?? 0;
 
   const missingTables = dbStatus ? Object.entries(dbStatus).filter(([, v]) => !v).map(([k]) => k) : [];
 
@@ -93,11 +144,35 @@ export default function AdminOverviewPage() {
           </div>
         </Card>
       )}
+
+      {/* Live visitors banner — real-time via SSE */}
+      <Card className="!p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <span className="relative flex h-3 w-3">
+            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${liveConnected ? "bg-emerald-400" : "bg-amber-400"}`} />
+            <span className={`relative inline-flex rounded-full h-3 w-3 ${liveConnected ? "bg-emerald-500" : "bg-amber-500"}`} />
+          </span>
+          <div>
+            <p className="font-bold text-lg leading-none">
+              {liveVisitors} <span className="text-sm font-medium text-zinc-500">live visitor{liveVisitors === 1 ? "" : "s"} on site</span>
+            </p>
+            <p className="text-xs text-zinc-500 mt-1">
+              {liveConnected ? "● LIVE — streaming every 5s" : "○ connecting…"} · {live?.hourlyUses ?? 0} tool uses / hour · {live?.signups24h ?? 0} signups / 24h
+            </p>
+          </div>
+        </div>
+        <Radio size={20} className={liveConnected ? "text-emerald-500" : "text-amber-500"} />
+      </Card>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Visitors" value={formatCompact(totals.visitors ?? 0)} delta={totals.deltas?.visitors} icon={Users} />
         <StatCard label="Page views" value={formatCompact(totals.pageViews ?? 0)} delta={totals.deltas?.pageViews} icon={Eye} />
         <StatCard label="Tool uses" value={formatCompact(totals.toolUses ?? 0)} delta={totals.deltas?.toolUses} icon={MousePointerClick} />
         <StatCard label="Tool CTR" value={`${(totals.ctr ?? 0).toFixed(1)}%`} delta={totals.deltas?.ctr} icon={Activity} />
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard label="Registered users" value={formatCompact(totalUsers)} icon={Users} />
       </div>
 
       <Card>
