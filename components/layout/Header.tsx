@@ -146,42 +146,40 @@ export default function Header() {
       </div>
 
       <Drawer open={drawer} onClose={() => setDrawer(false)} title={settings.siteName}>
-        {/* Tools list — always shows, no API dependency */}
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-3 px-1">
+        {/* Mobile-style premium tools grid — same on all devices */}
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-4 px-1">
           All Tools
         </p>
-        <nav className="flex flex-col gap-2">
+        <div className="grid grid-cols-2 gap-3">
           {NAV_LINKS.map((l) => (
             <Link
               key={l.href}
               href={l.href}
               onClick={() => setDrawer(false)}
               className={cn(
-                "group flex items-center gap-3.5 px-3 py-2.5 rounded-2xl transition-all duration-200",
+                "group flex flex-col items-center gap-2.5 p-4 rounded-2xl transition-all duration-200 text-center",
                 pathname === l.href
-                  ? "bg-gradient-to-r from-brand-600/20 to-accent-500/10 border border-brand-500/30"
-                  : "border border-transparent hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:border-black/10 dark:hover:border-white/10 hover:translate-x-1"
+                  ? "bg-gradient-to-br from-brand-600/20 to-accent-500/10 border border-brand-500/30"
+                  : "bg-black/[0.03] dark:bg-white/[0.04] border border-black/10 dark:border-white/10 hover:bg-black/[0.06] dark:hover:bg-white/[0.08] hover:scale-[1.03] active:scale-[0.98]"
               )}
             >
               <span className={cn(
-                "grid size-11 shrink-0 place-items-center rounded-xl border transition-transform duration-200 group-hover:scale-110",
+                "grid size-12 place-items-center rounded-2xl transition-transform duration-200 group-hover:scale-110",
                 pathname === l.href
-                  ? "bg-gradient-to-br from-brand-500 to-accent-500 border-brand-400/40 text-white shadow-lg"
-                  : "bg-black/[0.04] dark:bg-white/[0.06] border-black/10 dark:border-white/10 text-zinc-700 dark:text-zinc-300"
+                  ? "bg-gradient-to-br from-brand-500 to-accent-500 text-white shadow-lg"
+                  : "bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-700 dark:to-zinc-800 text-zinc-700 dark:text-zinc-200 shadow-sm"
               )}>
-                <ToolIcon name={l.icon} size={18} />
+                <ToolIcon name={l.icon} size={22} />
               </span>
-              <span className="flex-1">
-                <span className={cn(
-                  "block text-sm font-semibold",
-                  pathname === l.href ? "text-zinc-900 dark:text-white" : "text-zinc-800 dark:text-zinc-200"
-                )}>
-                  {l.label}
-                </span>
+              <span className={cn(
+                "text-xs font-semibold leading-tight",
+                pathname === l.href ? "text-zinc-900 dark:text-white" : "text-zinc-700 dark:text-zinc-300"
+              )}>
+                {l.label}
               </span>
             </Link>
           ))}
-        </nav>
+        </div>
       </Drawer>
     </header>
   );

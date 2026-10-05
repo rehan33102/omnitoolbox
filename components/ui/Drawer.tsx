@@ -31,7 +31,7 @@ export default function Drawer({
       />
       <aside
         className={cn(
-          "absolute right-0 top-0 h-full w-[300px] max-w-[85vw] overflow-y-auto p-5",
+          "absolute right-0 top-0 h-full w-[340px] max-w-[90vw] overflow-y-auto p-5",
           "bg-white dark:bg-zinc-900 border-l border-black/10 dark:border-white/10 shadow-2xl"
         )}
         style={{ animation: "drawerSlideIn 0.25s ease-out" }}
