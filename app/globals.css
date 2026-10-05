@@ -356,6 +356,11 @@
   .glass-shimmer::after { display: none; }
 }
 
+@keyframes drawerSlideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
 /* ============ ANIMATED GLOWING TEXT (fun interactive headings) ============ */
 @keyframes text-shimmer {
   0% { background-position: 0% 50%; }

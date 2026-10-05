@@ -32,9 +32,9 @@ export default function Drawer({
       <aside
         className={cn(
           "absolute right-0 top-0 h-full w-[300px] max-w-[85vw] overflow-y-auto p-5",
-          "bg-white dark:bg-zinc-900 border-l border-black/10 dark:border-white/10 shadow-2xl",
-          "animate-[drawer-slide-in_0.25s_ease-out]"
+          "bg-white dark:bg-zinc-900 border-l border-black/10 dark:border-white/10 shadow-2xl"
         )}
+        style={{ animation: "drawerSlideIn 0.25s ease-out" }}
       >
         <div className="flex items-center justify-between mb-6">
           {title ? <h3 className="font-display font-semibold text-zinc-900 dark:text-white">{title}</h3> : <span />}
@@ -44,7 +44,6 @@ export default function Drawer({
         </div>
         {children}
       </aside>
-      <style>{`@keyframes drawer-slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }`}</style>
     </div>
   );
 }
