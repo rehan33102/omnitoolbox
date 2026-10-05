@@ -299,13 +299,13 @@ function AuthForm() {
               </div>
             )}
             <Button type="submit" disabled={busy} className="w-full" size="lg">
-              {busy ? "Please wait…" : mode === "login" ? "Log in 🚀" : "Send OTP ✨"}
+              {busy ? "Please wait…" : mode === "login" ? "Log in 🚀" : "Create Account 🎉"}
             </Button>
           </form>
 
           <p className="text-xs text-zinc-500 text-center mt-6">
             {mode === "signup" ? (
-              <>We&apos;ll email you a <b>6-digit OTP</b> — verify it and you&apos;re in. Already registered?{" "}
+              <>Account turant ban jayega — koi OTP nahi! Already registered?{" "}
                 <button onClick={() => setMode("login")} className="text-brand-700 dark:text-brand-400 font-semibold hover:underline">Log in</button></>
             ) : (
               <>New here?{" "}
