@@ -20,6 +20,7 @@ function ExplorerInner({ tools }: { tools: Tool[] }) {
   const params = useSearchParams();
   const [query, setQuery] = useState(() => params.get("q") ?? "");
   const [cat, setCat] = useState<"all" | ToolCategoryId>("all");
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // Admin edits from /admin/tools (IndexedDB/localStorage) apply instantly.
   const overrides = useToolOverrides();
@@ -47,16 +48,19 @@ function ExplorerInner({ tools }: { tools: Tool[] }) {
       />
 
       <Reveal delay={100}>
-        <div className="max-w-2xl mx-auto relative mb-6">
+        <div className="max-w-2xl mx-auto relative mb-6 z-30">
           <SmartSearch
             tools={liveTools}
             variant="hero"
             initialQuery={params.get("q") ?? ""}
             onQueryChange={setQuery}
+            onDropdownChange={setSearchOpen}
           />
         </div>
       </Reveal>
 
+      {/* Hide category pills while search dropdown is open to avoid overlap */}
+      {!searchOpen && (
       <Reveal delay={160}>
         <div className="flex flex-wrap justify-center gap-2 mb-10">
           <button
@@ -82,6 +86,7 @@ function ExplorerInner({ tools }: { tools: Tool[] }) {
           })}
         </div>
       </Reveal>
+      )}
 
       {filtered.length > 0 ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 cv-auto">

@@ -19,6 +19,8 @@ interface SmartSearchProps {
   onQueryChange?: (q: string) => void;
   /** e.g. close the mobile drawer after navigating */
   onNavigate?: () => void;
+  /** called when the search dropdown opens/closes (for hiding overlapping UI) */
+  onDropdownChange?: (open: boolean) => void;
 }
 
 /** Bold the first query-token occurrence inside the title. */
@@ -52,6 +54,7 @@ export default function SmartSearch({
   initialQuery = "",
   onQueryChange,
   onNavigate,
+  onDropdownChange,
 }: SmartSearchProps) {
   const router = useRouter();
   const { track } = useTrackToolUsage();
@@ -138,6 +141,11 @@ export default function SmartSearch({
   };
 
   const showDropdown = open && query.trim().length > 0;
+
+  // Notify parent when dropdown opens/closes (to hide overlapping UI)
+  useEffect(() => {
+    onDropdownChange?.(showDropdown);
+  }, [showDropdown, onDropdownChange]);
 
   return (
     <div ref={rootRef} className={cn("relative", hero ? "w-full" : "w-full")}>
