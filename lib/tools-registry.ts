@@ -34,14 +34,6 @@ export const TOOLS: Tool[] = [
     keywords: ["svg cleaner", "clean svg", "svg optimizer", "optimize svg", "svg minifier", "reduce svg size", "svg editor", "remove svg metadata", "svg compressor", "minify svg"],
   },
   {
-    id: "t5", slug: "background-remover", title: "Background Remover",
-    tagline: "Remove image backgrounds with one click",
-    description: "Client-side background removal interface powered by in-browser ML.",
-    category: "image", href: "/tools/background-remover", icon: "Eraser", image: "/images/tools/background-remover.jpg", badge: "new",
-    enabled: true, sortOrder: 5, usageCount: 0, updatedAt: "2026-10-03",
-    keywords: ["photo maker", "remove background", "background remover", "transparent background", "png maker", "cutout", "erase bg", "photo editor", "bild hintergrund entfernen", "remove bg", "transparent png", "bg eraser", "photo cutout", "sticker maker", "photo background changer"],
-  },
-  {
     id: "t21", slug: "background-studio", title: "Background Studio",
     tagline: "Pro background studio — change backgrounds like a pro",
     description: "Upload a photo, AI removes the background, then restyle it: solid colors, gradients, blurred background, custom photos, studio scenes. Add drop shadows, tune brightness & contrast, download in HD. 100% free, on-device.",

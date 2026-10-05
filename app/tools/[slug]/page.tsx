@@ -21,7 +21,6 @@ const TOOL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "image-converter": dynamic(() => import("@/components/media/ImageConverter")),
   "image-compressor": dynamic(() => import("@/components/media/ImageCompressor")),
   "svg-cleaner": dynamic(() => import("@/components/media/SvgCleaner")),
-  "background-remover": dynamic(() => import("@/components/media/BackgroundRemover")),
   "background-studio": dynamic(() => import("@/components/media/BackgroundStudio")),
   "watermark-remover": dynamic(() => import("@/components/media/WatermarkRemover")),
   "fancy-text": dynamic(() => import("@/components/social/FancyTextStylator")),
