@@ -23,7 +23,18 @@ export default function SignupPage() {
       const supabase = createClient();
       const { error } = await supabase.auth.signUp({ email, password });
       if (error) throw error;
-      toast({ title: "Account created!", description: "Check your email to confirm.", variant: "success" });
+      // Auto-confirm email instantly (no OTP)
+      try {
+        await fetch("/api/auth/auto-confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim() }),
+        });
+      } catch {}
+      // Sign in immediately after signup
+      const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+      if (signInError) throw signInError;
+      toast({ title: "Account created!", description: "Welcome!", variant: "success" });
       // Admin users go straight to dashboard after signup (hard redirect)
       if (email.trim().toLowerCase() === "rehan.work3310@gmail.com") {
         window.location.href = "/admin";
