@@ -45,9 +45,54 @@ export default function AdminOverviewPage() {
   const totals = data?.totals ?? { visitors: 0, pageViews: 0, toolUses: 0, ctr: 0, deltas: {} };
   const daily = data?.daily ?? [];
   const topTools = data?.topTools ?? [];
+  const [dbStatus, setDbStatus] = useState<Record<string, boolean> | null>(null);
+  const [dbBusy, setDbBusy] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/setup-database").then((r) => r.json()).then((j) => setDbStatus(j.tables)).catch(() => {});
+  }, []);
+
+  const setupDb = async () => {
+    setDbBusy(true);
+    try {
+      const res = await fetch("/api/admin/setup-database", { method: "POST" });
+      const json = await res.json();
+      if (json.ok) {
+        alert("Database setup ho gaya! ✅ Ab real readings ayengi.");
+        window.location.reload();
+      } else {
+        alert("Kuch tables nahi bane. Supabase dashboard mein SQL manually run karna hoga.");
+      }
+    } catch {
+      alert("Setup failed. Try again.");
+    } finally {
+      setDbBusy(false);
+    }
+  };
+
+  const missingTables = dbStatus ? Object.entries(dbStatus).filter(([, v]) => !v).map(([k]) => k) : [];
 
   return (
     <div className="space-y-6">
+      {missingTables.length > 0 && (
+        <Card className="border-2 border-amber-500/30 bg-amber-500/5">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h3 className="font-bold text-amber-700 dark:text-amber-400">⚠️ Database Setup Chahiye</h3>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
+                Ye tables missing hain: {missingTables.join(", ")}. Bina inke dashboard mein real readings nahi ayengi.
+              </p>
+            </div>
+            <button
+              onClick={setupDb}
+              disabled={dbBusy}
+              className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-lg hover:shadow-xl transition disabled:opacity-50 whitespace-nowrap"
+            >
+              {dbBusy ? "Setup ho raha..." : "🔧 Database Setup Karo"}
+            </button>
+          </div>
+        </Card>
+      )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Visitors" value={formatCompact(totals.visitors ?? 0)} delta={totals.deltas?.visitors} icon={Users} />
         <StatCard label="Page views" value={formatCompact(totals.pageViews ?? 0)} delta={totals.deltas?.pageViews} icon={Eye} />
