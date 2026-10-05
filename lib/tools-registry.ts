@@ -10,6 +10,14 @@ export const TOOLS: Tool[] = [
     keywords: ["prompt generator", "prompt maker", "midjourney prompt", "chatgpt prompt", "ai prompt", "prompt builder", "prompt optimizer", "flux prompt", "claude prompt", "prompt engineering", "dalle prompt", "image prompt maker", "ai prompt writer"],
   },
   {
+    id: "t-new", slug: "image-generator", title: "AI Image Generator",
+    tagline: "Create stunning AI images from text - free, no signup",
+    description: "Type a prompt and generate stunning AI images instantly — free via Pollinations.ai. Style presets, multiple sizes, Flux & Turbo models. Download or save to your library.",
+    category: "ai", href: "/tools/image-generator", icon: "Sparkles", badge: "new",
+    enabled: true, sortOrder: 1.5, usageCount: 0, updatedAt: "2026-10-05",
+    keywords: ["ai image generator", "text to image", "generate image", "ai art", "ai photo maker", "free image generator", "flux image", "ai picture generator", "text to picture", "ai image creator", "generate ai art", "free ai art"],
+  },
+  {
     id: "t2", slug: "image-converter", title: "Image Converter",
     tagline: "Convert WebP ↔ PNG ↔ JPG instantly in your browser",
     description: "Client-side image format converter. Your files never leave your device.",
@@ -168,6 +176,14 @@ export const TOOLS: Tool[] = [
     category: "image", href: "/tools/watermark-remover", icon: "Droplets", image: "/images/tools/watermark-remover.jpg", badge: "new",
     enabled: true, sortOrder: 20, usageCount: 0, updatedAt: "2026-10-04",
     keywords: ["watermark remover", "remove watermark", "gemini watermark", "ai watermark remover", "logo remover", "remove logo from photo", "erase watermark", "watermark eraser", "text remover", "remove text from image", "clean image", "photo watermark remover", "free watermark remover", "video watermark remover", "remove watermark from video", "gemini video watermark"],
+  },
+  {
+    id: "t21", slug: "video-generator", title: "Video Generator",
+    tagline: "Create news videos & slideshows from images + text - free",
+    description: "Turn images and headlines into pro videos right in your browser: add slides, write headlines, preview with Ken Burns motion, then generate a WebM video. Perfect for news clips, shorts and slideshows. 100% client-side — nothing uploaded, forever free.",
+    category: "ai", href: "/tools/video-generator", icon: "Clapperboard", image: "/images/tools/video-generator.jpg", badge: "new",
+    enabled: true, sortOrder: 21, usageCount: 0, updatedAt: "2026-10-05",
+    keywords: ["video generator", "slideshow maker", "news video maker", "create video from images", "image to video", "slideshow video", "free video maker", "online video generator", "text to video", "photo slideshow", "video maker online free", "ken burns", "shorts maker", "reels maker"],
   },
 ];
 

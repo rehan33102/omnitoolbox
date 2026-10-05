@@ -5,15 +5,14 @@ export const dynamic = "force-dynamic";
 // polls this endpoint on startup; if versionCode is higher than the
 // installed app's, it shows an "Update available" popup.
 const LATEST = {
-  versionCode: 10,
-  versionName: "10",
+  versionCode: 11,
+  versionName: "11",
   apkUrl: "https://omnitoolbox-zeta.vercel.app/downloads/omnibox-app.apk",
   changelog:
-    "• v10 — DOWNLOADS FIXED! 📥\n" +
-    "• Downloads ab app mein kaam karte hain\n" +
-    "• Library ab delete nahi hoti\n" +
-    "• Videos dubara download nahi hote\n" +
-    "• Sab bugs fixed",
+    "• v11 — AUTO-UPDATE! 🔄\n" +
+    "• App ab khud update download karega\n" +
+    "• Koi button dabane ki zaroorat nahi\n" +
+    "• Sab kuch automatic!",
 };
 
 export async function GET() {

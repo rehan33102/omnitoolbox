@@ -23,6 +23,7 @@ const TOOL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "svg-cleaner": dynamic(() => import("@/components/media/SvgCleaner")),
   "background-remover": dynamic(() => import("@/components/media/BackgroundRemover")),
   "background-studio": dynamic(() => import("@/components/media/BackgroundStudio")),
+  "image-generator": dynamic(() => import("@/components/media/ImageGenerator")),
   "watermark-remover": dynamic(() => import("@/components/media/WatermarkRemover")),
   "fancy-text": dynamic(() => import("@/components/social/FancyTextStylator")),
   "bio-generator": dynamic(() => import("@/components/social/BioGenerator")),
@@ -38,6 +39,7 @@ const TOOL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "unit-converter": dynamic(() => import("@/components/calc/UnitConverter")),
   "bmi-calorie-calculator": dynamic(() => import("@/components/calc/BmiCalculator")),
   "age-calculator": dynamic(() => import("@/components/calc/AgeCalculator")),
+  "video-generator": dynamic(() => import("@/components/media/VideoGenerator")),
 };
 
 export async function generateStaticParams() {
