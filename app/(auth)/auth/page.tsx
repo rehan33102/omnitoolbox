@@ -217,44 +217,9 @@ function AuthForm() {
       {step === "otp" ? (
         <div className="mt-6">
           <div className="text-center mb-6">
-            <span className="inline-flex p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-3">
-              <CheckCircle2 size={24} />
-            </span>
-            <h2 className="font-bold text-lg">Verify your email</h2>
             <p className="text-sm text-zinc-500 mt-1">
-              We sent a 6-digit code to <b>{email.trim().toLowerCase()}</b>.
+              Account ban raha hai...
             </p>
-          </div>
-          <form onSubmit={handleOtpSubmit} className="space-y-4">
-            <Input
-              type="text"
-              inputMode="numeric"
-              placeholder="6-digit OTP"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              className="text-center text-2xl font-mono tracking-[0.5em] py-4"
-              maxLength={6}
-              required
-              autoFocus
-            />
-            <Button type="submit" disabled={busy} className="w-full" size="lg">
-              {busy ? "Verifying…" : "Verify & Continue 🚀"}
-            </Button>
-          </form>
-          <div className="flex justify-between mt-4 text-sm">
-            <button
-              onClick={() => { setStep("form"); setOtp(""); }}
-              className="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
-            >
-              ← Back
-            </button>
-            <button
-              onClick={resendOtp}
-              disabled={busy}
-              className="text-brand-700 dark:text-brand-400 font-semibold hover:underline disabled:opacity-50"
-            >
-              Resend OTP
-            </button>
           </div>
         </div>
       ) : (
@@ -302,7 +267,7 @@ function AuthForm() {
                 className="pl-11"
                 required
                 autoComplete="email"
-                hint={mode === "signup" ? "Gmail only — your OTP goes here 📧" : undefined}
+                hint={undefined}
               />
             </div>
             <div className="relative">

@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Clapperboard, Plus, Trash2, ChevronUp, ChevronDown, Play, Pause,
-  Download, ImagePlus, Loader2, RotateCcw, Film, Music,
+  Download, ImagePlus, Loader2, RotateCcw, Film, Music, Newspaper,
+  Mic, Radio, User,
 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -136,6 +137,313 @@ function wrapText(
   if (line) ctx.fillText(line, x, yy);
 }
 
+/* ================= NEWS ANCHOR MODE ================= */
+
+type GenMode = "slideshow" | "news";
+type NewsTemplate = "breaking" | "standard" | "urgent";
+
+const TEMPLATES: Record<
+  NewsTemplate,
+  { label: string; banner: string; accent: string; bg0: string; bg1: string; bannerText: string }
+> = {
+  breaking: {
+    label: "🔴 Breaking News",
+    banner: "#c81e1e",
+    accent: "#fbbf24",
+    bg0: "#200606",
+    bg1: "#3a0d0d",
+    bannerText: "BREAKING NEWS",
+  },
+  standard: {
+    label: "🔵 Standard News",
+    banner: "#1d4ed8",
+    accent: "#93c5fd",
+    bg0: "#060b1c",
+    bg1: "#0c1836",
+    bannerText: "NEWS",
+  },
+  urgent: {
+    label: "⚫ Urgent Alert",
+    banner: "#7f1d1d",
+    accent: "#f87171",
+    bg0: "#0a0a0a",
+    bg1: "#200b0b",
+    bannerText: "URGENT",
+  },
+};
+
+interface NewsCue {
+  start: number;
+  end: number;
+  text: string;
+}
+
+interface NewsFrameOpts {
+  anchorName: string;
+  channelName: string;
+  template: NewsTemplate;
+  ticker: string;
+  cueText: string;
+  audioActive: boolean;
+}
+
+/** Split a script into ≤550-char chunks on sentence boundaries (TTS limit is 600). */
+function chunkScript(text: string, max = 550): string[] {
+  const sentences =
+    text.match(/[^.!?؛؟\n]+[.!?؛؟\n]+["'”]?|\S[^.!?؛؟\n]*$/g) ?? [text];
+  const chunks: string[] = [];
+  let cur = "";
+  for (const s of sentences) {
+    const t = s.trim();
+    if (!t) continue;
+    if (cur && `${cur} ${t}`.length > max) {
+      chunks.push(cur);
+      cur = t;
+    } else {
+      cur = cur ? `${cur} ${t}` : t;
+    }
+  }
+  if (cur) chunks.push(cur);
+  const out: string[] = [];
+  for (const c of chunks) {
+    if (c.length <= max) out.push(c);
+    else for (let i = 0; i < c.length; i += max) out.push(c.slice(i, i + max));
+  }
+  return out.filter(Boolean);
+}
+
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
+/** Draw one news-anchor frame. t = seconds since start, amp = 0..1 talking amplitude. */
+function drawNewsFrame(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement | null,
+  W: number,
+  H: number,
+  t: number,
+  amp: number,
+  o: NewsFrameOpts
+) {
+  const tpl = TEMPLATES[o.template];
+
+  // ---- Studio backdrop ----
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, tpl.bg0);
+  g.addColorStop(1, tpl.bg1);
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  // radial glow behind anchor
+  const cx = W / 2;
+  const cy = H * 0.44;
+  const glow = ctx.createRadialGradient(cx, cy, 10, cx, cy, W * 0.45);
+  glow.addColorStop(0, `${tpl.accent}22`);
+  glow.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = glow;
+  ctx.fillRect(0, 0, W, H);
+
+  // subtle dot pattern
+  ctx.fillStyle = "rgba(255,255,255,0.05)";
+  const step = Math.max(28, W * 0.028);
+  for (let y = step / 2; y < H; y += step) {
+    for (let x = step / 2; x < W; x += step) {
+      ctx.beginPath();
+      ctx.arc(x, y, Math.max(1, W * 0.0012), 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  // ---- Top banner ----
+  const bh = H * 0.105;
+  ctx.fillStyle = tpl.banner;
+  ctx.fillRect(0, 0, W, bh);
+  // banner shine
+  const shine = ctx.createLinearGradient(0, 0, 0, bh);
+  shine.addColorStop(0, "rgba(255,255,255,0.22)");
+  shine.addColorStop(0.5, "rgba(255,255,255,0)");
+  ctx.fillStyle = shine;
+  ctx.fillRect(0, 0, W, bh);
+
+  // blinking LIVE dot
+  const blink = 0.55 + 0.45 * Math.sin(t * 6);
+  const dotR = bh * 0.16;
+  const dotX = W * 0.035;
+  ctx.fillStyle = `rgba(255,255,255,${blink})`;
+  ctx.beginPath();
+  ctx.arc(dotX, bh / 2, dotR, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.font = `800 ${Math.round(bh * 0.34)}px system-ui, sans-serif`;
+  ctx.fillStyle = "#ffffff";
+  ctx.textBaseline = "middle";
+  ctx.fillText("LIVE", dotX + dotR * 2.2, bh / 2 + 1);
+
+  // banner headline
+  ctx.font = `900 ${Math.round(bh * 0.42)}px system-ui, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.fillText(o.template === "standard" ? o.channelName.toUpperCase() : tpl.bannerText, cx, bh / 2 + 1);
+  // channel name right
+  ctx.textAlign = "right";
+  ctx.font = `700 ${Math.round(bh * 0.28)}px system-ui, sans-serif`;
+  ctx.fillText(o.channelName, W * 0.975, bh / 2 + 1);
+  ctx.textAlign = "left";
+
+  // ---- Anchor photo (circle) with talking animation ----
+  const R = Math.min(W, H) * 0.21;
+  const talking = o.audioActive ? amp : 0;
+  const pulse = 1 + talking * 0.035 + Math.sin(t * 6) * (o.audioActive ? 0.006 : 0.003);
+  const wobbleY = Math.sin(t * 7.3) * 3 * (o.audioActive ? Math.max(0.3, amp) : 0.15);
+  const pr = R * pulse;
+
+  ctx.save();
+  // glow ring
+  ctx.shadowColor = tpl.accent;
+  ctx.shadowBlur = 24 + talking * 30;
+  ctx.strokeStyle = tpl.accent;
+  ctx.lineWidth = Math.max(4, W * 0.006);
+  ctx.beginPath();
+  ctx.arc(cx, cy + wobbleY, pr + ctx.lineWidth, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.shadowBlur = 0;
+
+  // photo clipped to circle
+  ctx.beginPath();
+  ctx.arc(cx, cy + wobbleY, pr, 0, Math.PI * 2);
+  ctx.clip();
+  if (img && img.complete && img.naturalWidth > 0) {
+    const ir = img.naturalWidth / img.naturalHeight;
+    let dw = pr * 2, dh = pr * 2;
+    if (ir > 1) { dw = pr * 2 * ir; } else { dh = (pr * 2) / ir; }
+    // face-centered: bias slightly up
+    ctx.drawImage(img, cx - dw / 2, cy + wobbleY - dh / 2 - pr * 0.12, dw, dh);
+  } else {
+    ctx.fillStyle = "#1e293b";
+    ctx.fillRect(cx - pr, cy + wobbleY - pr, pr * 2, pr * 2);
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.font = `700 ${Math.round(pr * 0.5)}px system-ui, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.fillText("?", cx, cy + wobbleY + pr * 0.18);
+    ctx.textAlign = "left";
+  }
+  ctx.restore();
+
+  // ---- Lower third (slide-in) ----
+  const slideIn = Math.min(1, t / 0.7);
+  const ease = 1 - Math.pow(1 - slideIn, 3);
+  const ltW = W * 0.52;
+  const ltH = H * 0.105;
+  const ltX = cx - ltW / 2;
+  const ltY = cy + pr + H * 0.035;
+  const hiddenX = -ltW - 40;
+  const drawX = hiddenX + (ltX - hiddenX) * ease;
+
+  ctx.save();
+  ctx.fillStyle = "rgba(0,0,0,0.62)";
+  roundRect(ctx, drawX, ltY, ltW, ltH, ltH * 0.18);
+  ctx.fill();
+  // accent bar
+  ctx.fillStyle = tpl.banner;
+  roundRect(ctx, drawX, ltY, ltW * 0.028, ltH, ltH * 0.18);
+  ctx.fill();
+  if (slideIn > 0.4) {
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `800 ${Math.round(ltH * 0.34)}px system-ui, sans-serif`;
+    ctx.textBaseline = "middle";
+    const name = o.anchorName || "News Anchor";
+    ctx.fillText(name.slice(0, 28), drawX + ltW * 0.07, ltY + ltH * 0.32, ltW * 0.86);
+    ctx.fillStyle = tpl.accent;
+    ctx.font = `600 ${Math.round(ltH * 0.22)}px system-ui, sans-serif`;
+    ctx.fillText(`${o.channelName} • Anchor`, drawX + ltW * 0.07, ltY + ltH * 0.72, ltW * 0.86);
+  }
+  ctx.restore();
+
+  // ---- Subtitles ----
+  if (o.cueText) {
+    const fs = Math.round(W * 0.028);
+    ctx.font = `600 ${fs}px system-ui, sans-serif`;
+    const maxW = W * 0.86;
+    const words = o.cueText.split(/\s+/);
+    const lines: string[] = [];
+    let line = "";
+    for (const w of words) {
+      const test = line ? `${line} ${w}` : w;
+      if (ctx.measureText(test).width > maxW && line) {
+        lines.push(line);
+        line = w;
+      } else line = test;
+      if (lines.length === 2) break;
+    }
+    if (line && lines.length < 2) lines.push(line);
+    const boxH = lines.length * fs * 1.45 + fs * 0.7;
+    const boxY = H - H * 0.105 - boxH - H * 0.03;
+    ctx.fillStyle = "rgba(0,0,0,0.68)";
+    roundRect(ctx, W * 0.07, boxY, W * 0.86, boxH, 12);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.textBaseline = "middle";
+    ctx.textAlign = "center";
+    lines.forEach((ln, i) => {
+      ctx.fillText(ln, cx, boxY + fs * 0.65 + i * fs * 1.45 + fs * 0.35);
+    });
+    ctx.textAlign = "left";
+  }
+
+  // ---- Bottom ticker ----
+  const th = H * 0.075;
+  const ty = H - th;
+  ctx.fillStyle = "rgba(0,0,0,0.85)";
+  ctx.fillRect(0, ty, W, th);
+  ctx.fillStyle = tpl.banner;
+  ctx.fillRect(0, ty, W, Math.max(3, th * 0.08));
+  const ticker = (o.ticker || o.channelName).trim() || "NEWS";
+  ctx.font = `700 ${Math.round(th * 0.42)}px system-ui, sans-serif`;
+  ctx.textBaseline = "middle";
+  const unit = `  •  ${ticker} `;
+  const unitW = ctx.measureText(unit).width;
+  const repeat = Math.ceil(W / unitW) + 2;
+  const fullW = unitW * repeat;
+  const speed = W * 0.12;
+  let sx = W - ((t * speed) % fullW);
+  ctx.fillStyle = "#ffffff";
+  // clip ticker area
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, ty, W, th);
+  ctx.clip();
+  for (let i = 0; i < repeat; i++) {
+    ctx.fillText(unit, sx + i * unitW, ty + th / 2 + 1);
+  }
+  // "TICKER" tag on left
+  ctx.fillStyle = tpl.banner;
+  const tagW = W * 0.13;
+  ctx.fillRect(0, ty, tagW, th);
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `900 ${Math.round(th * 0.36)}px system-ui, sans-serif`;
+  ctx.textAlign = "center";
+  ctx.fillText("NEWS", tagW / 2, ty + th / 2 + 1);
+  ctx.textAlign = "left";
+  ctx.restore();
+
+  // watermark
+  ctx.font = `600 ${Math.round(W * 0.018)}px system-ui, sans-serif`;
+  ctx.fillStyle = "rgba(255,255,255,0.4)";
+  ctx.fillText("OmniToolBox", W * 0.02, bh + H * 0.035);
+}
+
 export default function VideoGenerator() {
   const { toast } = useToast();
   const [slides, setSlides] = useState<Slide[]>(() => [newSlide(), newSlide()]);
@@ -156,6 +464,30 @@ export default function VideoGenerator() {
 
   const { w: W, h: H } = SIZES[size];
   const totalDuration = slides.reduce((a, s) => a + Math.max(1, s.duration), 0);
+
+  // ---- News Anchor mode state ----
+  const [mode, setMode] = useState<GenMode>("slideshow");
+  const [anchorPhoto, setAnchorPhoto] = useState<string | null>(null);
+  const [anchorName, setAnchorName] = useState("");
+  const [channelName, setChannelName] = useState("Omni News");
+  const [newsScript, setNewsScript] = useState("");
+  const [tickerText, setTickerText] = useState("");
+  const [newsLang, setNewsLang] = useState("ur");
+  const [newsVoice, setNewsVoice] = useState<"male" | "female">("male");
+  const [newsTemplate, setNewsTemplate] = useState<NewsTemplate>("breaking");
+  const [languages, setLanguages] = useState<{ code: string; label: string; flag: string }[]>([]);
+  const [newsBusy, setNewsBusy] = useState(false);
+  const [newsStep, setNewsStep] = useState("");
+  const [voicePreviewing, setVoicePreviewing] = useState(false);
+
+  const anchorImgRef = useRef<HTMLImageElement | null>(null);
+  const anchorFileRef = useRef<HTMLInputElement>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const newsAudioRef = useRef<{
+    actx: AudioContext;
+    buffer: AudioBuffer;
+    cues: NewsCue[];
+  } | null>(null);
 
   // Keep an <img> per slide image
   useEffect(() => {
@@ -259,8 +591,90 @@ export default function VideoGenerator() {
   );
 
   useEffect(() => {
-    renderAt(playTime);
-  }, [renderAt, playTime, size]);
+    if (mode === "slideshow") renderAt(playTime);
+  }, [renderAt, playTime, size, mode]);
+
+  // ---- News Anchor: fetch TTS languages ----
+  useEffect(() => {
+    fetch("/api/voiceover/config")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (j?.edge?.languages?.length) setLanguages(j.edge.languages);
+      })
+      .catch(() => {});
+  }, []);
+
+  // ---- News Anchor: keep an <img> for the anchor photo ----
+  useEffect(() => {
+    if (!anchorPhoto) {
+      anchorImgRef.current = null;
+      return;
+    }
+    const img = new Image();
+    img.src = anchorPhoto;
+    anchorImgRef.current = img;
+  }, [anchorPhoto]);
+
+  const pickAnchorPhoto = () => anchorFileRef.current?.click();
+
+  const onAnchorFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    e.target.value = "";
+    if (!f) return;
+    if (!f.type.startsWith("image/")) {
+      toast({ title: "Sirf image file chahiye", variant: "error" });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setAnchorPhoto(reader.result as string);
+      toast({ title: "Anchor photo lag gayi 📸", variant: "success" });
+    };
+    reader.readAsDataURL(f);
+  };
+
+  /** Current talking amplitude 0..1 from the analyser (0 when idle). */
+  const getAmp = useCallback(() => {
+    const an = analyserRef.current;
+    if (!an) return 0;
+    const buf = new Float32Array(an.fftSize);
+    an.getFloatTimeDomainData(buf);
+    let sum = 0;
+    for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+    const rms = Math.sqrt(sum / buf.length);
+    return Math.min(1, rms * 6);
+  }, []);
+
+  const renderNewsPreview = useCallback(
+    (t: number) => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      drawNewsFrame(ctx, anchorImgRef.current, W, H, t, getAmp(), {
+        anchorName,
+        channelName,
+        template: newsTemplate,
+        ticker: tickerText,
+        cueText: newsScript.trim().split(/\n+/)[0]?.slice(0, 120) ?? "",
+        audioActive: false,
+      });
+    },
+    [W, H, getAmp, anchorName, channelName, newsTemplate, tickerText, newsScript]
+  );
+
+  // Idle news preview loop (ticker scrolls, banner blinks, anchor breathes)
+  useEffect(() => {
+    if (mode !== "news" || newsBusy) return;
+    let raf = 0;
+    const t0 = performance.now();
+    const loop = () => {
+      renderNewsPreview((performance.now() - t0) / 1000);
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [mode, newsBusy, renderNewsPreview]);
 
   useEffect(() => {
     if (!playing) {
