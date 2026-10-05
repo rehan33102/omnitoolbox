@@ -62,16 +62,26 @@ export default function SmartSearch({
   const rootRef = useRef<HTMLDivElement>(null);
   const hero = variant === "hero";
 
+  // Guard against undefined tools
+  const safeTools = Array.isArray(tools) ? tools : [];
+
   const tokens = useMemo(() => query.toLowerCase().trim().split(/\s+/).filter(Boolean), [query]);
   const results = useMemo(() => {
     // Single-letter/short queries can match many tools — show more results
     const limit = query.trim().length <= 2 ? 12 : 6;
-    return smartSearch(tools, query, limit);
-  }, [tools, query]);
-  const alternatives = useMemo(
-    () => (query.trim() && results.length === 0 ? findAlternatives(tools, query, 3) : []),
-    [tools, query, results.length]
-  );
+    try {
+      return smartSearch(safeTools, query, limit);
+    } catch {
+      return [];
+    }
+  }, [safeTools, query]);
+  const alternatives = useMemo(() => {
+    try {
+      return query.trim() && results.length === 0 ? findAlternatives(safeTools, query, 3) : [];
+    } catch {
+      return [];
+    }
+  }, [safeTools, query, results.length]);
   const flat = results.length > 0 ? results.map((r) => r.tool) : alternatives.map((a) => a.tool);
 
   useEffect(() => {
@@ -205,7 +215,7 @@ export default function SmartSearch({
           {results.length > 0 ? (
             <ul className="max-h-[60vh] overflow-y-auto p-2">
               {results.map(({ tool }, i) => {
-                const s = CATEGORY_STYLE[tool.category];
+                const s = CATEGORY_STYLE[tool.category] ?? CATEGORY_STYLE.web;
                 return (
                   <li key={tool.slug} role="option" aria-selected={i === active}>
                     <button
@@ -253,7 +263,7 @@ export default function SmartSearch({
               </p>
               <ul>
                 {alternatives.map(({ tool }, i) => {
-                  const s = CATEGORY_STYLE[tool.category];
+                  const s = CATEGORY_STYLE[tool.category] ?? CATEGORY_STYLE.web;
                   return (
                     <li key={tool.slug} role="option" aria-selected={i === active}>
                       <button
