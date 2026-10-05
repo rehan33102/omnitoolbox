@@ -10,14 +10,6 @@ export const TOOLS: Tool[] = [
     keywords: ["prompt generator", "prompt maker", "midjourney prompt", "chatgpt prompt", "ai prompt", "prompt builder", "prompt optimizer", "flux prompt", "claude prompt", "prompt engineering", "dalle prompt", "image prompt maker", "ai prompt writer"],
   },
   {
-    id: "t-new", slug: "image-generator", title: "AI Image Generator",
-    tagline: "Create stunning AI images from text - free, no signup",
-    description: "Type a prompt and generate stunning AI images instantly — free via Pollinations.ai. Style presets, multiple sizes, Flux & Turbo models. Download or save to your library.",
-    category: "ai", href: "/tools/image-generator", icon: "Sparkles", badge: "new",
-    enabled: true, sortOrder: 1.5, usageCount: 0, updatedAt: "2026-10-05",
-    keywords: ["ai image generator", "text to image", "generate image", "ai art", "ai photo maker", "free image generator", "flux image", "ai picture generator", "text to picture", "ai image creator", "generate ai art", "free ai art"],
-  },
-  {
     id: "t2", slug: "image-converter", title: "Image Converter",
     tagline: "Convert WebP ↔ PNG ↔ JPG instantly in your browser",
     description: "Client-side image format converter. Your files never leave your device.",
