@@ -41,7 +41,7 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="hidden xl:flex items-center gap-1 ml-4">
+        <nav className="hidden 2xl:flex items-center gap-1 ml-4">
           {NAV_LINKS.map((l) => {
             const active = pathname === l.href;
             return (
@@ -81,7 +81,7 @@ export default function Header() {
           <button
             aria-label="Open menu"
             onClick={() => setDrawer(true)}
-            className="xl:hidden p-2.5 rounded-xl glass hover:bg-black/5 dark:hover:bg-white/10 transition"
+            className="2xl:hidden p-2.5 rounded-xl glass hover:bg-black/5 dark:hover:bg-white/10 transition"
           >
             <Menu size={18} />
           </button>
