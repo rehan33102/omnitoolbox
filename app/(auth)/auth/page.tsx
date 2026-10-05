@@ -66,7 +66,7 @@ function AuthForm() {
   const [otp, setOtp] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const nextUrl = params.get("next") || "/dashboard";
+  const nextUrl = params.get("next") || "/";
 
   const goNext = () => {
     // Hard redirect so the server picks up the fresh session cookie immediately.
@@ -100,7 +100,7 @@ function AuthForm() {
           password,
           options: {
             data: { full_name: fullName.trim() },
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/`,
           },
         });
         if (error) throw error;
