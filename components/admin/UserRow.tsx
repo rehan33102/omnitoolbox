@@ -136,9 +136,12 @@ export default function UserRow({
   return (
     <div className="border-b border-black/5 dark:border-white/5 last:border-0">
       {/* Clickable user header */}
-      <button
+      <div
         onClick={toggleExpand}
-        className="w-full p-4 flex items-center gap-4 text-left hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition cursor-pointer"
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleExpand(); } }}
+        role="button"
+        tabIndex={0}
+        className="w-full p-4 flex items-center gap-4 text-left hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition cursor-pointer select-none"
       >
         <span className="p-2.5 rounded-2xl bg-brand-500/10 text-brand-700 dark:text-brand-300 shrink-0">
           <ShieldCheck size={18} />
@@ -219,7 +222,7 @@ export default function UserRow({
             <Trash2 size={16} className="text-red-600 dark:text-red-400" />
           </button>
         </div>
-      </button>
+      </div>
 
       {/* Expandable creations */}
       {expanded && (
