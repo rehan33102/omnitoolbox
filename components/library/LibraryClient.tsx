@@ -215,6 +215,15 @@ function GroupSection({ group, onCount }: { group: GroupDef; onCount?: (kind: st
 export default function LibraryClient() {
   const [otherKinds, setOtherKinds] = useState<string[]>([]);
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [filterKind, setFilterKind] = useState<string | null>(null);
+
+  // Read ?kind= from URL to filter (e.g. from dashboard stats)
+  useEffect(() => {
+    try {
+      const k = new URLSearchParams(window.location.search).get("kind");
+      if (k) setFilterKind(k);
+    } catch { /* ignore */ }
+  }, []);
 
   const onCount = useCallback((kind: string, n: number) => {
     setCounts((c) => (c[kind] === n ? c : { ...c, [kind]: n }));
@@ -230,9 +239,26 @@ export default function LibraryClient() {
   const total = allKinds.reduce((a, k) => a + (counts[k] ?? 0), 0);
   const loaded = allKinds.every((k) => counts[k] !== undefined);
 
+  const visibleGroups = filterKind
+    ? GROUPS.filter((g) => g.kind === filterKind)
+    : GROUPS;
+
   return (
     <div className="space-y-5">
-      {GROUPS.map((g) => (
+      {filterKind && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Showing: <span className="font-semibold text-zinc-900 dark:text-white capitalize">{filterKind}</span>
+          </p>
+          <button
+            onClick={() => { setFilterKind(null); window.history.replaceState(null, "", "/library"); }}
+            className="text-sm text-brand-600 dark:text-brand-400 hover:underline"
+          >
+            Show all →
+          </button>
+        </div>
+      )}
+      {visibleGroups.map((g) => (
         <GroupSection key={g.kind} group={g} onCount={onCount} />
       ))}
 
