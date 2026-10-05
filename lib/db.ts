@@ -132,6 +132,17 @@ export async function saveBlob(
   };
   try {
     await run<unknown>("blobs", "readwrite", (s) => s.put(row));
+    // Track to server for admin dashboard (non-blocking, never breaks UX)
+    try {
+      const validKinds = ["voiceover", "image", "qr", "pdf", "video"];
+      if (validKinds.includes(kind)) {
+        fetch("/api/track-creation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ kind, name, toolSlug: (meta as any)?.toolSlug }),
+        }).catch(() => {});
+      }
+    } catch {}
     return id;
   } catch {
     return null;

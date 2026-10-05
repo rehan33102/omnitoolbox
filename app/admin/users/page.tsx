@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Ban, KeyRound, RefreshCw, Search, ShieldCheck, Trash2, UserCheck, Users } from "lucide-react";
+import { RefreshCw, Search, Users } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
 import { Input } from "@/components/ui/Input";
 import Skeleton from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
+import UserRow from "@/components/admin/UserRow";
 
 interface AdminUser {
   id: string;
@@ -155,59 +155,16 @@ export default function AdminUsersPage() {
             {users.length === 0 ? "No registered users yet." : "No users match your search."}
           </p>
         ) : (
-          <div className="divide-y divide-black/5 dark:divide-white/5">
+          <div>
             {filtered.map((u) => (
-              <div key={u.id} className="p-4 flex items-center gap-4">
-                <span className="p-2.5 rounded-2xl bg-brand-500/10 text-brand-700 dark:text-brand-300 shrink-0">
-                  <ShieldCheck size={18} />
-                </span>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-medium text-sm truncate">{u.email}</p>
-                    {u.isSelf && <Badge variant="pro">you</Badge>}
-                    {u.banned ? (
-                      <Badge variant="pdf">suspended</Badge>
-                    ) : u.emailConfirmed ? (
-                      <Badge variant="ai">active</Badge>
-                    ) : (
-                      <Badge variant="text">unverified</Badge>
-                    )}
-                  </div>
-                  <p className="text-xs text-zinc-500 mt-0.5 truncate">
-                    {u.fullName || "No name set"} · Joined {fmtDate(u.createdAt)} · Last login {fmtDate(u.lastSignInAt)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <button
-                    onClick={() => toggleSuspend(u)}
-                    disabled={busyId === u.id || u.isSelf}
-                    title={u.banned ? "Unsuspend user" : "Suspend user"}
-                    className="p-2 rounded-lg hover:bg-amber-500/10 transition disabled:opacity-40"
-                  >
-                    {u.banned ? (
-                      <UserCheck size={16} className="text-emerald-600 dark:text-emerald-400" />
-                    ) : (
-                      <Ban size={16} className="text-amber-600 dark:text-amber-400" />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => resetPassword(u)}
-                    disabled={busyId === u.id}
-                    title="Send password reset email"
-                    className="p-2 rounded-lg hover:bg-blue-500/10 transition disabled:opacity-40"
-                  >
-                    <KeyRound size={16} className="text-blue-600 dark:text-blue-400" />
-                  </button>
-                  <button
-                    onClick={() => setConfirmDelete(u)}
-                    disabled={busyId === u.id || u.isSelf}
-                    title="Delete user"
-                    className="p-2 rounded-lg hover:bg-red-500/10 transition disabled:opacity-40"
-                  >
-                    <Trash2 size={16} className="text-red-600 dark:text-red-400" />
-                  </button>
-                </div>
-              </div>
+              <UserRow
+                key={u.id}
+                user={u}
+                busy={busyId === u.id}
+                onSuspend={toggleSuspend}
+                onResetPassword={resetPassword}
+                onDelete={(user) => setConfirmDelete(user)}
+              />
             ))}
           </div>
         )}

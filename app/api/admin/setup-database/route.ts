@@ -22,6 +22,20 @@ const MIGRATIONS = [
   `create index if not exists analytics_events_created_idx on analytics_events (created_at desc)`,
   `create index if not exists analytics_events_slug_idx on analytics_events (tool_slug)`,
 
+  // User creations (what each user generates — shown in admin dashboard)
+  `create table if not exists user_creations (
+    id bigint generated always as identity primary key,
+    user_id uuid references auth.users(id) on delete cascade,
+    user_email text,
+    kind text not null,
+    name text not null,
+    tool_slug text,
+    created_at timestamptz not null default now()
+  )`,
+  `create index if not exists user_creations_user_idx on user_creations (user_id)`,
+  `create index if not exists user_creations_created_idx on user_creations (created_at desc)`,
+  `create index if not exists user_creations_kind_idx on user_creations (kind)`,
+
   // Profiles (admin/user roles)
   `create table if not exists profiles (
     id uuid primary key references auth.users(id) on delete cascade,
