@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Sparkles, Zap, ShieldCheck, Smartphone, Infinity as InfinityIcon } from "lucide-react";
+import { ArrowRight, Sparkles, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
 import DownloadAppButton from "./DownloadAppButton";
 
@@ -42,7 +42,7 @@ export default function Hero({ toolCount }: { toolCount: number }) {
         {/* Magazine eyebrow */}
         <p className="eyebrow justify-center mb-6 animate-fade-up">
           <Sparkles size={12} className="text-ember-400" />
-          {toolCount}+ free tools · no signup · no watermarks
+          {toolCount}+ free tools
         </p>
 
         {/* Giant condensed editorial headline — animated glow fun */}
@@ -65,9 +65,7 @@ export default function Hero({ toolCount }: { toolCount: number }) {
         <p
           className="mt-6 text-zinc-400 text-base md:text-lg max-w-2xl mx-auto animate-fade-up [animation-delay:360ms]"
         >
-          Prompt Studio, image converter &amp; compressor, AI voiceover, fancy
-          text, bio generator, hashtag finder and more — private,
-          and 100% free.
+          Convert images, generate voiceovers, craft prompts, and more.
         </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-3 animate-fade-up [animation-delay:480ms]">
@@ -77,55 +75,6 @@ export default function Hero({ toolCount }: { toolCount: number }) {
             </Button>
           </Link>
           <DownloadAppButton />
-        </div>
-
-        {/* Trust strip */}
-        <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs uppercase tracking-[0.2em] text-zinc-500 animate-fade-up [animation-delay:600ms]">
-          <span>100% free forever</span>
-          <span className="text-zinc-700">/</span>
-          <span>Private by design</span>
-          <span className="text-zinc-700">/</span>
-          <span>Works on mobile</span>
-        </div>
-
-        {/* Glassmorphic floating stat cards */}
-        <div className="mt-10 flex flex-wrap justify-center gap-4 animate-fade-up [animation-delay:720ms]">
-          <div className="glass-card glass-float glass-shimmer px-6 py-4 flex items-center gap-3" style={{ "--anim-delay": "0s" } as React.CSSProperties}>
-            <span className="p-2.5 rounded-xl bg-gradient-to-br from-amber-500 to-orange-500 text-white shadow-lg">
-              <Zap size={18} />
-            </span>
-            <div className="text-left">
-              <p className="font-display font-bold text-xl text-white leading-none">{toolCount}+</p>
-              <p className="text-[11px] uppercase tracking-widest text-zinc-400 mt-1">Free tools</p>
-            </div>
-          </div>
-          <div className="glass-card glass-float glass-shimmer px-6 py-4 flex items-center gap-3" style={{ "--anim-delay": "1.2s" } as React.CSSProperties}>
-            <span className="p-2.5 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg">
-              <ShieldCheck size={18} />
-            </span>
-            <div className="text-left">
-              <p className="font-display font-bold text-xl text-white leading-none">100%</p>
-              <p className="text-[11px] uppercase tracking-widest text-zinc-400 mt-1">Private</p>
-            </div>
-          </div>
-          <div className="glass-card glass-float glass-shimmer px-6 py-4 flex items-center gap-3" style={{ "--anim-delay": "2.4s" } as React.CSSProperties}>
-            <span className="p-2.5 rounded-xl bg-gradient-to-br from-violet-500 to-purple-500 text-white shadow-lg">
-              <Smartphone size={18} />
-            </span>
-            <div className="text-left">
-              <p className="font-display font-bold text-xl text-white leading-none">24/7</p>
-              <p className="text-[11px] uppercase tracking-widest text-zinc-400 mt-1">Mobile ready</p>
-            </div>
-          </div>
-          <div className="glass-card glass-float glass-shimmer px-6 py-4 flex items-center gap-3" style={{ "--anim-delay": "3.6s" } as React.CSSProperties}>
-            <span className="p-2.5 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 text-white shadow-lg">
-              <InfinityIcon size={18} />
-            </span>
-            <div className="text-left">
-              <p className="font-display font-bold text-xl text-white leading-none">$0</p>
-              <p className="text-[11px] uppercase tracking-widest text-zinc-400 mt-1">Forever free</p>
-            </div>
-          </div>
         </div>
       </div>
 

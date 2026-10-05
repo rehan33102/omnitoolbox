@@ -22,18 +22,17 @@ export const metadata = buildMetadata({
 });
 
 const FAQS = [
-  { question: "Is OmniToolBox really free?", answer: "Yes — every tool is 100% free with no signup, no watermarks and no usage caps on core features." },
-  { question: "Do my images get uploaded to a server?", answer: "No. Image tools run entirely in your browser via canvas and WebAssembly. Your files never leave your device." },
-  { question: "Which AI models does the Prompt Studio support?", answer: "Midjourney, ChatGPT/GPT-4, Flux and Claude — each with tailored syntax, preset styles and negative-prompt builders." },
-  { question: "Can I use the tools on mobile?", answer: "Yes. Every tool is fully responsive and touch-friendly on phones, tablets and desktops." },
-  { question: "How do I suggest a new tool?", answer: "Use the contact page — popular requests get built first and ship without any downtime." },
+  { question: "Is it free?", answer: "Yes. All tools are free, no signup needed." },
+  { question: "Are my files uploaded?", answer: "No. Image tools run in your browser. Files stay on your device." },
+  { question: "Does it work on mobile?", answer: "Yes. All tools work on phones, tablets, and desktops." },
+  { question: "Can I suggest a tool?", answer: "Yes, use the contact page." },
 ];
 
 const FEATURES = [
-  { icon: Wallet, title: "100% free, forever", text: "No paywalls, no credits, no watermarks. Every utility is free for everyone." },
-  { icon: ShieldCheck, title: "Private by design", text: "Image and media tools process locally in your browser — nothing is uploaded." },
-  { icon: Gauge, title: "Zero server lag", text: "Client-side processing and edge-cached pages mean instant results." },
-  { icon: Sparkles, title: "Always expanding", text: "New AI tools and utilities ship regularly, voted by the community." },
+  { icon: Wallet, title: "Free", text: "Every tool is free. No paywalls." },
+  { icon: ShieldCheck, title: "Private", text: "Files are processed in your browser." },
+  { icon: Gauge, title: "Fast", text: "Instant results, no waiting." },
+  { icon: Sparkles, title: "More coming", text: "New tools added regularly." },
 ];
 
 export default async function HomePage() {
@@ -58,8 +57,7 @@ export default async function HomePage() {
       <section className="container mt-20 md:mt-28">
         <SectionHeader
           eyebrow="Why OmniToolBox"
-          title={<>Built for <span className="text-gradient-warm">creators</span></>}
-          sub="One fast, private toolbox that respects your time, your data and your wallet."
+          title={<>Built for <span className="text-gradient-warm">you</span></>}
         />
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {FEATURES.map((f, i) => (
@@ -79,8 +77,8 @@ export default async function HomePage() {
 
       <section className="container mt-20 md:mt-28 max-w-3xl">
         <SectionHeader
-          eyebrow="Good to know"
-          title={<>Questions, <span className="text-gradient-warm">answered</span></>}
+          eyebrow="FAQ"
+          title="Questions"
         />
         <div className="space-y-3">
           {FAQS.map((f, i) => (
@@ -105,10 +103,10 @@ export default async function HomePage() {
             <div className="relative">
               <p className="eyebrow justify-center mb-4">One toolbox</p>
               <h2 className="font-condensed uppercase leading-[0.95] tracking-tight text-white text-4xl sm:text-5xl md:text-6xl">
-                Stop juggling 20<br />
-                <span className="text-gradient-warm">bookmarked tools.</span>
+                All your tools.<br />
+                <span className="text-gradient-warm">One place.</span>
               </h2>
-              <p className="text-zinc-400 mt-4 max-w-xl mx-auto">One fast, free toolbox for everything you create, post and ship.</p>
+              <p className="text-zinc-400 mt-4 max-w-xl mx-auto">Free tools for everyday tasks.</p>
               <Link href="/ai-prompt-studio" className="inline-block mt-8">
                 <Button size="lg" className="!bg-gradient-to-r !from-ember-500 !to-magent-500 hover:!shadow-glow-warm !border-0">
                   Start creating free <ArrowRight size={17} />
