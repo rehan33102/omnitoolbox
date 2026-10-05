@@ -1,8 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 
 /** Owner's secret bypass key — ADMIN_BYPASS_KEY env var preferred, fallback for continuity. */
 const BOSS_KEY = process.env.ADMIN_BYPASS_KEY || "boss-x7k9m2-2026";
+
+/** Admin emails — must match lib/auth.ts owner list */
+const ADMIN_EMAILS = ["rehan.work3310@gmail.com", "info.rehan3310@gmail.com"];
 
 export async function middleware(req: NextRequest) {
   // SECRET BYPASS: ?boss=<key> skips all auth (owner's private link).
@@ -46,8 +50,25 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-  if (profile?.role !== "admin") {
+  // Check admin via whitelist (email) OR profiles table via admin client (bypasses RLS)
+  const email = (user.email ?? "").toLowerCase();
+  const isWhitelisted = ADMIN_EMAILS.includes(email);
+
+  let isAdmin = isWhitelisted;
+  if (!isAdmin) {
+    try {
+      const admin = createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+      );
+      const { data: profile } = await admin.from("profiles").select("role").eq("id", user.id).single();
+      isAdmin = profile?.role === "admin";
+    } catch {
+      isAdmin = false;
+    }
+  }
+
+  if (!isAdmin) {
     if (isApi) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     const url = req.nextUrl.clone();
     url.pathname = "/";
