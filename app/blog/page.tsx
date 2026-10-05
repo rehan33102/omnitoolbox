@@ -29,8 +29,7 @@ export default async function BlogPage() {
           Guides & <span className="text-gradient">tutorials</span>
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
-          Deep, practical guides on AI prompts, image optimization and social growth —
-          written to actually help, not to rank and bounce.
+          Practical guides on AI prompts, image optimization and social growth.
         </p>
       </div>
 

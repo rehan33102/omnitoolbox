@@ -62,7 +62,7 @@ export default function ContactPage() {
           <Send size={16} /> Send message
         </Button>
         <p className="text-xs text-zinc-500 text-center">
-          This opens your email app with the message pre-filled — no account needed, nothing stored.
+          Opens your email app with the message pre-filled.
         </p>
       </Card>
 

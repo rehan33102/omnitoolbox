@@ -96,7 +96,6 @@ export default async function ToolPage({ params }: { params: { slug: string } })
         <div className="flex gap-2 mb-4">
           <Badge variant={tool.category as any}>{tool.category}</Badge>
           {tool.badge && <Badge variant="new">{tool.badge}</Badge>}
-          <Badge variant="new">100% free</Badge>
         </div>
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           {tool.title}

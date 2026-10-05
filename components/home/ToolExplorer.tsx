@@ -54,7 +54,7 @@ function ExplorerInner({ tools }: { tools: Tool[] }) {
       <SectionHeader
         eyebrow="The collection"
         title={<>Find your <span className="text-gradient-warm">tool</span></>}
-        sub={`Search across all ${liveTools.length} utilities — free forever, no signup.`}
+        sub={`Search all ${liveTools.length} utilities.`}
       />
 
       <Reveal delay={100}>

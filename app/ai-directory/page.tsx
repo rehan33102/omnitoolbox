@@ -35,8 +35,7 @@ export default async function DirectoryPage() {
           Discover new <span className="text-gradient">AI tools</span>
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
-          Fresh AI launches across video, audio, coding and productivity —
-          ranked by real community votes, updated daily.
+          New AI tools across video, audio, coding and productivity.
         </p>
       </div>
 

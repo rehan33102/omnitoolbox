@@ -31,8 +31,7 @@ export default function PdfToolsPage() {
           PDF <span className="text-gradient">Tools</span>
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
-          Professional PDF utilities that run entirely in your browser.
-          Private and free — no uploads needed.
+          PDF utilities that run in your browser.
         </p>
       </div>
 

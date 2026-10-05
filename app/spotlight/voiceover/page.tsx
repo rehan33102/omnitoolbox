@@ -19,7 +19,7 @@ const FEATURES = [
   {
     icon: Mic2,
     title: "Neural voices, free",
-    text: "Microsoft's natural neural voices — male & female, with sleep, calm, normal and energetic styles. No signup, no key, no robotic robot-voice.",
+    text: "Natural neural voices — male & female, calm, sleep and energetic styles.",
     accent: "text-violet-300",
     glow: "from-violet-600/30",
   },

@@ -13,7 +13,7 @@ export const metadata = buildMetadata({
 const TUTORIALS = [
   {
     title: "Complete Website Tutorial",
-    desc: "Full walkthrough — AI Voiceover live demo, Background Remover live demo, QR tools, PDF tools and more. English + Urdu!",
+    desc: "Full walkthrough — voiceover, background remover, QR and PDF tools.",
     duration: "89 sec",
     video: "/tutorials/omnitoolbox-tutorial-v2.mp4",
     poster: "/images/tools/ai-voiceover.jpg",
@@ -21,7 +21,7 @@ const TUTORIALS = [
   },
   {
     title: "AI Voiceover Studio — Full Guide",
-    desc: "Type text, pick from 32 languages, choose male/female voice, adjust speed & style, generate and download MP3. 100% free!",
+    desc: "Type text, pick a voice, generate and download MP3.",
     duration: "56 sec",
     video: "/tutorials/tutorial-voiceover.mp4",
     poster: "/images/tools/ai-voiceover.jpg",
@@ -29,7 +29,7 @@ const TUTORIALS = [
   },
   {
     title: "Background Remover — Full Guide",
-    desc: "Upload any photo, one click removes the background. Then use Background Studio to add new backgrounds, shadows and effects!",
+    desc: "Upload a photo — one click removes the background.",
     duration: "51 sec",
     video: "/tutorials/tutorial-bgremover.mp4",
     poster: "/images/tools/background-remover.jpg",
@@ -37,7 +37,7 @@ const TUTORIALS = [
   },
   {
     title: "QR Generator & More Tools",
-    desc: "Create custom QR codes, convert images, merge PDFs, generate fancy text and hashtags — all in seconds!",
+    desc: "QR codes, image conversion, PDF merge, fancy text and hashtags.",
     duration: "49 sec",
     video: "/tutorials/tutorial-qr.mp4",
     poster: "/images/tools/qr-generator.jpg",

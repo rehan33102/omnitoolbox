@@ -33,13 +33,13 @@ export default function AIVoiceoverPage() {
           AI Voiceover <span className="text-gradient">Studio</span>
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
-          Free text-to-speech in 38 languages — generate real MP3 audio, download it, and keep your history. No signup.
+          Text-to-speech in 38 languages — MP3 download and history.
         </p>
         <Link
           href="/spotlight/voiceover"
           className="mt-4 inline-flex items-center gap-2 rounded-full border border-ember-500/40 bg-ember-500/10 px-4 py-2 text-sm font-medium text-ember-700 dark:text-ember-200 hover:bg-ember-500/20 transition"
         >
-          <Sparkles size={15} /> ✨ View premium showcase <ArrowRight size={15} />
+          <Sparkles size={15} /> View showcase <ArrowRight size={15} />
         </Link>
       </div>
 

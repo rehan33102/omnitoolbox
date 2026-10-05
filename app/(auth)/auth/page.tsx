@@ -299,13 +299,13 @@ function AuthForm() {
               </div>
             )}
             <Button type="submit" disabled={busy} className="w-full" size="lg">
-              {busy ? "Please wait…" : mode === "login" ? "Log in 🚀" : "Create Account 🎉"}
+              {busy ? "Please wait…" : mode === "login" ? "Log in" : "Create Account"}
             </Button>
           </form>
 
           <p className="text-xs text-zinc-500 text-center mt-6">
             {mode === "signup" ? (
-              <>Your account will be created instantly — no OTP required! Already registered?{" "}
+              <>No OTP required. Already registered?{" "}
                 <button onClick={() => setMode("login")} className="text-brand-700 dark:text-brand-400 font-semibold hover:underline">Log in</button></>
             ) : (
               <>New here?{" "}

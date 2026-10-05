@@ -59,8 +59,7 @@ export default function HireMePage() {
           Hire <span className="text-gradient-warm">Me</span>
         </h1>
         <p className="text-zinc-500 max-w-2xl mx-auto">
-          I build tools, videos, websites and apps. Pick a service below —
-          you'll land on WhatsApp with a ready message. Just hit send!
+          Pick a service below — you'll land on WhatsApp with a ready message.
         </p>
       </div>
 
@@ -88,7 +87,7 @@ export default function HireMePage() {
         <Sparkles size={24} className="mx-auto mb-3 text-ember-500" />
         <h2 className="font-bold text-xl mb-2">Something else in mind?</h2>
         <p className="text-sm text-zinc-500 mb-4">
-          Tell me what you need — I love building new things!
+          Tell me what you need.
         </p>
         <a
           href={waLink("Assalam o alaikum! I have a custom project in mind. Can we discuss?")}

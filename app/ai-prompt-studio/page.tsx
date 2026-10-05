@@ -31,7 +31,6 @@ export default function PromptStudioPage() {
       <div className="max-w-3xl mb-8">
         <div className="flex gap-2 mb-4">
           <Badge variant="ai">AI Tool</Badge>
-          <Badge variant="new">Free</Badge>
         </div>
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           AI Prompt <span className="text-gradient">Studio</span>

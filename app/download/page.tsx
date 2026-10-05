@@ -13,14 +13,11 @@ export default function DownloadPage() {
   return (
     <div className="container py-10 max-w-4xl">
       <div className="text-center mb-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-ember-600 dark:text-ember-400 mb-3">
-          Free forever
-        </p>
         <h1 className="font-display text-3xl md:text-5xl font-bold mb-4">
           Download <span className="text-gradient-warm">Omni Tool Box</span>
         </h1>
         <p className="text-zinc-500 max-w-2xl mx-auto">
-          Get the app on your phone or PC. Always up to date — the app loads the live website!
+          Get the app on your phone or PC.
         </p>
       </div>
 
@@ -43,7 +40,7 @@ export default function DownloadPage() {
             className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold px-6 py-3 hover:scale-105 transition">
             <Download size={18} /> Download APK
           </a>
-          <p className="text-xs text-zinc-500 mt-3">v10 · Android 7.0+ · Downloads fixed! 📥</p>
+          <p className="text-xs text-zinc-500 mt-3">v11 · Android 7.0+</p>
         </Card>
 
         {/* PC */}

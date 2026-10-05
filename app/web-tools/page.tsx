@@ -31,8 +31,7 @@ export default function WebToolsPage() {
           Web <span className="text-gradient">Tools</span>
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
-          Handy everyday utilities that run entirely in your browser.
-          Scannable QR codes and unbreakable passwords — zero uploads, zero cost.
+          QR codes and passwords — right in your browser.
         </p>
       </div>
 

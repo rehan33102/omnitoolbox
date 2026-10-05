@@ -29,14 +29,12 @@ export default function CalculatorsPage() {
       <div className="max-w-3xl mb-8">
         <div className="flex gap-2 mb-4">
           <Badge variant="web">Calculators</Badge>
-          <Badge variant="new">100% free</Badge>
         </div>
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           Everyday <span className="text-gradient">Calculators</span>
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
-          Live currency rates, instant unit conversions, BMI & calorie targets,
-          and exact age breakdowns — all calculated right in your browser.
+          Currency rates, unit conversions, BMI, calories and age — in your browser.
         </p>
       </div>
 

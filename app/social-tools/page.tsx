@@ -27,14 +27,12 @@ export default function SocialToolsPage() {
       <div className="max-w-3xl mb-8">
         <div className="flex gap-2 mb-4">
           <Badge variant="social">Social Tools</Badge>
-          <Badge variant="new">Growth kit</Badge>
         </div>
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
           Social Media <span className="text-gradient">Growth Suite</span>
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
-          Fancy unicode text, scroll-stopping bios and high-reach hashtags —
-          everything you need to grow on Instagram & TikTok.
+          Fancy text, bios and hashtags for Instagram & TikTok.
         </p>
       </div>
 
