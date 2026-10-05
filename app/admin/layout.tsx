@@ -50,7 +50,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </span>
           <h1 className="font-display text-xl font-bold mb-2">Access denied</h1>
           <p className="text-sm text-zinc-500">
-            {user.email} is signed in but doesn't have admin access.
+            {user.email} is signed in but doesn&apos;t have admin access.
           </p>
         </Card>
       </div>

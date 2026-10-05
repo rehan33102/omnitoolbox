@@ -172,7 +172,7 @@ export default function HashtagFinder() {
       {(niche === "custom" && customTopic.trim()) && (
         <div className="pt-4 border-t border-white/10 space-y-4">
           <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-            🚀 Generate for: <span className="text-violet-500">"{customTopic.trim()}"</span>
+            Generate for: <span className="text-violet-500">&ldquo;{customTopic.trim()}&rdquo;</span>
           </p>
           <div className="grid grid-cols-2 gap-3">
             <Button size="sm" onClick={() => { setShowDesc(!showDesc); setShowSeo(false); }} className="w-full">

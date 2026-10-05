@@ -769,7 +769,7 @@ export default function BackgroundStudio() {
           New photo
         </button>
       </div>
-      <p className="text-center text-[11px] text-zinc-600">HD renders at your photo's full original resolution.</p>
+      <p className="text-center text-[11px] text-zinc-600">HD renders at your photo&apos;s full original resolution.</p>
     </div>
   );
 }

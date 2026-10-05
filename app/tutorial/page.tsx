@@ -93,7 +93,7 @@ export default function TutorialPage() {
         <Sparkles size={24} className="mx-auto mb-3 text-ember-500" />
         <h2 className="font-bold text-xl mb-2">Want a tutorial for a specific tool?</h2>
         <p className="text-sm text-zinc-500 mb-4">
-          Message us on WhatsApp and we'll make one for you!
+          Message us on WhatsApp and we&apos;ll make one for you!
         </p>
         <a
           href="https://wa.me/923407560964?text=Assalam%20o%20alaikum!%20Please%20make%20a%20tutorial%20for%20..."

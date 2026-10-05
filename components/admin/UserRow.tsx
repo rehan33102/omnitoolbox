@@ -234,7 +234,7 @@ export default function UserRow({
             </div>
           ) : !creations || creations.length === 0 ? (
             <p className="text-sm text-zinc-500 py-3">
-              No creations yet. When this user generates voiceovers, images, QR codes, PDFs or videos, they'll appear here.
+              No creations yet. When this user generates voiceovers, images, QR codes, PDFs or videos, they&apos;ll appear here.
             </p>
           ) : (
             <div className="space-y-3">

@@ -59,7 +59,7 @@ export default function HireMePage() {
           Hire <span className="text-gradient-warm">Me</span>
         </h1>
         <p className="text-zinc-500 max-w-2xl mx-auto">
-          Pick a service below — you'll land on WhatsApp with a ready message.
+          Pick a service below — you&apos;ll land on WhatsApp with a ready message.
         </p>
       </div>
 
