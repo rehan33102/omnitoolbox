@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { TOOLS, mergeTools } from "@/lib/tools-registry";
 import { createAdminClient } from "@/lib/supabase/admin";
 

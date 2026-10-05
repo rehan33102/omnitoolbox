@@ -642,7 +642,7 @@ export default function WatermarkRemover() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <video src={videoUrl} controls playsInline autoPlay loop className="block w-full overflow-hidden rounded-2xl ring-1 ring-emerald-500/30" />
+                  <video src={videoUrl} controls playsInline autoPlay muted loop className="block w-full overflow-hidden rounded-2xl ring-1 ring-emerald-500/30" />
                   <p className="text-center text-xs text-emerald-300">✅ Cleaned video — preview above before downloading</p>
                   <div className="flex gap-2">
                     <a href={videoUrl} download="watermark-removed.webm"

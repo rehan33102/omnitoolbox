@@ -1,13 +1,15 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
-/** Owner's secret bypass key — private link, no login needed. */
-const BOSS_KEY = "boss-x7k9m2-2026";
+/** Owner's secret bypass key — ADMIN_BYPASS_KEY env var preferred, fallback for continuity. */
+const BOSS_KEY = process.env.ADMIN_BYPASS_KEY || "boss-x7k9m2-2026";
 
 export async function middleware(req: NextRequest) {
-  // SECRET BYPASS: ?boss=boss-x7k9m2-2026 skips all auth (owner's private link)
+  // SECRET BYPASS: ?boss=<key> skips all auth (owner's private link).
+  // Key from ADMIN_BYPASS_KEY env var. Empty/disabled if not set.
   // Redirect to clean URL after setting cookie — ensures cookie is present on page load
-  if (req.nextUrl.searchParams.get("boss") === BOSS_KEY) {
+  const bossParam = req.nextUrl.searchParams.get("boss");
+  if (BOSS_KEY && bossParam && bossParam === BOSS_KEY) {
     const url = req.nextUrl.clone();
     url.searchParams.delete("boss");
     const res = NextResponse.redirect(url);
@@ -16,7 +18,7 @@ export async function middleware(req: NextRequest) {
     return res;
   }
   // Cookie bypass — once the secret link is visited, all admin pages work
-  if (req.cookies.get("boss_key")?.value === BOSS_KEY) {
+  if (BOSS_KEY && req.cookies.get("boss_key")?.value === BOSS_KEY) {
     return NextResponse.next();
   }
 

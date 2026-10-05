@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { execSync } from "child_process";
 
+export const dynamic = "force-dynamic";
+
 // Returns the current deployed version (git commit hash).
 // The AutoUpdater client polls this; when the hash changes, the page auto-reloads
 // so users always get the latest version without doing anything.

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 
 // Current OmniBox Android app release. The in-app updater (MainActivity)
 // polls this endpoint on startup; if versionCode is higher than the

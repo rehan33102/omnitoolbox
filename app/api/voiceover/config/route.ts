@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+export const dynamic = "force-dynamic";
 import { EDGE_LANGUAGES, EDGE_STYLES } from "@/lib/edge-tts";
 
 export async function GET() {

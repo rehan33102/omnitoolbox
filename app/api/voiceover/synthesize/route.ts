@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { edgeTts, resolveEdgeParams, EDGE_LANGUAGES, type EdgeTtsOptions, type SpeechCue } from "@/lib/edge-tts";
+import { rateLimit } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
@@ -137,6 +138,12 @@ function num(v: unknown): number | undefined {
 }
 
 export async function POST(req: NextRequest) {
+  // Rate limit: 25 requests/min per IP (protects Edge TTS quota)
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (!rateLimit(`tts:${ip}`, 25)) {
+    return NextResponse.json({ error: "Too many requests. Please wait a moment." }, { status: 429 });
+  }
+
   let body: Body;
   try {
     body = await req.json();

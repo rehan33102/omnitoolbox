@@ -16,7 +16,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // SECRET BYPASS: owner's private link sets boss_key cookie — skip all auth.
   // Middleware redirects ?boss=... to clean URL after setting cookie, so cookie is always present here.
   const cookieStore = await cookies();
-  const isBoss = cookieStore.get("boss_key")?.value === "boss-x7k9m2-2026";
+  const bypassKey = process.env.ADMIN_BYPASS_KEY || "boss-x7k9m2-2026";
+  const isBoss = !!bypassKey && cookieStore.get("boss_key")?.value === bypassKey;
   if (isBoss) {
     return (
       <div className="container py-8">
