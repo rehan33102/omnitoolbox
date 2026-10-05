@@ -146,15 +146,9 @@ export default function Header() {
       </div>
 
       <Drawer open={drawer} onClose={() => setDrawer(false)} title={settings.siteName}>
-        <div className="mb-5">
-          {tools.length > 0 ? (
-            <SmartSearch tools={tools} variant="compact" onNavigate={() => setDrawer(false)} />
-          ) : (
-            <div className="p-4 text-center text-sm text-zinc-500">Loading search...</div>
-          )}
-        </div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 mb-3 px-1">
-          Menu
+        {/* Tools list — always shows, no API dependency */}
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-3 px-1">
+          All Tools
         </p>
         <nav className="flex flex-col gap-2">
           {NAV_LINKS.map((l) => (
@@ -173,19 +167,18 @@ export default function Header() {
                 "grid size-11 shrink-0 place-items-center rounded-xl border transition-transform duration-200 group-hover:scale-110",
                 pathname === l.href
                   ? "bg-gradient-to-br from-brand-500 to-accent-500 border-brand-400/40 text-white shadow-lg"
-                  : "bg-black/[0.04] dark:bg-white/[0.07] border-black/10 dark:border-white/10 text-zinc-600 dark:text-zinc-300"
+                  : "bg-black/[0.04] dark:bg-white/[0.06] border-black/10 dark:border-white/10 text-zinc-700 dark:text-zinc-300"
               )}>
-                <ToolIcon name={l.icon} size={19} />
+                <ToolIcon name={l.icon} size={18} />
               </span>
-              <span className={cn(
-                "font-display font-semibold text-[15px] tracking-tight",
-                pathname === l.href ? "text-zinc-900 dark:text-white" : "text-zinc-700 dark:text-zinc-200"
-              )}>
-                {l.label}
+              <span className="flex-1">
+                <span className={cn(
+                  "block text-sm font-semibold",
+                  pathname === l.href ? "text-zinc-900 dark:text-white" : "text-zinc-800 dark:text-zinc-200"
+                )}>
+                  {l.label}
+                </span>
               </span>
-              {pathname === l.href && (
-                <span className="ml-auto size-2 rounded-full bg-brand-500" />
-              )}
             </Link>
           ))}
         </nav>
