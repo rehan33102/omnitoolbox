@@ -52,7 +52,7 @@ export default function SignupPage() {
   return (
     <Card>
       <h1 className="font-display text-2xl font-bold mb-1">Create account</h1>
-      <p className="text-sm text-zinc-500 mb-6">Free forever. Save prompt history and vote on AI tools.</p>
+      <p className="text-sm text-zinc-500 mb-6">Save prompt history and vote on AI tools.</p>
       <form onSubmit={signup} className="space-y-4">
         <Input label="Email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
         <Input label="Password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 6 characters" />
