@@ -137,7 +137,7 @@ export default function SmartSearch({
     }
   };
 
-  const showDropdown = open && query.trim().length > 0 && !hero;
+  const showDropdown = open && query.trim().length > 0;
 
   return (
     <div ref={rootRef} className={cn("relative", hero ? "w-full" : "w-full")}>
