@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import AutoUpdater from "@/components/AutoUpdater";
 import { Toaster, ToastProvider } from "@/components/ui/Toast";
 import { siteUrl } from "@/lib/utils";
 import { SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ToastProvider>
             <ServiceWorkerRegister />
+            <AutoUpdater />
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
