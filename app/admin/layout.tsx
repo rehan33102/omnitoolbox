@@ -16,14 +16,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   // SECRET BYPASS: owner's private link sets boss_key cookie — skip all auth.
   // Middleware redirects ?boss=... to clean URL after setting cookie, so cookie is always present here.
   const cookieStore = await cookies();
-  const bypassKey = process.env.ADMIN_BYPASS_KEY || "boss-x7k9m2-2026";
+  const bypassKey = process.env.ADMIN_BYPASS_KEY;
   const isBoss = !!bypassKey && cookieStore.get("boss_key")?.value === bypassKey;
   if (isBoss) {
     return (
       <div className="container py-8">
         <div className="mb-6">
-          <h1 className="font-display text-2xl font-bold">Admin Dashboard 🔐</h1>
-          <p className="text-sm text-zinc-500">Manage tools, monetization and SEO — changes apply instantly, no redeploy.</p>
+          <h1 className="font-display text-2xl font-bold">Admin Dashboard</h1>
         </div>
         <AdminMobileNav />
         <div className="flex gap-6 items-start">
@@ -62,7 +61,6 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="container py-8">
       <div className="mb-6">
         <h1 className="font-display text-2xl font-bold">Admin Dashboard</h1>
-        <p className="text-sm text-zinc-500">Manage tools, monetization and SEO — changes apply instantly, no redeploy.</p>
       </div>
       {/* Mobile nav — the sidebar is hidden on phones, so this is the only way to reach sub-pages on mobile */}
       <AdminMobileNav />

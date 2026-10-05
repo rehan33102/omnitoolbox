@@ -1,17 +1,14 @@
 import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
-// Current OmniBox Android app release. The in-app updater (MainActivity)
-// polls this endpoint on startup; if versionCode is higher than the
-// installed app's, it shows an "Update available" popup.
+// Current OmniBox Android app release.
+// NOTE: The in-app update popup has been REMOVED from both apps (v12+).
+// This endpoint is kept for reference only — apps no longer poll it.
 const LATEST = {
-  versionCode: 11,
-  versionName: "11",
+  versionCode: 12,
+  versionName: "12",
   apkUrl: "https://omnitoolbox-zeta.vercel.app/downloads/omnibox-app.apk",
-  changelog:
-    "• v11 — AUTO-UPDATE! 🔄\n" +
-    "• The app now downloads updates automatically\n" +
-    "• No buttons to press — everything is automatic!",
+  changelog: "Update popup removed — the app loads the live website automatically.",
 };
 
 export async function GET() {

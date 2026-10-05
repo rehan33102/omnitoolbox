@@ -40,7 +40,7 @@ export default function DownloadPage() {
             className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-bold px-6 py-3 hover:scale-105 transition">
             <Download size={18} /> Download APK
           </a>
-          <p className="text-xs text-zinc-500 mt-3">v11 · Android 7.0+</p>
+          <p className="text-xs text-zinc-500 mt-3">v12 · Android 7.0+</p>
         </Card>
 
         {/* PC */}
