@@ -120,9 +120,41 @@ function downloadBlob(blob: Blob, filename: string) {
   downloadBlobFile(blob, filename);
 }
 
+const FORM_KEY = "omnitoolbox-voiceover-form";
+
+interface SavedForm {
+  lang: string; text: string; edgeVoice: "male" | "female"; edgeStyle: string;
+  ratePct: number; pitchHz: number; useCustomRate: boolean; useCustomPitch: boolean;
+  pauseSec: number; useCustomPause: boolean;
+}
+
+function loadSavedForm(): Partial<SavedForm> {
+  try {
+    const raw = localStorage.getItem(FORM_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* ignore */ }
+  return {};
+}
+
 export default function VoiceoverStudio() {
-  const [lang, setLang] = useState("en");
-  const [text, setText] = useState(DEFAULT_TEXT);
+  const [savedForm] = useState<SavedForm | null>(() => {
+    if (typeof window === "undefined") return null;
+    const s = loadSavedForm();
+    return {
+      lang: s.lang ?? "en",
+      text: s.text ?? DEFAULT_TEXT,
+      edgeVoice: s.edgeVoice ?? "female",
+      edgeStyle: s.edgeStyle ?? "sleep",
+      ratePct: s.ratePct ?? 0,
+      pitchHz: s.pitchHz ?? -4,
+      useCustomRate: s.useCustomRate ?? false,
+      useCustomPitch: s.useCustomPitch ?? true,
+      pauseSec: s.pauseSec ?? 0.4,
+      useCustomPause: s.useCustomPause ?? true,
+    };
+  });
+  const [lang, setLang] = useState(savedForm?.lang ?? "en");
+  const [text, setText] = useState(savedForm?.text ?? DEFAULT_TEXT);
   const [generating, setGenerating] = useState(false);
   const [genStep, setGenStep] = useState("");
   const [audioUrl, setAudioUrl] = useState("");
@@ -132,17 +164,29 @@ export default function VoiceoverStudio() {
   // Edge neural voice controls (free, primary engine).
   const [edgeLangs, setEdgeLangs] = useState<EdgeLang[]>(EDGE_LANGS_FALLBACK);
   const [edgeStyles, setEdgeStyles] = useState<EdgeStyle[]>(EDGE_STYLES_FALLBACK);
-  const [edgeVoice, setEdgeVoice] = useState<"male" | "female">("female");
-  const [edgeStyle, setEdgeStyle] = useState("sleep");
-  const [ratePct, setRatePct] = useState(0);   // speed override, -40..40 (0 = style default)
-  const [pitchHz, setPitchHz] = useState(0);   // pitch override, -15..15 (0 = style default)
-  const [useCustomRate, setUseCustomRate] = useState(false);
-  const [useCustomPitch, setUseCustomPitch] = useState(false);
-  const [pauseSec, setPauseSec] = useState(0.5);
-  const [useCustomPause, setUseCustomPause] = useState(false);
+  const [edgeVoice, setEdgeVoice] = useState<"male" | "female">(savedForm?.edgeVoice ?? "female");
+  const [edgeStyle, setEdgeStyle] = useState(savedForm?.edgeStyle ?? "sleep");
+  const [ratePct, setRatePct] = useState(savedForm?.ratePct ?? 0);   // speed override, -40..40 (0 = style default)
+  const [pitchHz, setPitchHz] = useState(savedForm?.pitchHz ?? -4);   // pitch override, -15..15 (default -4)
+  const [useCustomRate, setUseCustomRate] = useState(savedForm?.useCustomRate ?? false);
+  const [useCustomPitch, setUseCustomPitch] = useState(savedForm?.useCustomPitch ?? true);
+  const [pauseSec, setPauseSec] = useState(savedForm?.pauseSec ?? 0.4);
+  const [useCustomPause, setUseCustomPause] = useState(savedForm?.useCustomPause ?? true);
   const [engine, setEngine] = useState<TtsEngine>("");
   const [previewing, setPreviewing] = useState(false);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Persist form state — script and settings survive navigation/refresh
+  useEffect(() => {
+    try {
+      const data: SavedForm = {
+        lang, text, edgeVoice, edgeStyle,
+        ratePct, pitchHz, useCustomRate, useCustomPitch,
+        pauseSec, useCustomPause,
+      };
+      localStorage.setItem(FORM_KEY, JSON.stringify(data));
+    } catch { /* ignore */ }
+  }, [lang, text, edgeVoice, edgeStyle, ratePct, pitchHz, useCustomRate, useCustomPitch, pauseSec, useCustomPause]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const stopRef = useRef(false);
   const { toast } = useToast();
