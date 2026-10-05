@@ -398,7 +398,7 @@ export default function VoiceoverStudio() {
             <Languages size={15} className="text-brand-700 dark:text-brand-400" /> Language
           </label>
           <select id="vo-lang" value={lang} onChange={(e) => setLang(e.target.value)} className="input-base w-full">
-            <optgroup label="✨ Neural voices (Microsoft · free)">
+            <optgroup label="Neural Voices">
               {edgeLangs.map((l) => (
                 <option key={l.code} value={l.code}>
                   {l.flag} {l.label}
@@ -541,7 +541,7 @@ export default function VoiceoverStudio() {
           <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4 space-y-3 animate-fade-up">
             {engine === "edge" || engine === "elevenlabs" ? (
               <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1">
-                ✨ {engine === "edge" ? "Neural voice (Microsoft)" : "Premium neural voice (ElevenLabs)"}
+                ✨ {engine === "edge" ? "Neural Voice" : "Premium Neural Voice"}
               </p>
             ) : engine === "google-fallback" || engine === "google" ? (
               <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1">
