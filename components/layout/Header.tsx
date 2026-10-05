@@ -150,7 +150,7 @@ export default function Header() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 mb-4 px-1">
           All Tools
         </p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-4 gap-2.5">
           {NAV_LINKS.map((l) => (
             <Link
               key={l.href}
