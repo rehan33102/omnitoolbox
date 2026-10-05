@@ -64,13 +64,20 @@ function ExplorerInner({ tools }: { tools: Tool[] }) {
             variant="hero"
             initialQuery={params.get("q") ?? ""}
             onQueryChange={setQuery}
+            onDropdownChange={(open) => {
+              // On mobile, hide pills when dropdown opens to avoid overlap
+              const pills = document.getElementById("category-pills");
+              if (pills) {
+                pills.style.display = open && window.innerWidth < 768 ? "none" : "";
+              }
+            }}
           />
         </div>
       </Reveal>
 
-      {/* Category pills — always visible, grid filters live below */}
+      {/* Category pills — hidden on mobile when search dropdown is open */}
       <Reveal delay={160}>
-        <div className="flex flex-wrap justify-center gap-2 mb-10">
+        <div id="category-pills" className="flex flex-wrap justify-center gap-2 mb-10">
           <button
             onClick={() => setCat("all")}
             className={cn("btn-base px-4 py-2 text-sm rounded-full border",
