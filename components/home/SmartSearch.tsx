@@ -144,7 +144,17 @@ export default function SmartSearch({
     }
   };
 
-  const showDropdown = open && query.trim().length > 0 && !hero;
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile for showing dropdown vs cards
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  const showDropdown = open && query.trim().length > 0 && (!hero || isMobile);
 
   // Notify parent when dropdown opens/closes (to hide overlapping UI)
   useEffect(() => {

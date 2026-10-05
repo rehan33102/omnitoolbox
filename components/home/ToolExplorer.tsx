@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { SearchX, Sparkles } from "lucide-react";
 import SmartSearch from "./SmartSearch";
@@ -25,13 +25,24 @@ function ExplorerInner({ tools }: { tools: Tool[] }) {
   const overrides = useToolOverrides();
   const liveTools = useMemo(() => applyToolOverrides(tools, overrides), [tools, overrides]);
 
+  const [isMobileView, setIsMobileView] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobileView(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   const filtered = useMemo(() => {
     const q = query.trim();
+    // On mobile, don't filter cards — dropdown handles results
+    if (isMobileView && q) return [];
     const base = cat === "all" ? liveTools : liveTools.filter((t) => t.category === cat);
     if (!q) return base;
     const slugs = new Set(smartSearch(liveTools, q, 100).map((h) => h.tool.slug));
     return base.filter((t) => slugs.has(t.slug));
-  }, [liveTools, query, cat]);
+  }, [liveTools, query, cat, isMobileView]);
 
   const alternatives = useMemo(
     () => (query.trim() && filtered.length === 0 ? findAlternatives(liveTools, query, 3) : []),
