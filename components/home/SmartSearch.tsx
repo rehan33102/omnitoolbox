@@ -94,13 +94,17 @@ export default function SmartSearch({
 
   useEffect(() => setActive(0), [query]);
 
-  // Close dropdown on outside click
+  // Close dropdown on outside click/touch
   useEffect(() => {
-    const onDoc = (e: MouseEvent) => {
+    const onDoc = (e: MouseEvent | TouchEvent) => {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    document.addEventListener("touchstart", onDoc, { passive: true });
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("touchstart", onDoc);
+    };
   }, []);
 
   // "/" focuses the hero search
@@ -170,8 +174,11 @@ export default function SmartSearch({
           ref={inputRef}
           value={query}
           onChange={(e) => {
-            setQuery(e.target.value);
+            const v = e.target.value;
+            setQuery(v);
             setOpen(true);
+            // Call directly for immediate mobile response (useEffect also covers this)
+            onQueryChange?.(v);
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={onKeyDown}
