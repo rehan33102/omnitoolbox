@@ -55,7 +55,9 @@ function AuthForm() {
   const router = useRouter();
   const params = useSearchParams();
   const { toast } = useToast();
-  const [mode, setMode] = useState<Mode>("login");
+  const [mode, setMode] = useState<Mode>(() =>
+    params.get("mode") === "signup" ? "signup" : "login"
+  );
   const [step, setStep] = useState<Step>("form");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");

@@ -17,8 +17,8 @@ export default function DownloadAppButton() {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <Button size="lg" variant="secondary" onClick={() => handleClick("apk")}>
+    <div className="flex flex-wrap items-center justify-center gap-3">
+      <Button size="md" variant="secondary" onClick={() => handleClick("apk")}>
         {clicked === "apk" ? (
           <>
             <Loader2 size={17} className="animate-spin" /> Starting download…
@@ -29,7 +29,7 @@ export default function DownloadAppButton() {
           </>
         )}
       </Button>
-      <Button size="lg" onClick={() => handleClick("exe")}>
+      <Button size="md" onClick={() => handleClick("exe")}>
         {clicked === "exe" ? (
           <>
             <Loader2 size={17} className="animate-spin" /> Starting download…

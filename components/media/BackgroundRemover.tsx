@@ -236,7 +236,7 @@ export default function BackgroundRemover() {
       } catch {
         setEngine("failed");
         setBusy(false);
-        setError("The AI engine couldn't start. Check your internet connection and tap Retry.");
+        setError("Background removal is temporarily unavailable. The server is busy and the on-device AI couldn't download. Please check your internet connection and try again in a moment.");
         return;
       }
     }

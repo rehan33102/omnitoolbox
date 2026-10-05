@@ -11,6 +11,7 @@ import Drawer from "@/components/ui/Drawer";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import SmartSearch from "@/components/home/SmartSearch";
 import LogoMark from "@/components/layout/LogoMark";
+import ProfileMenu from "@/components/layout/ProfileMenu";
 import ToolIcon from "@/components/ui/ToolIcon";
 import type { Tool } from "@/types";
 
@@ -76,6 +77,7 @@ export default function Header() {
             <SmartSearch tools={tools} variant="compact" />
           </div>
           <ThemeToggle />
+          <ProfileMenu />
           <button
             aria-label="Open menu"
             onClick={() => setDrawer(true)}
