@@ -13,7 +13,8 @@ import Skeleton from "@/components/ui/Skeleton";
 import Badge from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
-import { listBlobKinds, listByKind, type BlobMeta } from "@/lib/db";
+import { listBlobKinds, listByKind, getBlob, type BlobMeta } from "@/lib/db";
+import { downloadBlob } from "@/lib/download";
 import { cn } from "@/lib/utils";
 
 interface Profile {
@@ -96,6 +97,29 @@ export default function DashboardPage() {
     await supabase.auth.signOut();
     toast({ title: "Logged out. See you soon! 👋", variant: "success" });
     window.location.href = "/";
+  };
+
+  // Open a recent item directly — download/view the actual file
+  const openItem = async (item: BlobMeta) => {
+    try {
+      const data = await getBlob(item.id);
+      if (!data?.blob) {
+        toast({ title: "File not found", variant: "error" });
+        return;
+      }
+      // For images and PDFs, open in new tab; for others, download
+      const blob = data.blob as Blob;
+      const url = URL.createObjectURL(blob);
+      if (item.kind === "image" || item.kind === "pdf") {
+        window.open(url, "_blank");
+      } else {
+        downloadBlob(blob, item.name);
+      }
+      // Clean up after a delay
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    } catch {
+      toast({ title: "Could not open file", variant: "error" });
+    }
   };
 
   if (loading) {
@@ -190,7 +214,11 @@ export default function DashboardPage() {
               const km = KIND_META[item.kind];
               const Icon = km?.icon ?? FileText;
               return (
-                <Link key={item.id} href={`/library?kind=${item.kind}`} className="block">
+                <button
+                  key={item.id}
+                  onClick={() => openItem(item)}
+                  className="w-full block text-left"
+                >
                   <div className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-xl hover:bg-black/[0.03] dark:hover:bg-white/5 transition cursor-pointer">
                     <span className="p-2 rounded-lg bg-black/5 dark:bg-white/10">
                       <Icon size={16} className="text-zinc-600 dark:text-zinc-400" />
@@ -201,9 +229,11 @@ export default function DashboardPage() {
                         {km?.label ?? item.kind} · {new Date(item.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
                       </p>
                     </div>
-                    <span className="text-brand-600 dark:text-brand-400 text-sm shrink-0">→</span>
+                    <span className="text-xs text-brand-600 dark:text-brand-400 font-medium shrink-0">
+                      Open →
+                    </span>
                   </div>
-                </Link>
+                </button>
               );
             })}
           </div>
