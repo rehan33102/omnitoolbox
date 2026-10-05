@@ -52,19 +52,26 @@ export default function AdminAuthPage() {
     try {
       const supabase = createClient();
       if (mode === "signup") {
-        // 1. Create account — Supabase sends 6-digit OTP to email
+        // Create account — NO OTP, instant activation
         const { error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
           options: { emailRedirectTo: `${window.location.origin}/admin` },
         });
         if (error) throw error;
-        setStep("otp");
-        toast({
-          title: "OTP bhej diya! 📧",
-          description: `${email.trim()} par 6-digit code check karo.`,
-          variant: "success",
+        // Auto-confirm instantly
+        await fetch("/api/auth/auto-confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim() }),
+        }).catch(() => {});
+        // Sign in directly
+        const { error: loginError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
         });
+        if (loginError) throw loginError;
+        await finishAuth();
       } else {
         // Login — direct, no OTP (already verified during signup)
         const { error } = await supabase.auth.signInWithPassword({

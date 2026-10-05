@@ -104,12 +104,24 @@ function AuthForm() {
           },
         });
         if (error) throw error;
-        setStep("otp");
+        // NO OTP — auto-confirm instantly via server
+        await fetch("/api/auth/auto-confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: cleanEmail }),
+        }).catch(() => {});
+        // Now sign in directly
+        const { error: loginError } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        });
+        if (loginError) throw loginError;
         toast({
-          title: "OTP sent! 📧",
-          description: `Check ${cleanEmail} for your 6-digit code.`,
+          title: "Account ban gaya! 🎉",
+          description: "Welcome to Omni Tool Box!",
           variant: "success",
         });
+        goNext();
         return;
       }
 
