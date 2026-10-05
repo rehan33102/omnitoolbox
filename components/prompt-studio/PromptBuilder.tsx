@@ -112,22 +112,24 @@ export default function PromptBuilder() {
   const words = finalPrompt ? finalPrompt.split(/\s+/).length : 0;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid gap-4 sm:gap-6 lg:grid-cols-2 w-full max-w-full overflow-hidden">
       {/* ── Builder ─────────────────────────────── */}
-      <Card className="space-y-5">
+      <Card className="space-y-4 sm:space-y-5 w-full max-w-full overflow-hidden">
         <div className="flex items-center gap-2">
           <Wand2 size={18} className="text-brand-700 dark:text-brand-400" />
           <h2 className="font-display font-semibold">Build your prompt</h2>
         </div>
 
-        <Tabs defaultValue={model}>
-          <TabsList>
-            {MODELS.map((m) => (
-              <TabsTrigger key={m} value={m} onClick={() => setModel(m)}>
-                {MODEL_META[m].label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        <Tabs defaultValue={model} className="w-full max-w-full">
+          <div className="overflow-x-auto -mx-1 px-1">
+            <TabsList className="w-max min-w-full">
+              {MODELS.map((m) => (
+                <TabsTrigger key={m} value={m} onClick={() => setModel(m)} className="whitespace-nowrap">
+                  {MODEL_META[m].label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </div>
           {MODELS.map((m) => (
             <TabsContent key={m} value={m}>
               <p className="text-xs text-zinc-500">{MODEL_META[m].tagline}</p>
@@ -241,8 +243,8 @@ export default function PromptBuilder() {
       </Card>
 
       {/* ── Output ──────────────────────────────── */}
-      <div className="space-y-4">
-        <Card className="relative">
+      <div className="space-y-4 w-full max-w-full overflow-hidden">
+        <Card className="relative w-full max-w-full overflow-hidden">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Sparkles size={16} className="text-accent-600 dark:text-accent-400" />
@@ -250,12 +252,12 @@ export default function PromptBuilder() {
             </div>
             <Badge variant="ai">{meta.label}</Badge>
           </div>
-          <pre className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-200 bg-black/30 rounded-xl p-4 min-h-[220px] max-h-[420px] overflow-y-auto font-sans">
+          <pre className="whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-200 bg-black/30 rounded-xl p-3 sm:p-4 min-h-[180px] sm:min-h-[220px] max-h-[320px] sm:max-h-[420px] overflow-y-auto overflow-x-hidden font-sans w-full max-w-full">
             {finalPrompt || <span className="text-zinc-500">Your optimized prompt will appear here…</span>}
           </pre>
-          <div className="flex items-center justify-between mt-3 text-xs text-zinc-500">
-            <span>{finalPrompt.length} chars · {words} words</span>
-            <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mt-3 text-xs text-zinc-500">
+            <span className="shrink-0">{finalPrompt.length} chars · {words} words</span>
+            <div className="flex gap-2 flex-wrap">
               <Button size="sm" variant="secondary" onClick={saveToHistory} disabled={!finalPrompt}>
                 <Save size={14} /> Save
               </Button>
