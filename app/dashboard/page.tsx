@@ -144,21 +144,27 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      {/* Stats */}
+      {/* Stats — clickable, go to library */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="!p-4">
-          <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold uppercase tracking-wide">
-            <Library size={14} /> Saved items
-          </div>
-          <p className="font-display text-3xl font-bold mt-1">{totalItems}</p>
-        </Card>
-        {Object.entries(KIND_META).map(([kind, { label, icon: Icon }]) => (
-          <Card key={kind} className="!p-4">
+        <Link href="/library">
+          <Card className="!p-4 hover:border-brand-500/40 hover:shadow-md transition cursor-pointer">
             <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold uppercase tracking-wide">
-              <Icon size={14} /> {label}
+              <Library size={14} /> Saved items
             </div>
-            <p className="font-display text-3xl font-bold mt-1">{counts[kind] ?? 0}</p>
+            <p className="font-display text-3xl font-bold mt-1">{totalItems}</p>
+            <p className="text-xs text-brand-600 dark:text-brand-400 mt-1">View all →</p>
           </Card>
+        </Link>
+        {Object.entries(KIND_META).map(([kind, { label, icon: Icon }]) => (
+          <Link key={kind} href={`/library?kind=${kind}`}>
+            <Card className="!p-4 hover:border-brand-500/40 hover:shadow-md transition cursor-pointer">
+              <div className="flex items-center gap-2 text-zinc-500 text-xs font-semibold uppercase tracking-wide">
+                <Icon size={14} /> {label}
+              </div>
+              <p className="font-display text-3xl font-bold mt-1">{counts[kind] ?? 0}</p>
+              <p className="text-xs text-brand-600 dark:text-brand-400 mt-1">View →</p>
+            </Card>
+          </Link>
         ))}
       </div>
 
@@ -184,17 +190,20 @@ export default function DashboardPage() {
               const km = KIND_META[item.kind];
               const Icon = km?.icon ?? FileText;
               return (
-                <div key={item.id} className="flex items-center gap-3 py-2.5">
-                  <span className="p-2 rounded-lg bg-black/5 dark:bg-white/10">
-                    <Icon size={16} className="text-zinc-600 dark:text-zinc-400" />
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{item.name}</p>
-                    <p className="text-xs text-zinc-500">
-                      {km?.label ?? item.kind} · {new Date(item.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
-                    </p>
+                <Link key={item.id} href={`/library?kind=${item.kind}`} className="block">
+                  <div className="flex items-center gap-3 py-2.5 px-2 -mx-2 rounded-xl hover:bg-black/[0.03] dark:hover:bg-white/5 transition cursor-pointer">
+                    <span className="p-2 rounded-lg bg-black/5 dark:bg-white/10">
+                      <Icon size={16} className="text-zinc-600 dark:text-zinc-400" />
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{item.name}</p>
+                      <p className="text-xs text-zinc-500">
+                        {km?.label ?? item.kind} · {new Date(item.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                      </p>
+                    </div>
+                    <span className="text-brand-600 dark:text-brand-400 text-sm shrink-0">→</span>
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
