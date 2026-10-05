@@ -95,9 +95,6 @@ export default function Footer() {
                 <Link href={l.href} className="hover:text-zinc-900 dark:hover:text-white transition">{l.label}</Link>
               </li>
             ))}
-            <li>
-              <Link href="/admin" className="hover:text-zinc-900 dark:hover:text-white transition">Admin</Link>
-            </li>
           </ul>
         </nav>
       </div>
