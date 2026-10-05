@@ -41,55 +41,43 @@ export default function Header() {
           </span>
         </Link>
 
-        <nav className="hidden 2xl:flex items-center gap-1 ml-4 max-w-full overflow-hidden">
-          {NAV_LINKS.slice(0, 5).map((l) => {
+        {/* Nike-style clean nav: text only, underline on hover */}
+        <nav className="hidden 2xl:flex items-center gap-7 ml-10">
+          {NAV_LINKS.slice(0, 6).map((l) => {
             const active = pathname === l.href;
             return (
               <Link
                 key={l.href}
                 href={l.href}
                 className={cn(
-                  "group relative flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 whitespace-nowrap",
+                  "relative text-[15px] font-medium tracking-tight transition-colors whitespace-nowrap py-1",
+                  "after:absolute after:bottom-0 after:left-0 after:h-[2px] after:bg-current after:transition-all after:duration-200",
                   active
-                    ? "text-white bg-gradient-to-r from-ember-500 to-magent-500 shadow-glow-warm scale-[1.02]"
-                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-gradient-to-r hover:from-ember-500/10 hover:to-magent-500/10 hover:shadow-md hover:-translate-y-px"
+                    ? "text-zinc-900 dark:text-white after:w-full"
+                    : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white after:w-0 hover:after:w-full"
                 )}
               >
-                <ToolIcon
-                  name={l.icon}
-                  size={15}
-                  className={cn(
-                    "transition-transform duration-200",
-                    active ? "scale-110" : "group-hover:scale-110 group-hover:rotate-6"
-                  )}
-                />
                 {l.label}
-                {active && (
-                  <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full bg-white/80" />
-                )}
               </Link>
             );
           })}
-          {/* "More" dropdown for remaining links — works at any zoom level */}
+          {/* "More" dropdown for remaining links */}
           <div className="relative group">
-            <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-all whitespace-nowrap">
+            <button className="relative text-[15px] font-medium tracking-tight text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors whitespace-nowrap py-1 after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-current group-hover:after:w-full after:transition-all after:duration-200">
               More
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="transition-transform group-hover:rotate-180">
-                <path d="m6 9 6 6 6-6"/>
-              </svg>
             </button>
-            <div className="absolute top-full right-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-              <div className="bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl p-2 min-w-[200px]">
-                {NAV_LINKS.slice(5).map((l) => {
+            <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div className="bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl p-2 min-w-[220px]">
+                {NAV_LINKS.slice(6).map((l) => {
                   const active = pathname === l.href;
                   return (
                     <Link
                       key={l.href}
                       href={l.href}
                       className={cn(
-                        "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors whitespace-nowrap",
+                        "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors whitespace-nowrap",
                         active
-                          ? "bg-gradient-to-r from-ember-500/20 to-magent-500/10 text-zinc-900 dark:text-white"
+                          ? "bg-black/5 dark:bg-white/10 text-zinc-900 dark:text-white"
                           : "text-zinc-600 dark:text-zinc-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-zinc-900 dark:hover:text-white"
                       )}
                     >
