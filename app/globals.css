@@ -384,6 +384,17 @@
   position: relative;
 }
 
+/* Soft subtle color shift for white text — gentle and elegant */
+.text-animated-soft {
+  background: linear-gradient(110deg, #ffffff, #fde68a, #fbcfe8, #ddd6fe, #ffffff);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: text-shimmer 8s ease-in-out infinite;
+  position: relative;
+}
+
 /* Soft glow behind text that pulses always */
 .text-glow-wrap {
   position: relative;

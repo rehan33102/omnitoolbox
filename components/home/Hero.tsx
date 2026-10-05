@@ -46,12 +46,12 @@ export default function Hero({ toolCount }: { toolCount: number }) {
         </p>
 
         {/* Giant condensed editorial headline — animated glow fun */}
-        <h1 className="font-condensed uppercase leading-[0.92] tracking-tight text-white text-[17vw] sm:text-7xl md:text-8xl lg:text-[7.5rem] select-none">
+        <h1 className="font-condensed uppercase leading-[0.92] tracking-tight text-[17vw] sm:text-7xl md:text-8xl lg:text-[7.5rem] select-none">
           <span className="block overflow-hidden">
-            <span className="block animate-hero-line text-glow-wrap text-fun-hover">Every tool</span>
+            <span className="block animate-hero-line text-animated-soft text-glow-wrap text-fun-hover">Every tool</span>
           </span>
           <span className="block overflow-hidden">
-            <span className="block animate-hero-line [animation-delay:120ms] text-glow-wrap text-fun-hover">
+            <span className="block animate-hero-line [animation-delay:120ms] text-animated-soft text-glow-wrap text-fun-hover">
               you need<span className="text-ember-500">.</span>
             </span>
           </span>
