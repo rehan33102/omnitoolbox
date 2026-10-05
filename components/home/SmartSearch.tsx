@@ -179,6 +179,12 @@ export default function SmartSearch({
           aria-expanded={showDropdown}
           aria-controls="smart-search-listbox"
           aria-label="Search tools"
+          inputMode="search"
+          enterKeyHint="search"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
           placeholder={hero ? "Search tools… try “photo maker”, “voice”, “qr”" : "Search tools…"}
           className={cn(
             "w-full bg-white/[0.05] backdrop-blur-xl border border-black/10 dark:border-white/10 text-zinc-900 dark:text-white",
