@@ -15,6 +15,8 @@ type RemoveFn = (image: Blob, config?: Record<string, unknown>) => Promise<Blob>
 const CDN_URLS = [
   "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm",
   "https://esm.sh/@imgly/background-removal@1.5.5",
+  "https://unpkg.com/@imgly/background-removal@1.5.5/dist/index.mjs",
+  "https://cdn.skypack.dev/@imgly/background-removal@1.5.5",
 ];
 
 // Give slow mobile connections a fair chance, but NEVER hang forever.
@@ -295,8 +297,11 @@ export default function BackgroundRemover() {
         <div className="rounded-xl border border-red-500/25 bg-red-500/10 p-4 flex items-start gap-3">
           <TriangleAlert size={18} className="text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm text-red-700 dark:text-red-200 font-medium">AI engine didn&apos;t start</p>
-            <p className="text-xs text-red-700 dark:text-red-200/70 mt-1">Check your internet connection and try again.</p>
+            <p className="text-sm text-red-700 dark:text-red-200 font-medium">AI model download failed</p>
+            <p className="text-xs text-red-700 dark:text-red-200/70 mt-1">
+              The AI model (44MB) couldn&apos;t download. This happens on slow connections.
+              Try: 1) Connect to WiFi 2) Click Retry 3) Wait 2-3 minutes for download.
+            </p>
           </div>
           <Button size="sm" variant="secondary" onClick={retryEngine}>
             <RefreshCw size={14} /> Retry
