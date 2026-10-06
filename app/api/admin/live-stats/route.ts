@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireAdminApi } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -11,7 +11,7 @@ export const runtime = "nodejs";
  * EventSource request carries cookies automatically.
  */
 export async function GET(request: Request) {
-  if (!(await requireAdminApi())) {
+  if (!(await requirePermission("dashboard"))) {
     return new Response(JSON.stringify({ error: "Forbidden" }), {
       status: 403,
       headers: { "Content-Type": "application/json" },
@@ -37,14 +37,85 @@ export async function GET(request: Request) {
           const hourCutoff = new Date(now - 60 * 60 * 1000).toISOString();
           const dayCutoff = new Date(now - 24 * 60 * 60 * 1000).toISOString();
 
-          // Live visitors: distinct viewers in last 5 min
-          const { data: liveEvents } = await supabase
+          // Live visitors: distinct viewers in last 5 min, plus a per-visitor
+          // detail list (country/city + opt-in precise coords). The geo columns
+          // only exist after migration 013 / the setup SQL — select defensively:
+          // try with geo columns, fall back to the bare select so the stream
+          // never breaks.
+          interface LiveEventRow {
+            viewer: string | null;
+            created_at: string;
+            country?: string | null;
+            city?: string | null;
+            latitude?: number | null;
+            longitude?: number | null;
+            user_id?: string | null;
+            user_email?: string | null;
+            user_name?: string | null;
+          }
+          let liveRows: LiveEventRow[] = [];
+          let geoOk = false;
+          const withGeo = await supabase
             .from("analytics_events")
-            .select("viewer")
+            .select("viewer, created_at, country, city, latitude, longitude, user_id, user_email, user_name")
             .gte("created_at", liveCutoff);
-          const liveVisitors = new Set(
-            (liveEvents ?? []).map((r) => r.viewer).filter(Boolean)
-          ).size;
+          if (withGeo.error) {
+            const bare = await supabase
+              .from("analytics_events")
+              .select("viewer, created_at")
+              .gte("created_at", liveCutoff);
+            liveRows = (bare.data ?? []) as LiveEventRow[];
+          } else {
+            liveRows = (withGeo.data ?? []) as LiveEventRow[];
+            geoOk = true;
+          }
+
+          // Aggregate to one entry per viewer: latest activity wins for the
+          // location fields, so the freshest reading is shown.
+          const byViewer = new Map<
+            string,
+            {
+              lastActive: string;
+              country: string | null;
+              city: string | null;
+              latitude: number | null;
+              longitude: number | null;
+              userId: string | null;
+              userEmail: string | null;
+              userName: string | null;
+            }
+          >();
+          for (const r of liveRows) {
+            if (!r.viewer) continue;
+            const e = byViewer.get(r.viewer) ?? {
+              lastActive: "", country: null, city: null, latitude: null, longitude: null,
+              userId: null, userEmail: null, userName: null,
+            };
+            if (r.created_at > e.lastActive) e.lastActive = r.created_at;
+            if (r.country) e.country = r.country;
+            if (r.city) e.city = r.city;
+            if (typeof r.latitude === "number") e.latitude = r.latitude;
+            if (typeof r.longitude === "number") e.longitude = r.longitude;
+            if (r.user_id) e.userId = r.user_id;
+            if (r.user_email) e.userEmail = r.user_email;
+            if (r.user_name) e.userName = r.user_name;
+            byViewer.set(r.viewer, e);
+          }
+          const liveVisitors = byViewer.size;
+          const liveList = [...byViewer.entries()]
+            .sort((a, b) => (a[1].lastActive < b[1].lastActive ? 1 : -1))
+            .slice(0, 50)
+            .map(([viewer, e]) => ({
+              viewer: viewer.slice(0, 8),
+              country: e.country,
+              city: e.city,
+              latitude: e.latitude,
+              longitude: e.longitude,
+              userId: e.userId,
+              userEmail: e.userEmail,
+              userName: e.userName,
+              lastActive: e.lastActive,
+            }));
 
           // Tool uses in the last hour
           const { count: hourlyUses } = await supabase
@@ -85,6 +156,8 @@ export async function GET(request: Request) {
             type: "live-stats",
             ts: new Date().toISOString(),
             liveVisitors,
+            liveList,
+            geoEnabled: geoOk,
             hourlyUses: hourlyUses ?? 0,
             hourlyViews: hourlyViews ?? 0,
             signups24h,

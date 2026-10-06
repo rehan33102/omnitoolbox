@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { DollarSign, Globe, LayoutDashboard, Newspaper, Settings, Users, Wrench } from "lucide-react";
+import { DollarSign, Globe, LayoutDashboard, Newspaper, Settings, Users, Wrench, Image, History, HeartPulse, Megaphone, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -10,9 +10,14 @@ const LINKS = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/tools", label: "Tools", icon: Wrench },
   { href: "/admin/blog", label: "Blog", icon: Newspaper },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
+  { href: "/admin/media", label: "Media", icon: Image },
+  { href: "/admin/analytics/visitors", label: "Analytics", icon: BarChart3 },
   { href: "/admin/monetization", label: "Ads", icon: DollarSign },
+  { href: "/admin/engagement", label: "Engage", icon: Megaphone },
   { href: "/admin/seo", label: "SEO", icon: Globe },
+  { href: "/admin/activity", label: "Activity", icon: History },
+  { href: "/admin/health", label: "Health", icon: HeartPulse },
+  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 /**

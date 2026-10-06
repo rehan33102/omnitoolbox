@@ -430,7 +430,7 @@ export default function WatermarkRemover() {
                 : "bg-white/5 text-zinc-400 hover:bg-white/10 hover:text-white"
             }`}
           >
-            {m === "image" ? "🖼️ Image" : "🎬 Video"}
+            {m === "image" ? "️ Image" : " Video"}
           </button>
         ))}
       </div>
@@ -457,13 +457,13 @@ export default function WatermarkRemover() {
                   : "bg-white/5 text-zinc-400 hover:bg-white/10"
               }`}
             >
-              🖌️ Manual brush — other marks
+              ️ Manual brush — other marks
             </button>
           </div>
 
           {!file ? (
             <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] px-6 py-14 text-center transition hover:border-fuchsia-500/50 hover:bg-white/[0.05]">
-              <span className="text-4xl">🖼️</span>
+              <span className="text-4xl">️</span>
               <span className="text-sm font-medium text-zinc-300">Tap to upload an image</span>
               <span className="text-xs text-zinc-500">PNG / JPG — processed 100% on your device</span>
               <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) setupImage(f); }} />
@@ -532,7 +532,7 @@ export default function WatermarkRemover() {
                     {(["brush", "eraser"] as const).map(pm => (
                       <button key={pm} onClick={() => setPaintMode(pm)}
                         className={`rounded-md px-3 py-1.5 text-xs font-semibold capitalize ${paintMode === pm ? "bg-fuchsia-600 text-white" : "text-zinc-400"}`}>
-                        {pm === "brush" ? "🖌️ Brush" : "🧽 Eraser"}
+                        {pm === "brush" ? "️ Brush" : " Eraser"}
                       </button>
                     ))}
                   </div>
@@ -569,14 +569,14 @@ export default function WatermarkRemover() {
                   ) : (
                     <button onClick={manualRemoveImage} disabled={busy || !hasMask}
                       className="flex-1 rounded-xl bg-gradient-to-r from-fuchsia-600 to-violet-600 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-fuchsia-500/25 transition hover:brightness-110 disabled:opacity-50">
-                      {busy ? "Working…" : "🖌️ Remove painted area"}
+                      {busy ? "Working…" : "️ Remove painted area"}
                     </button>
                   )
                 ) : (
                   <>
                     <button onClick={downloadImage}
                       className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition hover:brightness-110">
-                      ⬇️ Download cleaned image
+                      ️ Download cleaned image
                     </button>
                     <button onClick={() => { const b = beforeCanvasRef.current, c = imgCanvasRef.current; if (b && c) { c.getContext("2d")!.drawImage(b, 0, 0); } setAfterUrl(null); setConfidence(null); }}
                       className="rounded-xl bg-white/5 px-4 py-3 text-sm font-semibold text-zinc-300 ring-1 ring-white/10 hover:bg-white/10">
@@ -605,7 +605,7 @@ export default function WatermarkRemover() {
         <>
           {!file ? (
             <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] px-6 py-14 text-center transition hover:border-fuchsia-500/50 hover:bg-white/[0.05]">
-              <span className="text-4xl">🎬</span>
+              <span className="text-4xl"></span>
               <span className="text-sm font-medium text-zinc-300">Tap to upload a video</span>
               <span className="text-xs text-zinc-500">MP4 / WebM — watermark removed frame-by-frame, on-device</span>
               <input type="file" accept="video/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) setupVideo(f); }} />
@@ -647,7 +647,7 @@ export default function WatermarkRemover() {
                   <div className="flex gap-2">
                     <a href={videoUrl} download="watermark-removed.webm"
                       className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-center text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition hover:brightness-110">
-                      ⬇️ Download cleaned video
+                      ️ Download cleaned video
                     </a>
                     <button onClick={reset} className="rounded-xl bg-white/5 px-4 py-3 text-sm font-semibold text-zinc-400 ring-1 ring-white/10 hover:bg-white/10">
                       New video

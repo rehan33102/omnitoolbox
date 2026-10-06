@@ -21,7 +21,7 @@ export default function MediaToolTabs() {
         <TabsTrigger value="converter">Converter</TabsTrigger>
         <TabsTrigger value="compressor">Compressor</TabsTrigger>
         <TabsTrigger value="svg">SVG Cleaner</TabsTrigger>
-        <TabsTrigger value="studio">🎨 BG Studio</TabsTrigger>
+        <TabsTrigger value="studio"> BG Studio</TabsTrigger>
         <TabsTrigger value="watermark">Watermark Remover</TabsTrigger>
       </TabsList>
       <TabsContent value="converter" id="converter"><ImageConverter /></TabsContent>

@@ -117,7 +117,7 @@ function AuthForm() {
         });
         if (loginError) throw loginError;
         toast({
-          title: "Account created! 🎉",
+          title: "Account created! ",
           description: "Welcome to Omni Tool Box!",
           variant: "success",
         });
@@ -176,7 +176,7 @@ function AuthForm() {
         type: "signup",
       });
       if (error) throw error;
-      toast({ title: `Welcome, ${fullName.trim().split(" ")[0]}! 🎉`, variant: "success" });
+      toast({ title: `Welcome, ${fullName.trim().split(" ")[0]}! `, variant: "success" });
       goNext();
     } catch (err) {
       toast({ title: "Wrong OTP", description: (err as Error).message, variant: "error" });
@@ -194,7 +194,7 @@ function AuthForm() {
         email: email.trim().toLowerCase(),
       });
       if (error) throw error;
-      toast({ title: "OTP resent! 📧", variant: "success" });
+      toast({ title: "OTP resent! ", variant: "success" });
     } catch (err) {
       toast({ title: "Resend failed", description: (err as Error).message, variant: "error" });
     } finally {

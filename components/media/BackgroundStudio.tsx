@@ -601,7 +601,7 @@ export default function BackgroundStudio() {
   if (stage === "upload") {
     return (
       <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-white/15 bg-white/[0.03] px-6 py-14 text-center transition hover:border-fuchsia-500/50 hover:bg-white/[0.05]">
-        <span className="text-4xl">🎨</span>
+        <span className="text-4xl"></span>
         <span className="text-sm font-medium text-zinc-300">Tap to upload a photo</span>
         <span className="text-xs text-zinc-500">AI removes the background, then the studio opens — colors, gradients, blur, shadows & more</span>
         <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) onFile(f); }} />
@@ -623,11 +623,11 @@ export default function BackgroundStudio() {
 
   const tabs: { id: BgKind; label: string }[] = [
     { id: "transparent", label: "◻️ None" },
-    { id: "color", label: "🎨 Color" },
-    { id: "gradient", label: "🌈 Gradient" },
-    { id: "blur", label: "💧 Blur" },
-    { id: "image", label: "🖼️ Photo" },
-    { id: "preset", label: "🏞️ Scenes" },
+    { id: "color", label: " Color" },
+    { id: "gradient", label: " Gradient" },
+    { id: "blur", label: " Blur" },
+    { id: "image", label: "️ Photo" },
+    { id: "preset", label: "️ Scenes" },
   ];
 
   return (
@@ -692,7 +692,7 @@ export default function BackgroundStudio() {
         )}
         {bgKind === "image" && (
           <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-white/20 px-4 py-3 text-xs font-semibold text-zinc-300 hover:border-fuchsia-500/50">
-            📤 Upload background photo
+             Upload background photo
             <input type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) onCustomBg(f); }} />
           </label>
         )}
@@ -734,7 +734,7 @@ export default function BackgroundStudio() {
       {/* shadow */}
       <div className="space-y-2.5 rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
         <button onClick={() => setShadowOn(v => !v)} className="flex w-full items-center justify-between text-sm font-semibold text-zinc-200">
-          <span>🌑 Drop shadow</span>
+          <span> Drop shadow</span>
           <span className={`relative h-6 w-11 rounded-full transition ${shadowOn ? "bg-fuchsia-600" : "bg-white/10"}`}>
             <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${shadowOn ? "left-[22px]" : "left-0.5"}`} />
           </span>
@@ -759,7 +759,7 @@ export default function BackgroundStudio() {
       <div className="flex flex-wrap gap-2">
         <button onClick={() => download(true)} disabled={busy}
           className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition hover:brightness-110 disabled:opacity-50">
-          ⬇️ Download HD
+          ️ Download HD
         </button>
         <button onClick={() => download(false)} disabled={busy}
           className="rounded-xl bg-white/5 px-4 py-3 text-sm font-semibold text-zinc-200 ring-1 ring-white/10 hover:bg-white/10 disabled:opacity-50">

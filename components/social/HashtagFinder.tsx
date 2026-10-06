@@ -106,7 +106,7 @@ export default function HashtagFinder() {
     <Card className="space-y-5">
       {/* Custom search — type any topic */}
       <div>
-        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">🔍 Search your own topic</p>
+        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2"> Search your own topic</p>
         <div className="relative">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
           <input
@@ -148,7 +148,7 @@ export default function HashtagFinder() {
 
       <div className="flex flex-wrap gap-2">
         {niche === "custom" && !customTopic.trim() ? (
-          <p className="text-sm text-zinc-500 py-4">👆 Type your topic above to generate hashtags!</p>
+          <p className="text-sm text-zinc-500 py-4"> Type your topic above to generate hashtags!</p>
         ) : tags.map((t) => (
           <button
             key={t}
@@ -176,16 +176,16 @@ export default function HashtagFinder() {
           </p>
           <div className="grid grid-cols-2 gap-3">
             <Button size="sm" onClick={() => { setShowDesc(!showDesc); setShowSeo(false); }} className="w-full">
-              📝 {showDesc ? "Hide" : "Generate"} Description
+               {showDesc ? "Hide" : "Generate"} Description
             </Button>
             <Button size="sm" onClick={() => { setShowSeo(!showSeo); setShowDesc(false); }} className="w-full">
-              🔍 {showSeo ? "Hide" : "Generate"} SEO
+               {showSeo ? "Hide" : "Generate"} SEO
             </Button>
           </div>
 
           {showDesc && (
             <div className="rounded-xl bg-black/5 dark:bg-white/5 p-4 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">📝 Description</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500"> Description</p>
               <p className="text-sm whitespace-pre-line">{generateDescription(customTopic)}</p>
               <Button size="sm" onClick={() => copy(generateDescription(customTopic), "Description copied!")}>
                 {copied ? <Check size={14} /> : <Copy size={14} />} Copy Description
@@ -195,12 +195,12 @@ export default function HashtagFinder() {
 
           {showSeo && (
             <div className="rounded-xl bg-black/5 dark:bg-white/5 p-4 space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">🔍 SEO Keywords</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500"> SEO Keywords</p>
               <p className="text-sm">{generateSeo(customTopic).keywords}</p>
               <Button size="sm" onClick={() => copy(generateSeo(customTopic).keywords, "SEO keywords copied!")}>
                 {copied ? <Check size={14} /> : <Copy size={14} />} Copy Keywords
               </Button>
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 pt-2">📄 Meta Description</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 pt-2"> Meta Description</p>
               <p className="text-sm">{generateSeo(customTopic).meta}</p>
               <Button size="sm" onClick={() => copy(generateSeo(customTopic).meta, "Meta description copied!")}>
                 {copied ? <Check size={14} /> : <Copy size={14} />} Copy Meta

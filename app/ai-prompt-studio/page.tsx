@@ -6,12 +6,14 @@ import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 import Card from "@/components/ui/Card";
 
-export const metadata = buildMetadata({
-  title: "AI Prompt Studio — Free AI Prompt Generator",
-  description: "Generate and optimize AI prompts with preset styles, negative-prompt builder and {variable} placeholders. One-click copy. Free, no signup.",
-  path: "/ai-prompt-studio",
-  keywords: ["prompt generator", "midjourney prompt builder", "chatgpt prompt optimizer", "flux prompts", "claude prompts", "negative prompt"],
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "AI Prompt Studio — Free AI Prompt Generator",
+    description: "Generate and optimize AI prompts with preset styles, negative-prompt builder and {variable} placeholders. One-click copy. Free, no signup.",
+    path: "/ai-prompt-studio",
+    keywords: ["prompt generator", "midjourney prompt builder", "chatgpt prompt optimizer", "flux prompts", "claude prompts", "negative prompt"],
+  });
+}
 
 const STEPS = [
   { n: "1", t: "Pick your model", d: "Midjourney, Flux, ChatGPT or Claude — syntax adapts automatically." },

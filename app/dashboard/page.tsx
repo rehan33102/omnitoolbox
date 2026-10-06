@@ -95,7 +95,7 @@ export default function DashboardPage() {
   const logout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    toast({ title: "Logged out. See you soon! 👋", variant: "success" });
+    toast({ title: "Logged out. See you soon! ", variant: "success" });
     window.location.href = "/";
   };
 

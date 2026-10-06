@@ -8,12 +8,14 @@ import VoiceoverStudio from "@/components/voice/VoiceoverStudio";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 
-export const metadata = buildMetadata({
-  title: "Free AI Voiceover Studio — Text to Speech Online",
-  description: "Turn text into natural voiceovers free in 38 languages. Generate real MP3 audio — play, download, and keep history. No signup.",
-  path: "/ai-voiceover",
-  keywords: ["text to speech", "ai voiceover", "tts free", "voiceover generator", "text to voice online", "mp3 voiceover"],
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "Free AI Voiceover Studio — Text to Speech Online",
+    description: "Turn text into natural voiceovers free in 38 languages. Generate real MP3 audio — play, download, and keep history. No signup.",
+    path: "/ai-voiceover",
+    keywords: ["text to speech", "ai voiceover", "tts free", "voiceover generator", "text to voice online", "mp3 voiceover"],
+  });
+}
 
 export default function AIVoiceoverPage() {
   return (

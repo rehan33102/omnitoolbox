@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cache } from "react";
 import { headers } from "next/headers";
 import { SITE_NAME } from "./constants";
 
@@ -38,22 +39,113 @@ interface PageMeta {
   noIndex?: boolean;
 }
 
-export function buildMetadata({ title, description, path = "/", keywords = [], image, noIndex }: PageMeta): Metadata {
+/* ------------------------------------------------------------------ */
+/* Admin-managed SEO settings (KV `seo_settings` table, cached).       */
+/* Defaults + per-page overrides are applied live by buildMetadata().  */
+/* The KV read is lazy (dynamic import) so lib/seo never pulls the     */
+/* service-role client into a static import graph.                     */
+/* ------------------------------------------------------------------ */
+
+export interface SeoDefaults {
+  titleTemplate: string; // e.g. "%s | Omni Tool Box" — %s = page title
+  description: string; // fallback when a page has no description
+  ogImage: string; // fallback OG image path/URL
+  twitterCard: "summary" | "summary_large_image";
+}
+
+export interface SeoOverride {
+  path: string; // exact route, e.g. "/calculators"
+  title: string;
+  description: string;
+  ogImage: string;
+}
+
+interface SeoConfig {
+  defaults: SeoDefaults;
+  overrides: SeoOverride[];
+}
+
+const DEFAULTS_FALLBACK: SeoDefaults = {
+  titleTemplate: "",
+  description: "",
+  ogImage: "",
+  twitterCard: "summary_large_image",
+};
+
+let cfgCache: { ts: number; data: SeoConfig } | null = null;
+const CFG_TTL_MS = 60_000; // cross-request in-memory cache
+
+async function loadSeoConfig(): Promise<SeoConfig> {
+  const now = Date.now();
+  if (cfgCache && now - cfgCache.ts < CFG_TTL_MS) return cfgCache.data;
+  let defaults: Partial<SeoDefaults> = {};
+  let overrides: SeoOverride[] = [];
+  try {
+    const { getKV } = await import("./kv");
+    const [d, o] = await Promise.all([
+      getKV<Partial<SeoDefaults>>("seo_defaults", {}),
+      getKV<SeoOverride[]>("seo_overrides", []),
+    ]);
+    if (d && typeof d === "object") defaults = d;
+    if (Array.isArray(o)) overrides = o;
+  } catch {
+    /* DB unreachable (e.g. during build) — fall back to page-level values */
+  }
+  const data: SeoConfig = {
+    defaults: {
+      titleTemplate: typeof defaults.titleTemplate === "string" ? defaults.titleTemplate : "",
+      description: typeof defaults.description === "string" ? defaults.description : "",
+      ogImage: typeof defaults.ogImage === "string" ? defaults.ogImage : "",
+      twitterCard: defaults.twitterCard === "summary" ? "summary" : "summary_large_image",
+    },
+    overrides: overrides.filter((o) => o && typeof o.path === "string"),
+  };
+  cfgCache = { ts: now, data };
+  return data;
+}
+
+/** Per-request dedupe on top of the TTL cache. */
+const getSeoConfig = cache(loadSeoConfig);
+
+const normPath = (p: string) => (p === "" ? "/" : p || "/");
+
+/** Resolve an OG image: absolute URLs pass through, paths get the site origin. */
+const resolveImage = (img: string | undefined) =>
+  img && /^https?:\/\//i.test(img) ? img : img ? serverSiteUrl(img) : img;
+
+export async function buildMetadata({ title, description, path = "/", keywords = [], image, noIndex }: PageMeta): Promise<Metadata> {
+  const cfg = await getSeoConfig();
+
+  // 1. Per-page overrides win over everything (exact path match).
+  const ov = cfg.overrides.find((o) => normPath(o.path) === normPath(path));
+  let t = ov?.title?.trim() ? ov.title.trim() : title;
+  let d = ov?.description?.trim() ? ov.description.trim() : description;
+  let img = ov?.ogImage?.trim() ? ov.ogImage.trim() : image;
+
+  // 2. Global defaults fill the gaps.
+  const def = cfg.defaults;
+  if (def.titleTemplate.includes("%s") && t && !t.includes(SITE_NAME)) {
+    t = def.titleTemplate.replace("%s", t);
+  }
+  if (!d && def.description) d = def.description;
+  if (!img && def.ogImage) img = def.ogImage;
+
   const url = serverSiteUrl(path);
+  const imgUrl = resolveImage(img);
   return {
-    title,
-    description,
+    title: t,
+    description: d,
     keywords,
     alternates: { canonical: url },
     openGraph: {
       type: "website",
       siteName: SITE_NAME,
-      title,
-      description,
+      title: t,
+      description: d,
       url,
-      images: image ? [{ url: serverSiteUrl(image), width: 1200, height: 630 }] : undefined,
+      images: imgUrl ? [{ url: imgUrl, width: 1200, height: 630 }] : undefined,
     },
-    twitter: { card: "summary_large_image", title, description, images: image ? [serverSiteUrl(image)] : undefined },
+    twitter: { card: def.twitterCard, title: t, description: d, images: imgUrl ? [imgUrl] : undefined },
     ...(noIndex ? { robots: { index: false, follow: false } } : {}),
   };
 }

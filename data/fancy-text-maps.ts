@@ -212,7 +212,7 @@ const spongebob = (s: string) => {
   return [...s].map((c) => (/[a-zA-Z]/.test(c) ? (i++ % 2 === 0 ? c.toUpperCase() : c.toLowerCase()) : c)).join("");
 };
 const backwards = (s: string) => [...s].reverse().join("");
-const clap = (s: string) => s.split(" ").join(" 👏 ");
+const clap = (s: string) => s.split(" ").join("  ");
 const spaced = (s: string) => [...s].join(" ");
 const vaporwave = (s: string) =>
   [...s].map((c) => { const n = c.codePointAt(0)!; return n >= 0x21 && n <= 0x7e ? String.fromCodePoint(n + 0xfee0) : c; }).join("　");
@@ -281,7 +281,7 @@ export const FANCY_STYLES: FancyStyle[] = [
   /* ---- Playful transforms ---- */
   { id: "spongebob", label: "SpongeBob Mock", transform: spongebob },
   { id: "backwards", label: "Backwards", transform: backwards },
-  { id: "clap", label: "Clap 👏", transform: clap },
+  { id: "clap", label: "Clap ", transform: clap },
   { id: "spaced", label: "S p a c e d", transform: spaced },
 
   /* ---- Combining decorations ---- */
@@ -309,35 +309,35 @@ export const FANCY_STYLES: FancyStyle[] = [
   { id: "deco-arrows", label: "→ Arrows ←", transform: wrap("→ ", " ←") },
   { id: "deco-guillemet", label: "» Guillemets «", transform: wrap("» ", " «") },
   { id: "deco-fancyarrow", label: "➳ Fancy Arrows ➳", transform: wrap("➳ ", " ➳") },
-  { id: "deco-pointer", label: "☞ Pointer ☜", transform: wrap("☞ ", " ☜") },
+  { id: "deco-pointer", label: " Pointer ", transform: wrap(" ", " ") },
 
   /* ---- Stars & sparkles ---- */
-  { id: "deco-stars", label: "★ Stars ★", transform: wrap("★ ", " ★") },
-  { id: "deco-stars2", label: "☆ Hollow Stars ☆", transform: wrap("☆ ", " ☆") },
+  { id: "deco-stars", label: " Stars ", transform: wrap(" ", " ") },
+  { id: "deco-stars2", label: " Hollow Stars ", transform: wrap(" ", " ") },
   { id: "deco-sparkle", label: "✧ Sparkles ✧", transform: wrap("✧･ﾟ: *✧･ﾟ:", ":･ﾟ✧*:･ﾟ✧") },
-  { id: "deco-cutestars", label: "｡･:*:･ﾟ★ Cute ★ﾟ･:*:･｡", transform: wrap("｡･:*:･ﾟ★ ", " ☆ﾟ･:*:･｡") },
+  { id: "deco-cutestars", label: "｡･:*:･ﾟ Cute ﾟ･:*:･｡", transform: wrap("｡･:*:･ﾟ ", " ﾟ･:*:･｡") },
   { id: "deco-stardivider", label: "⋆ Star Divider ⋆", transform: wrap("⋆ ", " ⋆") },
   { id: "deco-plus", label: "₊˚ Plus ˚₊", transform: wrap("₊˚ ", " ˚₊") },
 
   /* ---- Hearts & love ---- */
-  { id: "deco-hearts", label: "♥ Hearts ♥", transform: wrap("♥ ", " ♥") },
-  { id: "deco-hearts2", label: "♡ Hollow Hearts ♡", transform: wrap("♡ ", " ♡") },
-  { id: "deco-heartline", label: "──♡ Line ♡──", transform: wrap("──♡ ", " ♡──") },
+  { id: "deco-hearts", label: " Hearts ", transform: wrap(" ", " ") },
+  { id: "deco-hearts2", label: " Hollow Hearts ", transform: wrap(" ", " ") },
+  { id: "deco-heartline", label: "── Line ──", transform: wrap("── ", " ──") },
 
   /* ---- Fire, energy, icons ---- */
-  { id: "deco-fire", label: "🔥 Fire 🔥", transform: wrap("🔥 ", " 🔥") },
-  { id: "deco-bolt", label: "⚡ Lightning ⚡", transform: wrap("⚡ ", " ⚡") },
-  { id: "deco-crown", label: "♛ Crown ♛", transform: wrap("♛ ", " ♛") },
-  { id: "deco-music", label: "♪ Music ♪", transform: wrap("♪ ", " ♪") },
-  { id: "deco-music2", label: "♫ Music ♫", transform: wrap("♫ ", " ♫") },
+  { id: "deco-fire", label: " Fire ", transform: wrap(" ", " ") },
+  { id: "deco-bolt", label: " Lightning ", transform: wrap(" ", " ") },
+  { id: "deco-crown", label: " Crown ", transform: wrap(" ", " ") },
+  { id: "deco-music", label: " Music ", transform: wrap(" ", " ") },
+  { id: "deco-music2", label: " Music ", transform: wrap(" ", " ") },
   { id: "deco-flower", label: "❀ Flower ❀", transform: wrap("❀ ", " ❀") },
   { id: "deco-snow", label: "❄ Snow ❄", transform: wrap("❄ ", " ❄") },
-  { id: "deco-moon", label: "☾ Moon ☽", transform: wrap("☾ ", " ☽") },
-  { id: "deco-skull", label: "☠ Skull ☠", transform: wrap("☠ ", " ☠") },
+  { id: "deco-moon", label: " Moon ", transform: wrap(" ", " ") },
+  { id: "deco-skull", label: " Skull ", transform: wrap(" ", " ") },
   { id: "deco-diamond", label: "◆ Diamond ◆", transform: wrap("◆ ", " ◆") },
   { id: "deco-diamond2", label: "◇ Hollow Diamond ◇", transform: wrap("◇ ", " ◇") },
-  { id: "deco-spade", label: "♠ Spade ♠", transform: wrap("♠ ", " ♠") },
-  { id: "deco-club", label: "♣ Club ♣", transform: wrap("♣ ", " ♣") },
+  { id: "deco-spade", label: " Spade ", transform: wrap(" ", " ") },
+  { id: "deco-club", label: " Club ", transform: wrap(" ", " ") },
   { id: "deco-check", label: "✔ Check ✔", transform: wrap("✔ ", " ✔") },
   { id: "deco-cross", label: "✖ Cross ✖", transform: wrap("✖ ", " ✖") },
 

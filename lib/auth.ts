@@ -1,12 +1,19 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getKV } from "@/lib/kv";
 
 export interface SessionUser {
   id: string;
   email: string;
-  role: "admin" | "user";
+  role: "admin" | "moderator" | "user" | "banned";
 }
+
+/** Owner emails — always admin, immune to role overrides. Must match middleware.ts. */
+const OWNER_EMAILS = ["rehan.work3310@gmail.com", "info.rehan3310@gmail.com"];
+
+/** KV key for admin-set extended roles (see lib/permissions.ts). Kept local to avoid an import cycle. */
+const USER_ROLES_KEY = "user_roles";
 
 /** Emails that are always admin (comma-separated env). No Supabase SQL needed. */
 function adminEmails(): string[] {
@@ -15,11 +22,23 @@ function adminEmails(): string[] {
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
   // Owner email — always admin
-  const owner = ["rehan.work3310@gmail.com", "info.rehan3310@gmail.com"];
-  return [...new Set([...fromEnv, ...owner])];
+  return [...new Set([...fromEnv, ...OWNER_EMAILS])];
 }
 
-export async function getSessionUser(): Promise<SessionUser | null> {
+/**
+ * Short-lived per-process role cache: getSessionUser runs on nearly every
+ * admin request and the KV read is a service-role round-trip. 10s TTL keeps
+ * it fast; role changes invalidate the entry immediately (see
+ * invalidateRoleCache, called by lib/permissions.ts and the users API).
+ */
+const roleCache = new Map<string, { role: SessionUser["role"]; ts: number }>();
+const ROLE_CACHE_TTL_MS = 10_000;
+
+export function invalidateRoleCache(userId: string): void {
+  roleCache.delete(userId);
+}
+
+async function baseSessionUser(): Promise<SessionUser | null> {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
@@ -76,6 +95,40 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       role: isWhitelisted ? "admin" : "user",
     };
   }
+}
+
+/**
+ * Admin-set extended role override (KV `user_roles`, managed from the Users
+ * page). Admin-set wins over the base role — except owner emails, which stay
+ * admin no matter what. A "banned" override blocks the user everywhere.
+ */
+async function applyRoleOverride(
+  id: string,
+  email: string,
+  base: SessionUser["role"]
+): Promise<SessionUser["role"]> {
+  if (OWNER_EMAILS.includes(email.toLowerCase())) return "admin";
+  const cached = roleCache.get(id);
+  if (cached && Date.now() - cached.ts < ROLE_CACHE_TTL_MS) return cached.role;
+  try {
+    const overrides = await getKV<Record<string, unknown>>(USER_ROLES_KEY, {});
+    const raw = overrides?.[id];
+    const role: SessionUser["role"] =
+      raw === "admin" || raw === "moderator" || raw === "user" || raw === "banned"
+        ? raw
+        : base;
+    roleCache.set(id, { role, ts: Date.now() });
+    return role;
+  } catch {
+    return base;
+  }
+}
+
+export async function getSessionUser(): Promise<SessionUser | null> {
+  const base = await baseSessionUser();
+  if (!base) return null;
+  const role = await applyRoleOverride(base.id, base.email, base.role);
+  return role === base.role ? base : { ...base, role };
 }
 
 /** Page-level guard: redirects non-admins. */

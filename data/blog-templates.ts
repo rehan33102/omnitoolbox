@@ -109,8 +109,8 @@ When someone lands on your profile, they decide in about three seconds whether t
 
 ## Copy-paste bio formulas
 
-- 👋 [Name] | [Niche] — Helping you [result], one post at a time — [CTA]
-- ⚡ [Niche] with NO filter — I say what others won't — Join the rebellion
+-  [Name] | [Niche] — Helping you [result], one post at a time — [CTA]
+-  [Niche] with NO filter — I say what others won't — Join the rebellion
 - Professional overthinker — Part-time [niche] enthusiast, full-time snacker
 - [Niche] strategist — Daily tips that actually work — DM "START"
 

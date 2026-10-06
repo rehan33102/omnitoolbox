@@ -1,0 +1,23 @@
+-- 011_branding.sql — DOC ONLY: no DDL required.
+--
+-- Site branding is stored as JSON in the existing `seo_settings` key-value
+-- table under the key `site_branding` (via lib/kv setKV/getKV), the same
+-- proven pattern used for `ad_configs`/`activity_log` etc. New tables need
+-- DDL that cannot run from the app (no exec_sql RPC in production), so the
+-- existing `seo_settings(key text pk, value text, updated_at timestamptz)`
+-- table is reused instead.
+--
+-- Shape (all strings, "" = unset → falls back to local site settings):
+-- {
+--   "siteName": "", "tagline": "", "logoUrl": "", "faviconUrl": "",
+--   "accentColor": "",            -- #rrggbb hex or ""
+--   "footerText": "",
+--   "socialX": "", "socialInstagram": "", "socialYoutube": "", "socialTiktok": ""
+-- }
+--
+-- Read path (public):  GET /api/branding  (Cache-Control: public, max-age=60)
+-- Write path (admin):  PUT /api/branding  (requireAdminApi + guardApi, zod-validated)
+-- Client: hooks/useBranding — localStorage mirror "otb-branding" for instant
+-- paint; applies --brand-accent CSS variable + favicon side-effects.
+-- Admin UI: app/admin/settings/page.tsx → Branding card.
+SELECT 1;

@@ -2,14 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-:root { --bg: 255 255 255; --fg: 10 10 18; }
+:root {
+  --bg: 255 255 255; --fg: 10 10 18;
+  /* BRAND ACCENT — runtime-overridable from admin Branding settings.
+     hooks/useBranding sets this from /api/branding (Supabase KV).
+     Default matches brand-500 (#8b5cf6) so the stock look is unchanged. */
+  --brand-accent: #8b5cf6;
+}
 .dark { --bg: 8 8 15; --fg: 244 244 250; }
 
 @layer base {
   html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; touch-action: manipulation; }
   body { @apply bg-[rgb(var(--bg))] text-[rgb(var(--fg))] font-sans antialiased; touch-action: manipulation; overflow-x: hidden; max-width: 100vw; }
   html { overflow-x: hidden; }
-  ::selection { @apply bg-brand-500/30 text-inherit; }
+  /* Selection tint follows the admin-set brand accent (default = brand-500). */
+  ::selection { background-color: color-mix(in srgb, var(--brand-accent) 30%, transparent); color: inherit; }
   /* Butter-smooth page entrance — GPU-friendly transform/opacity only */
   main { animation: page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
   @keyframes page-in {
@@ -54,6 +61,10 @@
   .btn-base {
     @apply inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/70;
   }
+  /* BRAND ACCENT UTILITIES — driven by --brand-accent (see :root + useBranding).
+     Use these where a surface should follow the admin-set accent color. */
+  .text-brand-accent { color: var(--brand-accent); }
+  .bg-brand-accent { background-color: var(--brand-accent); }
 }
 
 * { scrollbar-width: thin; scrollbar-color: rgba(139, 92, 246, 0.6) rgba(0, 0, 0, 0.1); }

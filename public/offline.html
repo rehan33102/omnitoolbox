@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>You're offline — OmniToolBox</title>
+<meta name="theme-color" content="#050A14" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #050A14; color: #f4f4f5;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 24px; text-align: center;
+  }
+  .card { max-width: 420px; }
+  .logo {
+    width: 72px; height: 72px; margin: 0 auto 24px; border-radius: 20px;
+    background: linear-gradient(135deg, #ff5a3c, #c026d3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 800; color: #fff;
+  }
+  h1 { font-size: 24px; margin-bottom: 12px; }
+  p { color: #a1a1aa; font-size: 15px; line-height: 1.6; margin-bottom: 24px; }
+  button {
+    background: linear-gradient(135deg, #ff5a3c, #c026d3); color: #fff;
+    border: none; border-radius: 999px; padding: 14px 36px;
+    font-size: 15px; font-weight: 700; cursor: pointer;
+  }
+  button:active { transform: scale(0.98); }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">O</div>
+    <h1>You're offline</h1>
+    <p>OmniToolBox needs an internet connection to load. Check your connection and try again — your installed tools will be right here when you're back.</p>
+    <button onclick="location.reload()">Try again</button>
+  </div>
+</body>
+</html>

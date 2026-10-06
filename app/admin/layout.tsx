@@ -5,6 +5,7 @@ import { ShieldAlert } from "lucide-react";
 import { getSessionUser } from "@/lib/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminMobileNav from "@/components/admin/AdminMobileNav";
+import AdminSearch from "@/components/admin/AdminSearch";
 import Card from "@/components/ui/Card";
 
 export const metadata: Metadata = {
@@ -21,8 +22,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (isBoss) {
     return (
       <div className="container py-8">
-        <div className="mb-6">
+        <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
           <h1 className="font-display text-2xl font-bold">Admin Dashboard</h1>
+          <AdminSearch />
         </div>
         <AdminMobileNav />
         <div className="flex gap-6 items-start">
@@ -59,8 +61,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="container py-8">
-      <div className="mb-6">
+      <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
         <h1 className="font-display text-2xl font-bold">Admin Dashboard</h1>
+        <AdminSearch />
       </div>
       {/* Mobile nav — the sidebar is hidden on phones, so this is the only way to reach sub-pages on mobile */}
       <AdminMobileNav />

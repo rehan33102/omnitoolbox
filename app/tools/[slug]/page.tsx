@@ -46,7 +46,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const tool = getToolBySlug(params.slug);
   if (!tool) return {};
-  return buildMetadata({
+  return await buildMetadata({
     title: `${tool.title} — ${tool.tagline}`,
     description: tool.description,
     path: `/tools/${tool.slug}`,

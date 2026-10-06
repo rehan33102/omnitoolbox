@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { requirePermission } from "@/lib/permissions";
+
+export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  // SECURITY: this exposes any user's creations — require the users section.
+  if (!(await requirePermission("users"))) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const userId = req.nextUrl.searchParams.get("userId");
   const email = req.nextUrl.searchParams.get("email");
   const limit = Math.min(parseInt(req.nextUrl.searchParams.get("limit") ?? "50"), 200);

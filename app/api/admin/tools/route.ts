@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireAdminApi } from "@/lib/auth";
+import { requirePermission } from "@/lib/permissions";
 import { guardApi } from "@/lib/api-security";
 import { mergeTools } from "@/lib/tools-registry";
 import { slugify } from "@/lib/utils";
@@ -52,7 +52,7 @@ async function guard(req: NextRequest) {
   // so unauthenticated floods are throttled before any auth/DB work.
   const sec = guardApi(req, { key: "admin:tools", max: 30 });
   if (sec) return sec;
-  if (!(await requireAdminApi())) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!(await requirePermission("tools"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   return null;
 }
 

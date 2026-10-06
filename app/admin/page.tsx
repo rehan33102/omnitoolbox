@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Activity, Eye, MousePointerClick, Radio, Users } from "lucide-react";
+import Link from "next/link";
+import { Activity, AlertTriangle, ArrowUpRight, Check, Eye, MousePointerClick, Radio, Users, Wrench } from "lucide-react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
 import StatCard from "@/components/admin/StatCard";
+import QuickStats from "@/components/admin/QuickStats";
 import Card from "@/components/ui/Card";
 import Skeleton from "@/components/ui/Skeleton";
 import Badge from "@/components/ui/Badge";
@@ -40,6 +42,8 @@ export default function AdminOverviewPage() {
   const [liveConnected, setLiveConnected] = useState(false);
   const [dbStatus, setDbStatus] = useState<Record<string, boolean> | null>(null);
   const [dbBusy, setDbBusy] = useState(false);
+  const [setupSql, setSetupSql] = useState<string | null>(null);
+  const [sqlCopied, setSqlCopied] = useState(false);
 
   const loadStats = async () => {
     try {
@@ -88,18 +92,28 @@ export default function AdminOverviewPage() {
   const setupDb = async () => {
     setDbBusy(true);
     try {
-      const res = await fetch("/api/admin/setup-database", { method: "POST" });
+      // The app cannot run DDL itself — fetch the setup SQL so the admin can
+      // run it once in Supabase Dashboard → SQL Editor. Honest, always works.
+      const res = await fetch("/api/admin/setup-database?sql=1");
       const json = await res.json();
-      if (json.ok) {
-        alert("Database setup complete! ✅ Live readings will now appear.");
-        window.location.reload();
-      } else {
-        alert("Some tables could not be created. Please run the SQL manually in the Supabase dashboard.");
+      if (json.sql) {
+        setSetupSql(json.sql);
+        setSqlCopied(false);
       }
     } catch {
-      alert("Setup failed. Try again.");
+      /* keep old data on failure */
     } finally {
       setDbBusy(false);
+    }
+  };
+
+  const copySetupSql = async () => {
+    if (!setupSql) return;
+    try {
+      await navigator.clipboard.writeText(setupSql);
+      setSqlCopied(true);
+    } catch {
+      /* clipboard unavailable — user can select manually */
     }
   };
 
@@ -129,7 +143,7 @@ export default function AdminOverviewPage() {
         <Card className="border-2 border-amber-500/30 bg-amber-500/5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <h3 className="font-bold text-amber-700 dark:text-amber-400">⚠️ Database Setup Required</h3>
+              <h3 className="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-2"><AlertTriangle size={18} /> Database Setup Required</h3>
               <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
                 These tables are missing: {missingTables.join(", ")}. Without them, the dashboard cannot show real readings.
               </p>
@@ -139,41 +153,79 @@ export default function AdminOverviewPage() {
               disabled={dbBusy}
               className="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-lg hover:shadow-xl transition disabled:opacity-50 whitespace-nowrap"
             >
-              {dbBusy ? "Setting up..." : "🔧 Set Up Database"}
+              {dbBusy ? "Setting up..." : (<span className="inline-flex items-center gap-2"><Wrench size={16} /> Set Up Database</span>)}
             </button>
           </div>
         </Card>
       )}
 
-      {/* Live visitors banner — real-time via SSE */}
-      <Card className="!p-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="relative flex h-3 w-3">
-            <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${liveConnected ? "bg-emerald-400" : "bg-amber-400"}`} />
-            <span className={`relative inline-flex rounded-full h-3 w-3 ${liveConnected ? "bg-emerald-500" : "bg-amber-500"}`} />
-          </span>
-          <div>
-            <p className="font-bold text-lg leading-none">
-              {liveVisitors} <span className="text-sm font-medium text-zinc-500">live visitor{liveVisitors === 1 ? "" : "s"} on site</span>
-            </p>
-            <p className="text-xs text-zinc-500 mt-1">
-              {liveConnected ? "● LIVE — streaming every 5s" : "○ connecting…"} · {live?.hourlyUses ?? 0} tool uses / hour · {live?.signups24h ?? 0} signups / 24h
-            </p>
+      {/* Setup SQL modal — the app cannot run DDL itself, so the admin copies
+          the SQL and runs it once in Supabase Dashboard → SQL Editor. */}
+      {setupSql && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setSetupSql(null)}>
+          <div className="w-full max-w-2xl rounded-3xl bg-white dark:bg-zinc-900 border border-black/10 dark:border-white/10 shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="p-5 border-b border-black/5 dark:border-white/5">
+              <h3 className="font-display font-bold">Run this SQL once in Supabase</h3>
+              <p className="text-sm text-zinc-500 mt-1">
+                Supabase Dashboard → SQL Editor → paste → Run. Then refresh this page.
+              </p>
+            </div>
+            <div className="p-5">
+              <textarea readOnly value={setupSql} rows={12}
+                className="w-full font-mono text-xs rounded-xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/[0.03] p-3" />
+              <div className="flex justify-end gap-2 mt-4">
+                <button onClick={() => setSetupSql(null)}
+                  className="px-4 py-2 rounded-xl text-sm font-medium hover:bg-black/5 dark:hover:bg-white/5 transition">
+                  Close
+                </button>
+                <button onClick={copySetupSql}
+                  className="px-5 py-2 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 shadow hover:shadow-lg transition">
+                  {sqlCopied ? (<span className="inline-flex items-center gap-1.5"><Check size={14} /> Copied</span>) : "Copy SQL"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-        <Radio size={20} className={liveConnected ? "text-emerald-500" : "text-amber-500"} />
-      </Card>
+      )}
+
+      {/* Live visitors banner — real-time via SSE, clickable to the visitors detail page */}
+      <Link href="/admin/analytics/visitors" aria-label="Live visitors — view details" className="group block rounded-3xl">
+        <Card hover className="!p-4 flex items-center justify-between cursor-pointer hover:ring-2 hover:ring-emerald-500/40 transition-shadow">
+          <div className="flex items-center gap-3">
+            <span className="relative flex h-3 w-3">
+              <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${liveConnected ? "bg-emerald-400" : "bg-amber-400"}`} />
+              <span className={`relative inline-flex rounded-full h-3 w-3 ${liveConnected ? "bg-emerald-500" : "bg-amber-500"}`} />
+            </span>
+            <div>
+              <p className="font-bold text-lg leading-none">
+                {liveVisitors} <span className="text-sm font-medium text-zinc-500">live visitor{liveVisitors === 1 ? "" : "s"} on site</span>
+              </p>
+              <p className="text-xs text-zinc-500 mt-1">
+                {liveConnected ? "● LIVE — streaming every 5s" : "○ connecting…"} · {live?.hourlyUses ?? 0} tool uses / hour · {live?.signups24h ?? 0} signups / 24h
+                <span className="ml-2 font-medium text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity">View details →</span>
+              </p>
+            </div>
+          </div>
+          <span className="flex items-center gap-2">
+            <ArrowUpRight size={16} className="text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <Radio size={20} className={liveConnected ? "text-emerald-500" : "text-amber-500"} />
+          </span>
+        </Card>
+      </Link>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Visitors" value={formatCompact(totals.visitors ?? 0)} delta={totals.deltas?.visitors} icon={Users} />
-        <StatCard label="Page views" value={formatCompact(totals.pageViews ?? 0)} delta={totals.deltas?.pageViews} icon={Eye} />
-        <StatCard label="Tool uses" value={formatCompact(totals.toolUses ?? 0)} delta={totals.deltas?.toolUses} icon={MousePointerClick} />
-        <StatCard label="Tool CTR" value={`${(totals.ctr ?? 0).toFixed(1)}%`} delta={totals.deltas?.ctr} icon={Activity} />
+        <StatCard label="Visitors" value={formatCompact(totals.visitors ?? 0)} delta={totals.deltas?.visitors} icon={Users} href="/admin/analytics/visitors" />
+        <StatCard label="Page views" value={formatCompact(totals.pageViews ?? 0)} delta={totals.deltas?.pageViews} icon={Eye} href="/admin/analytics/visitors" />
+        <StatCard label="Tool uses" value={formatCompact(totals.toolUses ?? 0)} delta={totals.deltas?.toolUses} icon={MousePointerClick} href="/admin/analytics/tools" />
+        <StatCard label="Tool CTR" value={`${(totals.ctr ?? 0).toFixed(1)}%`} delta={totals.deltas?.ctr} icon={Activity} href="/admin/analytics/tools" />
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard label="Registered users" value={formatCompact(totalUsers)} icon={Users} />
+        <StatCard label="Registered users" value={formatCompact(totalUsers)} icon={Users} href="/admin/analytics/users" />
       </div>
+
+      {/* Content quick-stats: tools, blog posts, ads, users — real counts with working links */}
+      <QuickStats />
 
       <Card>
         <h2 className="font-display font-semibold mb-1">Traffic — last 14 days</h2>

@@ -83,6 +83,19 @@ const MIGRATIONS = [
     meta jsonb,
     created_at timestamptz default now()
   )`,
+
+  // Coarse IP geolocation columns for visit analytics (country/city only — no IPs stored)
+  // + opt-in precise coordinates (only when visitor grants browser permission)
+  // + identity linkage (logged-in visitors)
+  `alter table analytics_events add column if not exists country text`,
+  `alter table analytics_events add column if not exists city text`,
+  `alter table analytics_events add column if not exists latitude double precision`,
+  `alter table analytics_events add column if not exists longitude double precision`,
+  `alter table analytics_events add column if not exists user_id text`,
+  `alter table analytics_events add column if not exists user_email text`,
+  `alter table analytics_events add column if not exists user_name text`,
+  `create index if not exists analytics_events_country_idx on analytics_events (country)`,
+  `create index if not exists analytics_events_user_idx on analytics_events (user_id)`,
 ];
 
 export async function POST(req: NextRequest) {
@@ -93,36 +106,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Admin only" }, { status: 403 });
   }
 
-  const supabase = createAdminClient();
-  const results: { migration: string; ok: boolean; error?: string }[] = [];
-
-  for (let i = 0; i < MIGRATIONS.length; i++) {
-    const sql = MIGRATIONS[i];
-    try {
-      // Use rpc to execute raw SQL (requires a helper function, fallback to direct)
-      const { error } = await supabase.rpc("exec_sql", { sql });
-      if (error) {
-        // If exec_sql doesn't exist, try via from() as a connectivity check
-        // and report that manual SQL is needed
-        results.push({
-          migration: `migration_${i + 1}`,
-          ok: false,
-          error: "exec_sql RPC not available. Please run SQL manually in Supabase dashboard.",
-        });
-      } else {
-        results.push({ migration: `migration_${i + 1}`, ok: true });
-      }
-    } catch (e) {
-      results.push({
-        migration: `migration_${i + 1}`,
-        ok: false,
-        error: (e as Error).message,
-      });
-    }
-  }
-
-  const allOk = results.every((r) => r.ok);
-  return NextResponse.json({ ok: allOk, results });
+  // The app cannot execute DDL: there is no exec_sql RPC in production, so a
+  // "one-click setup" would always fail. Be honest about it — point the admin
+  // to the copy-paste SQL flow (GET ?sql=1) instead of a fake attempt.
+  return NextResponse.json({
+    ok: false,
+    error:
+      "Automatic setup is not available on this project. Copy the setup SQL from this page and run it once in Supabase Dashboard → SQL Editor.",
+    sqlEndpoint: "/api/admin/setup-database?sql=1",
+  });
 }
 
 export async function GET(req: NextRequest) {
@@ -133,9 +125,15 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Admin only" }, { status: 403 });
   }
 
+  // ?sql=1 → return the raw setup SQL so the admin can run it in the
+  // Supabase dashboard SQL editor (the app cannot execute DDL itself).
+  if (req.nextUrl.searchParams.get("sql") === "1") {
+    return NextResponse.json({ sql: MIGRATIONS.join(";\n\n") + ";" });
+  }
+
   // Check which tables exist
   const supabase = createAdminClient();
-  const tables = ["analytics_events", "profiles", "tools_cms", "blog_posts", "ads_config", "user_library"];
+  const tables = ["analytics_events", "profiles", "tools_cms", "blog_posts", "ads_config", "user_library", "seo_settings"];
   const status: Record<string, boolean> = {};
 
   for (const t of tables) {

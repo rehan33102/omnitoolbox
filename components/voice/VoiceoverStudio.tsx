@@ -25,10 +25,10 @@ const EDGE_LANGS_FALLBACK = [
   { code: "fr", label: "French", flag: "🇫🇷" },
 ];
 const EDGE_STYLES_FALLBACK = [
-  { key: "sleep", label: "😴 Sleep / Deep Calm" },
-  { key: "calm", label: "🌿 Calm Story" },
-  { key: "normal", label: "🎙️ Normal" },
-  { key: "energetic", label: "⚡ Energetic / YouTube" },
+  { key: "sleep", label: " Sleep / Deep Calm" },
+  { key: "calm", label: " Calm Story" },
+  { key: "normal", label: "️ Normal" },
+  { key: "energetic", label: " Energetic / YouTube" },
 ];
 
 // Other languages fall back to the free Google voice.
@@ -474,8 +474,8 @@ export default function VoiceoverStudio() {
                   <Mic size={15} className="text-brand-700 dark:text-brand-400" /> Voice
                 </label>
                 <select id="vo-evoice" value={edgeVoice} onChange={(e) => setEdgeVoice(e.target.value as "male" | "female")} className="input-base w-full">
-                  <option value="male">👨 Male</option>
-                  <option value="female">👩 Female</option>
+                  <option value="male"> Male</option>
+                  <option value="female"> Female</option>
                 </select>
               </div>
               <div>
@@ -589,7 +589,7 @@ export default function VoiceoverStudio() {
               </p>
             ) : engine === "google-fallback" || engine === "google" ? (
               <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1">
-                ⚠️ Basic voice — HD voice was unavailable, please try again
+                ️ Basic voice — HD voice was unavailable, please try again
               </p>
             ) : null}
             <audio controls src={audioUrl} className="w-full" />

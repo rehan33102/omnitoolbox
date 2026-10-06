@@ -19,7 +19,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const post = await getPost(params.slug);
   if (!post) return {};
-  return buildMetadata({
+  return await buildMetadata({
     title: `${post.title} | OmniToolBox`,
     description: post.excerpt,
     path: `/blog/${post.slug}`,

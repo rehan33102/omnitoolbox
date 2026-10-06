@@ -2,12 +2,14 @@ import { buildMetadata } from "@/lib/seo";
 import Card from "@/components/ui/Card";
 import { Smartphone, MonitorDown, Download, Check } from "lucide-react";
 
-export const metadata = buildMetadata({
-  title: "Download Omni Tool Box — Android & PC Apps",
-  description: "Download Omni Tool Box for Android and Windows PC. Free app with 50+ AI tools, image utilities, PDF tools and more — always up to date.",
-  path: "/download",
-  keywords: ["download", "android app", "pc app", "windows app"],
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "Download Omni Tool Box — Android & PC Apps",
+    description: "Download Omni Tool Box for Android and Windows PC. Free app with 50+ AI tools, image utilities, PDF tools and more — always up to date.",
+    path: "/download",
+    keywords: ["download", "android app", "pc app", "windows app"],
+  });
+}
 
 export default function DownloadPage() {
   return (
@@ -66,12 +68,12 @@ export default function DownloadPage() {
       </div>
 
       <Card className="mt-8 p-6">
-        <h3 className="font-bold mb-3">📦 How to install PC version:</h3>
+        <h3 className="font-bold mb-3"> How to install PC version:</h3>
         <ol className="text-sm text-zinc-500 space-y-2 list-decimal list-inside">
           <li>Click <strong className="text-zinc-700 dark:text-zinc-300">&ldquo;Download for PC&rdquo;</strong> above</li>
           <li>Extract the ZIP file anywhere (right-click → Extract All)</li>
           <li>Open the folder and double-click <strong className="text-zinc-700 dark:text-zinc-300">&ldquo;Omni Tool Box.exe&rdquo;</strong></li>
-          <li>Done! The app opens with all the latest tools 🎉</li>
+          <li>Done! The app opens with all the latest tools </li>
         </ol>
       </Card>
     </div>

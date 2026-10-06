@@ -63,12 +63,12 @@ export default class ErrorBoundary extends Component<Props, State> {
       return (
         <div className="container py-16 max-w-md mx-auto">
           <Card className="text-center">
-            <p className="text-4xl mb-3">😢</p>
+            <p className="text-4xl mb-3"></p>
             <h2 className="font-bold text-lg mb-2">Something went wrong</h2>
             <p className="text-sm text-zinc-500 mb-6">
               The page couldn&apos;t load. Please try again — the error has been reported.
             </p>
-            <Button onClick={() => window.location.reload()}>Reload Page 🔄</Button>
+            <Button onClick={() => window.location.reload()}>Reload Page </Button>
           </Card>
         </div>
       );

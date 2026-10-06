@@ -3,12 +3,14 @@ import Card from "@/components/ui/Card";
 import TutorialVideo from "@/components/tutorial/TutorialVideo";
 import { PlayCircle, Mic, Image, QrCode, FileText, Sparkles } from "lucide-react";
 
-export const metadata = buildMetadata({
-  title: "Tutorials — Learn How to Use Omni Tool Box",
-  description: "Step-by-step video tutorials showing how to use every Omni Tool Box tool — AI Voiceover, Background Remover, QR Generator and more.",
-  path: "/tutorial",
-  keywords: ["tutorial", "how to use", "video guide", "omnitoolbox tutorial"],
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "Tutorials — Learn How to Use Omni Tool Box",
+    description: "Step-by-step video tutorials showing how to use every Omni Tool Box tool — AI Voiceover, Background Remover, QR Generator and more.",
+    path: "/tutorial",
+    keywords: ["tutorial", "how to use", "video guide", "omnitoolbox tutorial"],
+  });
+}
 
 const TUTORIALS = [
   {

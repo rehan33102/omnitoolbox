@@ -6,12 +6,14 @@ import PdfToolTabs from "@/components/pdf/PdfToolTabs";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 
-export const metadata = buildMetadata({
-  title: "Free PDF Tools — Merge, Split & Images to PDF",
-  description: "Merge PDFs, split pages, and convert images to PDF — 100% client-side, private, free. No signup, no uploads.",
-  path: "/pdf-tools",
-  keywords: ["merge pdf", "split pdf", "images to pdf", "combine pdf online", "extract pdf pages", "jpg to pdf"],
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "Free PDF Tools — Merge, Split & Images to PDF",
+    description: "Merge PDFs, split pages, and convert images to PDF — 100% client-side, private, free. No signup, no uploads.",
+    path: "/pdf-tools",
+    keywords: ["merge pdf", "split pdf", "images to pdf", "combine pdf online", "extract pdf pages", "jpg to pdf"],
+  });
+}
 
 export default function PdfToolsPage() {
   return (

@@ -8,12 +8,14 @@ import { getListings } from "@/lib/get-directory";
 
 export const revalidate = 300;
 
-export const metadata = buildMetadata({
-  title: "AI Tools Directory — New AI Tools, Community Voted",
-  description: "Browse newly launched AI tools across video, audio, coding, productivity and more. Community-voted rankings, updated daily.",
-  path: "/ai-directory",
-  keywords: ["ai tools directory", "new ai tools", "best ai tools 2026", "ai tools list"],
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "AI Tools Directory — New AI Tools, Community Voted",
+    description: "Browse newly launched AI tools across video, audio, coding, productivity and more. Community-voted rankings, updated daily.",
+    path: "/ai-directory",
+    keywords: ["ai tools directory", "new ai tools", "best ai tools 2026", "ai tools list"],
+  });
+}
 
 export default async function DirectoryPage() {
   const tools = await getListings();

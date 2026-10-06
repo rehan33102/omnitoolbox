@@ -1,11 +1,13 @@
 import { buildMetadata } from "@/lib/seo";
 import Card from "@/components/ui/Card";
 
-export const metadata = buildMetadata({
-  title: "Terms of Service",
-  description: "The rules for using OmniToolBox's free tools.",
-  path: "/terms",
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "Terms of Service",
+    description: "The rules for using OmniToolBox's free tools.",
+    path: "/terms",
+  });
+}
 
 const SECTIONS = [
   {

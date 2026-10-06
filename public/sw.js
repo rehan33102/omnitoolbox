@@ -5,8 +5,8 @@
  *  - Static assets (/_next/static, /images, /icons, fonts): CACHE FIRST.
  *  - API routes & /admin: never cached, always network.
  */
-const CACHE = "omnitoolbox-v8";
-const CORE = ["/", "/icons/icon-192.png", "/icons/icon-512.png"];
+const CACHE = "omnitoolbox-v9";
+const CORE = ["/", "/offline.html", "/icons/icon-192.png", "/icons/icon-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -86,6 +86,50 @@ self.addEventListener("fetch", (event) => {
         }
         return res;
       })
-      .catch(() => caches.match(request).then((hit) => hit || caches.match("/")))
+      .catch(async () => {
+        // Offline: serve cached page, homepage shell, then the offline page
+        const hit = await caches.match(request);
+        if (hit) return hit;
+        if (request.mode === "navigate") {
+          const home = await caches.match("/");
+          if (home) return home;
+          const offline = await caches.match("/offline.html");
+          if (offline) return offline;
+        }
+        return Response.error();
+      })
+  );
+});
+
+/* Web push — show a notification when the server pushes one. */
+self.addEventListener("push", (event) => {
+  let data = { title: "OmniToolBox", body: "", url: "/" };
+  try {
+    if (event.data) data = Object.assign(data, event.data.json());
+  } catch (e) {
+    /* fall back to defaults */
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body || "",
+      icon: "/icons/icon-192.png",
+      badge: "/icons/icon-192.png",
+      data: { url: data.url || "/" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = (event.notification.data && event.notification.data.url) || "/";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
+      for (const client of clients) {
+        if (client.url === new URL(url, self.location.origin).href && "focus" in client) {
+          return client.focus();
+        }
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
+    })
   );
 });

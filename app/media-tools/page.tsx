@@ -5,12 +5,14 @@ import MediaToolTabs from "@/components/media/MediaToolTabs";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 
-export const metadata = buildMetadata({
-  title: "Free Image Tools — Convert, Compress & Remove Background",
-  description: "Convert WebP to PNG/JPG, compress images 90%, clean SVGs, remove backgrounds and erase watermarks from photos & videos — 100% client-side, private, free. No signup.",
-  path: "/media-tools",
-  keywords: ["webp to png", "image converter", "image compressor", "svg cleaner", "background remover", "compress jpg online", "watermark remover", "remove watermark from photo", "video watermark remover", "gemini watermark remover"],
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "Free Image Tools — Convert, Compress & Remove Background",
+    description: "Convert WebP to PNG/JPG, compress images 90%, clean SVGs, remove backgrounds and erase watermarks from photos & videos — 100% client-side, private, free. No signup.",
+    path: "/media-tools",
+    keywords: ["webp to png", "image converter", "image compressor", "svg cleaner", "background remover", "compress jpg online", "watermark remover", "remove watermark from photo", "video watermark remover", "gemini watermark remover"],
+  });
+}
 
 export default function MediaToolsPage() {
   return (

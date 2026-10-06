@@ -6,6 +6,7 @@ import { Menu } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NAV_LINKS } from "@/lib/constants";
 import { useSiteSettings } from "@/hooks/useSiteSettings";
+import { useBranding } from "@/hooks/useBranding";
 import { cn } from "@/lib/utils";
 import Drawer from "@/components/ui/Drawer";
 import ThemeToggle from "@/components/ui/ThemeToggle";
@@ -20,6 +21,10 @@ export default function Header() {
   const [drawer, setDrawer] = useState(false);
   const [tools, setTools] = useState<Tool[]>([]);
   const { settings } = useSiteSettings();
+  const { branding } = useBranding();
+
+  // Branding (Supabase KV) wins; local site settings remain the fallback.
+  const siteName = branding.siteName || settings.logoText;
 
   // Lazy-load the tool list for the smart search dropdown (small payload, cached).
   useEffect(() => {
@@ -34,10 +39,27 @@ export default function Header() {
       <div className="container flex h-16 items-center gap-4">
         <Link href="/" className="flex items-center gap-3 shrink-0 group">
           <span className="transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
-            <LogoMark size={42} />
+            {branding.logoUrl ? (
+              <img
+                src={branding.logoUrl}
+                className="h-10 w-10 rounded-xl object-cover"
+                alt="logo"
+              />
+            ) : (
+              <LogoMark size={42} />
+            )}
           </span>
-          <span className="brand-name">
-            {settings.logoText}
+          <span
+            className="brand-name"
+            style={
+              branding.accentColor
+                ? {
+                    backgroundImage: `linear-gradient(100deg, ${branding.accentColor} 0%, color-mix(in srgb, ${branding.accentColor} 55%, #22d3ee) 100%)`,
+                  }
+                : undefined
+            }
+          >
+            {siteName}
           </span>
         </Link>
 

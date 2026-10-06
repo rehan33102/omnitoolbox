@@ -1,0 +1,31 @@
+-- 012_seo.sql — SEO settings KV keys (DOCUMENTATION ONLY, no DDL).
+--
+-- The `seo_settings(key text primary key, value text)` table already exists
+-- (see 006_ads.sql). lib/kv.ts reads/writes the keys below as JSON, and
+-- lib/activity.ts appends admin actions to `activity_log`. No new tables,
+-- no RLS changes — the app uses the service-role client for all access.
+--
+-- Key inventory:
+--   sitemap_last_generated  JSON string, ISO timestamp of last sitemap rebuild
+--                           (legacy rows may hold a raw ISO string — readers
+--                           must tolerate both)
+--   seo_sitemap_meta        { "urlCount": number } — URL count from last rebuild
+--   seo_sitemap             { "tools": bool, "blog": bool, "directory": bool }
+--                           — sections included in app/sitemap.ts
+--   seo_defaults            { "titleTemplate": string, "description": string,
+--                             "ogImage": string,
+--                             "twitterCard": "summary" | "summary_large_image" }
+--                           — applied live by buildMetadata() in lib/seo.ts
+--   seo_robots              { "rules": string } — raw robots.txt body; when set,
+--                           app/robots.txt/route.ts serves it verbatim
+--   seo_verification        { "google": string, "bing": string } — rendered as
+--                           <meta> tags in <head> by
+--                           components/seo/VerificationTags.tsx
+--   seo_overrides           [ { "path": string, "title": string,
+--                               "description": string, "ogImage": string } ]
+--                           — exact-path overrides, applied first by
+--                           buildMetadata()
+--   activity_log            [ { "id", "ts", "action", "detail", "actor" } ]
+--                           — capped at 300 entries by lib/activity.ts
+
+select 1;

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { DollarSign, Globe, LayoutDashboard, Newspaper, Settings, Users, Wrench } from "lucide-react";
+import { DollarSign, Globe, LayoutDashboard, Newspaper, Settings, Users, Wrench, Image, History, HeartPulse, Megaphone, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
@@ -10,9 +10,14 @@ const LINKS = [
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/tools", label: "Tools Manager", icon: Wrench },
   { href: "/admin/blog", label: "Blog Manager", icon: Newspaper },
-  { href: "/admin/settings", label: "Site & Social", icon: Settings },
+  { href: "/admin/media", label: "Media Library", icon: Image },
+  { href: "/admin/analytics/visitors", label: "Analytics", icon: BarChart3 },
   { href: "/admin/monetization", label: "Monetization", icon: DollarSign },
+  { href: "/admin/engagement", label: "Engagement", icon: Megaphone },
   { href: "/admin/seo", label: "SEO & Sitemap", icon: Globe },
+  { href: "/admin/activity", label: "Activity Log", icon: History },
+  { href: "/admin/health", label: "System Health", icon: HeartPulse },
+  { href: "/admin/settings", label: "Site & Social", icon: Settings },
 ];
 
 export default function AdminSidebar() {

@@ -23,7 +23,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const tool = await getListing(params.slug);
   if (!tool) return {};
-  return buildMetadata({
+  return await buildMetadata({
     title: `${tool.name} — ${tool.tagline} | OmniToolBox`,
     description: tool.description.slice(0, 155),
     path: `/ai-directory/${tool.slug}`,

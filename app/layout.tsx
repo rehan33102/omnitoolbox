@@ -8,6 +8,11 @@ import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import AutoUpdater from "@/components/AutoUpdater";
+import AdPopup from "@/components/ads/AdPopup";
+import VisitTracker from "@/components/analytics/VisitTracker";
+import AnnouncementBar from "@/components/AnnouncementBar";
+import CommandPalette from "@/components/CommandPalette";
+import VerificationTags from "@/components/seo/VerificationTags";
 import { Toaster, ToastProvider } from "@/components/ui/Toast";
 import { siteUrl } from "@/lib/utils";
 import { SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
@@ -68,14 +73,21 @@ import { websiteJsonLd, organizationJsonLd } from "@/lib/seo";
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <VerificationTags />
+      </head>
       <body className={`${inter.variable} ${display.variable} ${condensed.variable} min-h-screen flex flex-col`}>
         <JsonLd data={[websiteJsonLd(), organizationJsonLd()]} />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ToastProvider>
             <ServiceWorkerRegister />
             <AutoUpdater />
+            <VisitTracker />
+            <AdPopup />
+            <CommandPalette />
             <GlobalErrorHooks />
             <ErrorBoundary name="root">
+              <AnnouncementBar />
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />

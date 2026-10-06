@@ -6,12 +6,14 @@ import WebToolTabs from "@/components/web/WebToolTabs";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 
-export const metadata = buildMetadata({
-  title: "Free Web Tools — QR Generator & Password Generator",
-  description: "Create custom QR codes (PNG/SVG) and generate cryptographically secure passwords — 100% client-side, private, free. No signup.",
-  path: "/web-tools",
-  keywords: ["qr code generator", "password generator", "free qr maker", "strong password generator", "secure password", "qr code png download"],
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "Free Web Tools — QR Generator & Password Generator",
+    description: "Create custom QR codes (PNG/SVG) and generate cryptographically secure passwords — 100% client-side, private, free. No signup.",
+    path: "/web-tools",
+    keywords: ["qr code generator", "password generator", "free qr maker", "strong password generator", "secure password", "qr code png download"],
+  });
+}
 
 export default function WebToolsPage() {
   return (

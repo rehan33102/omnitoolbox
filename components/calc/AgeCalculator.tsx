@@ -81,7 +81,7 @@ export default function AgeCalculator() {
               <span className="text-gradient">{calc.days}</span>
               <span className="text-lg text-zinc-600 dark:text-zinc-400 font-semibold"> days</span>
             </p>
-            <p className="text-xs text-zinc-500 mt-2">Born on a {calc.bornOn} 🎂</p>
+            <p className="text-xs text-zinc-500 mt-2">Born on a {calc.bornOn} </p>
           </div>
         )}
       </Card>
@@ -111,7 +111,7 @@ export default function AgeCalculator() {
           {calc ? (
             <div className="text-center py-2">
               {calc.daysToBday === 0 ? (
-                <p className="font-display text-2xl font-extrabold text-gradient">🎉 Happy Birthday! 🎉</p>
+                <p className="font-display text-2xl font-extrabold text-gradient"> Happy Birthday! </p>
               ) : (
                 <>
                   <p className="font-display text-4xl font-extrabold text-gradient">{calc.daysToBday}</p>

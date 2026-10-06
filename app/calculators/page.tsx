@@ -10,12 +10,14 @@ import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 
-export const metadata = buildMetadata({
-  title: "Free Calculators — Currency, Unit, BMI & Age Calculator",
-  description: "Free online calculators: live currency converter (USD, PKR, EUR, USDT…), unit converter, BMI & calorie calculator, age calculator. No signup, instant results.",
-  path: "/calculators",
-  keywords: ["currency converter", "usd to pkr", "unit converter", "bmi calculator", "calorie calculator", "age calculator", "free calculators"],
-});
+export async function generateMetadata() {
+  return buildMetadata({
+    title: "Free Calculators — Currency, Unit, BMI & Age Calculator",
+    description: "Free online calculators: live currency converter (USD, PKR, EUR, USDT…), unit converter, BMI & calorie calculator, age calculator. No signup, instant results.",
+    path: "/calculators",
+    keywords: ["currency converter", "usd to pkr", "unit converter", "bmi calculator", "calorie calculator", "age calculator", "free calculators"],
+  });
+}
 
 export default function CalculatorsPage() {
   return (
@@ -52,10 +54,10 @@ export default function CalculatorsPage() {
 
       <Tabs defaultValue="currency">
         <TabsList>
-          <TabsTrigger value="currency">💱 Currency</TabsTrigger>
-          <TabsTrigger value="unit">📏 Units</TabsTrigger>
-          <TabsTrigger value="bmi">🔥 BMI & Calories</TabsTrigger>
-          <TabsTrigger value="age">🎂 Age</TabsTrigger>
+          <TabsTrigger value="currency"> Currency</TabsTrigger>
+          <TabsTrigger value="unit"> Units</TabsTrigger>
+          <TabsTrigger value="bmi"> BMI & Calories</TabsTrigger>
+          <TabsTrigger value="age"> Age</TabsTrigger>
         </TabsList>
         <TabsContent value="currency" id="currency"><CurrencyConverter /></TabsContent>
         <TabsContent value="unit" id="unit"><UnitConverter /></TabsContent>

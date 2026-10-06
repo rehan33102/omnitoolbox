@@ -1,0 +1,13 @@
+-- 010_site_ads.sql — DOCUMENTATION ONLY. No DDL is needed.
+--
+-- Popup ads ("site_ads") live in the existing `seo_settings` key-value table
+-- (see lib/kv.ts), the same proven pattern used by the activity log and other
+-- dynamic site settings. New DDL cannot run from the app in production (no
+-- exec_sql RPC), so no new table is created.
+--
+-- Key:        'site_ads'
+-- Value:      JSON array of popup ad objects:
+--   [{ id, name, imageUrl, linkUrl, animation, durationSec, pages, enabled, createdAt }]
+-- Written by: app/api/admin/site-ads/route.ts (admin CRUD, service-role)
+-- Read by:    app/api/ads/active/route.ts (public, returns enabled ads only)
+SELECT 1;
