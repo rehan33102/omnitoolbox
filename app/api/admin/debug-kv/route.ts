@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("seo_settings")
-    .select("key, updated_at")
+    .select("key, value, updated_at")
     .eq("key", key)
     .order("updated_at", { ascending: false });
   return NextResponse.json({
