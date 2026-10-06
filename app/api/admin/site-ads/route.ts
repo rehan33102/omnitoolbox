@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requirePermission } from "@/lib/permissions";
 import { guardApi } from "@/lib/api-security";
-import { getKV, setKV } from "@/lib/kv";
+import { getKV, setKV, deleteKV } from "@/lib/kv";
 import { logActivity } from "@/lib/activity";
 import { PAGE_TARGETS } from "@/lib/ad-pages";
 
@@ -106,12 +106,24 @@ export async function PATCH(req: NextRequest) {
   if (!(await setKV(KEY, ads))) {
     return NextResponse.json({ error: "Failed to save" }, { status: 500 });
   }
+  // Verify-after-write: the update (e.g. disable) must be visible on re-read,
+  // otherwise the public feed could keep serving a disabled ad.
+  const after = await readAll();
+  const check = after.find((a) => a.id === id);
+  if (!check || ("enabled" in updates && check.enabled !== updates.enabled)) {
+    return NextResponse.json(
+      { error: "Update did not persist" },
+      { status: 500 }
+    );
+  }
   const changed = Object.keys(updates).join(", ");
   await logActivity("ad.updated", `Popup ad "${ads[idx].name}" updated (${changed || "no changes"})`);
   return NextResponse.json({ ok: true, ad: ads[idx] });
 }
 
-/** DELETE — remove a popup ad by ?id=. */
+/** DELETE — remove a popup ad by ?id=. Verifies the id is really gone
+ * afterwards: a "success" that still serves the ad publicly is worse than
+ * an honest failure. */
 export async function DELETE(req: NextRequest) {
   const denied = await guard(req);
   if (denied) return denied;
@@ -121,8 +133,18 @@ export async function DELETE(req: NextRequest) {
   const idx = ads.findIndex((a) => a.id === id);
   if (idx === -1) return NextResponse.json({ error: "Ad not found" }, { status: 404 });
   const [removed] = ads.splice(idx, 1);
-  if (!(await setKV(KEY, ads))) {
+  // Empty list: remove the key entirely instead of storing [].
+  const saved = ads.length === 0 ? await deleteKV(KEY) : await setKV(KEY, ads);
+  if (!saved) {
     return NextResponse.json({ error: "Failed to save" }, { status: 500 });
+  }
+  // Verify-after-write: re-read and confirm the deleted ad is really gone.
+  const after = await readAll();
+  if (after.some((a) => a.id === id)) {
+    return NextResponse.json(
+      { error: "Delete did not persist — ad still present" },
+      { status: 500 }
+    );
   }
   await logActivity("ad.deleted", `Popup ad "${removed?.name ?? id}" deleted`);
   return NextResponse.json({ ok: true, deleted: id });

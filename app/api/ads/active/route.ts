@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getKV } from "@/lib/kv";
+import { getKVWithMeta } from "@/lib/kv";
 
 // Must be dynamic: this feed reflects live admin changes. A static
 // prerender would bake the build-time (empty) result forever.
@@ -8,7 +8,11 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/ads/active — public feed of enabled popup ads for the AdPopup
- * client component. No auth. Response is cacheable for 60s.
+ * client component. No auth.
+ *
+ * Caching: NONE (no-store). This feed must reflect admin deletes/disables
+ * immediately — a deleted ad must never be served again. The payload is tiny;
+ * freshness beats the few ms a cache would save.
  */
 export interface SiteAd {
   id: string;
@@ -25,7 +29,7 @@ export interface SiteAd {
 const KEY = "site_ads";
 
 export async function GET() {
-  const all = await getKV<SiteAd[]>(KEY, []);
+  const { value: all, updatedAt } = await getKVWithMeta<SiteAd[]>(KEY, []);
   const ads = all
     .filter((a) => a && a.enabled)
     .map((a) => ({
@@ -39,6 +43,13 @@ export async function GET() {
     }));
   return NextResponse.json(
     { ads },
-    { headers: { "Cache-Control": "public, max-age=60" } }
+    {
+      headers: {
+        "Cache-Control": "no-store, no-cache, must-revalidate",
+        Pragma: "no-cache",
+        // Lets clients/admins confirm they are seeing the latest write.
+        "X-Ads-Version": updatedAt ?? "none",
+      },
+    }
   );
 }

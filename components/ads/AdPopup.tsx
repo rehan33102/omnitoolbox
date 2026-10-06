@@ -30,7 +30,8 @@ export default function AdPopup() {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch("/api/ads/active", { cache: "default" });
+        // no-store: the feed must never serve a cached (deleted) ad.
+        const res = await fetch("/api/ads/active", { cache: "no-store" });
         if (!res.ok) return;
         const json = await res.json();
         const ads: ActiveAd[] = json.ads ?? [];
