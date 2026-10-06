@@ -222,9 +222,20 @@ export default function VisitorsAnalyticsPage() {
         </div>
         <p className="text-xs text-zinc-500 mb-4">Visitors active in the last 5 minutes</p>
         {!geoEnabled && (
-          <p className="text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2.5 mb-4">
-            Run the database setup SQL to enable location for the live list.
-          </p>
+          <div className="text-xs text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded-xl px-3 py-2.5 mb-4">
+            <p className="font-medium mb-1">Location columns missing in the database.</p>
+            <p className="mb-2">Run this SQL once in Supabase Dashboard → SQL Editor, then reload:</p>
+            <pre className="bg-black/40 rounded-lg p-2 overflow-x-auto text-[11px] leading-relaxed select-all">
+{`alter table analytics_events
+  add column if not exists country text,
+  add column if not exists city text,
+  add column if not exists latitude double precision,
+  add column if not exists longitude double precision,
+  add column if not exists user_id text,
+  add column if not exists user_email text,
+  add column if not exists user_name text;`}
+            </pre>
+          </div>
         )}
         <div className="space-y-2">
           {liveList.map((v) => (
