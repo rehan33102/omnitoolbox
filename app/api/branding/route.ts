@@ -69,9 +69,12 @@ async function guard(req: NextRequest) {
 export async function GET() {
   const branding = await getKV<BrandingPayload>(KV_KEY, DEFAULT_BRANDING);
   const merged = { ...DEFAULT_BRANDING, ...branding };
-  return NextResponse.json(merged, {
-    headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120" },
-  });
+  return NextResponse.json(
+    { ...merged, _v: "kvfix2" },
+    {
+      headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120" },
+    }
+  );
 }
 
 /** PUT — admin only. Validates + persists branding to the KV store. */
