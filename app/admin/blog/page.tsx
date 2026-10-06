@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import Switch from "@/components/ui/Switch";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Input, Textarea } from "@/components/ui/Input";
 import Skeleton from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
@@ -24,6 +25,8 @@ export default function AdminBlogPage() {
   const [loaded, setLoaded] = useState(false);
   const [modal, setModal] = useState<{ mode: "add" | "edit"; form: BlogForm } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<BlogPost | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
@@ -86,15 +89,21 @@ export default function AdminBlogPage() {
     }
   };
 
-  const remove = async (p: BlogPost) => {
-    if (!confirm(`Delete "${p.title}"? It will disappear from the blog. You can re-add it later with the same slug.`)) return;
-    const res = await fetch(`/api/admin/blog?slug=${encodeURIComponent(p.slug)}`, { method: "DELETE" });
-    if (!res.ok) {
+  const remove = async () => {
+    const p = deleteTarget;
+    if (!p) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/blog?slug=${encodeURIComponent(p.slug)}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      toast({ title: "Deleted", variant: "success" });
+      setDeleteTarget(null);
+      load();
+    } catch {
       toast({ title: "Delete failed", variant: "error" });
-      return;
+    } finally {
+      setDeleting(false);
     }
-    toast({ title: "Deleted", variant: "success" });
-    load();
   };
 
   const set = <K extends keyof BlogForm>(k: K, v: BlogForm[K]) =>
@@ -135,7 +144,7 @@ export default function AdminBlogPage() {
                   className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition">
                   <Pencil size={15} className="text-zinc-600 dark:text-zinc-400" />
                 </button>
-                <button onClick={() => remove(p)} aria-label={`Delete ${p.title}`}
+                <button onClick={() => setDeleteTarget(p)} aria-label={`Delete ${p.title}`}
                   className="p-2 rounded-lg hover:bg-red-500/10 transition">
                   <Trash2 size={15} className="text-red-600 dark:text-red-400" />
                 </button>
@@ -185,6 +194,15 @@ export default function AdminBlogPage() {
       <p className="text-xs text-zinc-500">
         Posts are stored in the database — publishing shows the post on /blog for all visitors, no redeploy.
       </p>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete post?"
+        message={deleteTarget ? `Delete "${deleteTarget.title}"? It will disappear from the blog. You can re-add it later with the same slug.` : ""}
+        onConfirm={remove}
+        onClose={() => !deleting && setDeleteTarget(null)}
+        busy={deleting}
+      />
     </div>
   );
 }

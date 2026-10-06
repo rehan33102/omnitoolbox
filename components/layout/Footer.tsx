@@ -83,7 +83,7 @@ export default function Footer() {
             </span>
           </Link>
           <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-xs leading-relaxed">
-            {branding.footerText || settings.tagline}
+            {branding.footerText || branding.tagline || settings.tagline}
           </p>
           <div className="flex gap-2 mt-4">
             {socials.map(({ label, href, Icon }) => (

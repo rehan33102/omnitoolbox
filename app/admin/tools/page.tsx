@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import Switch from "@/components/ui/Switch";
 import Badge from "@/components/ui/Badge";
 import Modal from "@/components/ui/Modal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { Input, Textarea } from "@/components/ui/Input";
 import Skeleton from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
@@ -39,6 +40,8 @@ export default function AdminToolsPage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ mode: "add" | "edit"; form: ToolForm } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Tool | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const { toast } = useToast();
 
   const load = async () => {
@@ -81,17 +84,23 @@ export default function AdminToolsPage() {
       },
     });
 
-  const remove = async (t: Tool) => {
-    if (!confirm(`Delete "${t.title}"? It will disappear from the site. You can re-add it later with the same slug.`)) return;
-    const res = await fetch(`/api/admin/tools?slug=${encodeURIComponent(t.slug)}`, { method: "DELETE" });
-    if (!res.ok) {
+  const remove = async () => {
+    const t = deleteTarget;
+    if (!t) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/tools?slug=${encodeURIComponent(t.slug)}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      // Clear any local override so a later re-add starts clean.
+      deleteToolOverride(t.slug).catch(() => {});
+      toast({ title: "Tool deleted", variant: "success" });
+      setDeleteTarget(null);
+      load();
+    } catch {
       toast({ title: "Delete failed", variant: "error" });
-      return;
+    } finally {
+      setDeleting(false);
     }
-    // Clear any local override so a later re-add starts clean.
-    deleteToolOverride(t.slug).catch(() => {});
-    toast({ title: "Tool deleted", variant: "success" });
-    load();
   };
 
   const save = async () => {
@@ -170,7 +179,7 @@ export default function AdminToolsPage() {
                   className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition">
                   <Pencil size={15} className="text-zinc-600 dark:text-zinc-400" />
                 </button>
-                <button onClick={() => remove(t)} aria-label={`Delete ${t.title}`}
+                <button onClick={() => setDeleteTarget(t)} aria-label={`Delete ${t.title}`}
                   className="p-2 rounded-lg hover:bg-red-500/10 transition">
                   <Trash2 size={15} className="text-red-600 dark:text-red-400" />
                 </button>
@@ -226,6 +235,15 @@ export default function AdminToolsPage() {
           </div>
         )}
       </Modal>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete tool?"
+        message={deleteTarget ? `Delete "${deleteTarget.title}"? It will disappear from the site. You can re-add it later with the same slug.` : ""}
+        onConfirm={remove}
+        onClose={() => !deleting && setDeleteTarget(null)}
+        busy={deleting}
+      />
     </div>
   );
 }

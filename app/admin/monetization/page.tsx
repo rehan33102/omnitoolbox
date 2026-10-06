@@ -9,6 +9,7 @@ import Badge from "@/components/ui/Badge";
 import { Input } from "@/components/ui/Input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 import Skeleton from "@/components/ui/Skeleton";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { useToast } from "@/components/ui/Toast";
 import { PAGE_TARGETS } from "@/lib/ad-pages";
 import type { AdConfig, AdType } from "@/types";
@@ -62,6 +63,11 @@ export default function AdminMonetizationPage() {
   const [popupSaving, setPopupSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  // In-app delete confirmation (native confirm() is auto-dismissed in
+  // headless/automated browsers, making the button look dead).
+  const [deletePopupTarget, setDeletePopupTarget] = useState<SiteAd | null>(null);
+  const [deleteConfigTarget, setDeleteConfigTarget] = useState<AdConfig | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   /* ---------------- ad_configs (AdSense) state ---------------- */
   const [ads, setAds] = useState<AdConfig[]>([]);
@@ -201,22 +207,27 @@ export default function AdminMonetizationPage() {
     }
   };
 
-  const removeSiteAd = async (id: string, name: string) => {
-    if (!confirm(`Delete popup ad "${name}"?`)) return;
+  const removeSiteAd = async () => {
+    const target = deletePopupTarget;
+    if (!target) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/site-ads?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/site-ads?id=${encodeURIComponent(target.id)}`, { method: "DELETE" });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.ok) throw new Error(json.error || "Delete failed");
       const check = await fetch("/api/admin/site-ads");
       const list = await check.json().catch(() => ({}));
-      if ((list.ads ?? []).some((a: SiteAd) => a.id === id)) {
+      if ((list.ads ?? []).some((a: SiteAd) => a.id === target.id)) {
         toast({ title: "Delete failed — still present", variant: "error" });
         return;
       }
       toast({ title: "Popup ad deleted", variant: "success" });
       setSiteAds(list.ads ?? []);
+      setDeletePopupTarget(null);
     } catch (e) {
       toast({ title: e instanceof Error ? e.message : "Delete failed", variant: "error" });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -231,28 +242,33 @@ export default function AdminMonetizationPage() {
     });
   };
 
-  /** Delete a placement. Fixed: verifies the API response and re-GETs the
+  /** Delete a placement. Verifies the API response and re-GETs the
    * list to confirm the row is actually gone before announcing success. */
-  const remove = async (id: string) => {
-    if (!confirm("Delete this ad config?")) return;
+  const remove = async () => {
+    const target = deleteConfigTarget;
+    if (!target) return;
+    setDeleting(true);
     try {
-      const res = await fetch(`/api/admin/ads?id=${encodeURIComponent(id)}`, { method: "DELETE" });
+      const res = await fetch(`/api/admin/ads?id=${encodeURIComponent(target.id)}`, { method: "DELETE" });
       const json = await res.json().catch(() => ({}));
       if (!res.ok || !json.ok) throw new Error(json.error || "Delete failed");
       // Re-fetch and confirm the row is really gone.
       const check = await fetch("/api/admin/ads");
       const list = await check.json().catch(() => ({}));
       const remaining: AdConfig[] = list.ads ?? [];
-      if (remaining.some((a) => a.id === id)) {
+      if (remaining.some((a) => a.id === target.id)) {
         toast({ title: "Delete failed — still present", variant: "error" });
         setAds(remaining);
         return;
       }
       toast({ title: "Ad config deleted", variant: "success" });
       setAds(remaining);
+      setDeleteConfigTarget(null);
     } catch (e) {
       toast({ title: e instanceof Error ? e.message : "Delete failed", variant: "error" });
       load();
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -402,7 +418,7 @@ export default function AdminMonetizationPage() {
                   className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition">
                   <Pencil size={15} className="text-zinc-500" />
                 </button>
-                <button onClick={() => removeSiteAd(a.id, a.name)} aria-label="Delete"
+                <button onClick={() => setDeletePopupTarget(a)} aria-label="Delete"
                   className="p-2 rounded-lg hover:bg-red-500/10 transition">
                   <Trash2 size={15} className="text-red-600 dark:text-red-400" />
                 </button>
@@ -473,7 +489,7 @@ export default function AdminMonetizationPage() {
                   </p>
                 </div>
                 <Switch checked={a.enabled} onChange={(v) => toggle(a.id, v)} label={`Toggle ${a.placement}`} />
-                <button onClick={() => remove(a.id)} aria-label="Delete"
+                <button onClick={() => setDeleteConfigTarget(a)} aria-label="Delete"
                   className="p-2 rounded-lg hover:bg-red-500/10 transition">
                   <Trash2 size={15} className="text-red-600 dark:text-red-400" />
                 </button>
@@ -490,6 +506,23 @@ export default function AdminMonetizationPage() {
           Slot-level control above is fully dynamic.
         </p>
       </Card>
+
+      <ConfirmModal
+        open={!!deletePopupTarget}
+        title="Delete popup ad?"
+        message={deletePopupTarget ? `Delete popup ad "${deletePopupTarget.name}"? It will stop showing on the site immediately.` : ""}
+        onConfirm={removeSiteAd}
+        onClose={() => !deleting && setDeletePopupTarget(null)}
+        busy={deleting}
+      />
+      <ConfirmModal
+        open={!!deleteConfigTarget}
+        title="Delete ad placement?"
+        message={deleteConfigTarget ? `Delete the "${deleteConfigTarget.placement}" placement?` : ""}
+        onConfirm={remove}
+        onClose={() => !deleting && setDeleteConfigTarget(null)}
+        busy={deleting}
+      />
     </div>
   );
 }

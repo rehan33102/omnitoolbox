@@ -183,11 +183,26 @@ function BrandingCard() {
       });
       const j = await res.json().catch(() => ({}));
       if (!res.ok || !j.ok) throw new Error(j.error || "Save failed");
-      window.dispatchEvent(new CustomEvent<Branding>(BRANDING_UPDATED_EVENT, { detail: j.branding }));
+      // Verify-after-write: re-read the authoritative value and confirm it
+      // stuck. A silent revert (stale KV read) used to make this button look
+      // broken — now a mismatch surfaces a loud error instead of a fake OK.
+      const verify = await fetch(`/api/branding?t=${Date.now()}`, { cache: "no-store" });
+      const saved = await verify.json().catch(() => null);
+      const stuck =
+        saved &&
+        (saved.tagline ?? "") === (b.tagline ?? "") &&
+        (saved.siteName ?? "") === (b.siteName ?? "") &&
+        (saved.accentColor ?? "") === (b.accentColor ?? "");
+      if (!stuck) {
+        throw new Error("Save did not stick on the server — please try again.");
+      }
+      // Adopt the server truth (never trust the request echo alone).
+      setB({ ...DEFAULT_BRANDING, ...saved });
+      window.dispatchEvent(new CustomEvent<Branding>(BRANDING_UPDATED_EVENT, { detail: saved }));
       toast({
         title: "Branding saved",
         variant: "success",
-        description: "Live for all visitors — header, footer and favicon update instantly.",
+        description: "Verified live for all visitors — header, footer and favicon update instantly.",
       });
     } catch (e) {
       toast({

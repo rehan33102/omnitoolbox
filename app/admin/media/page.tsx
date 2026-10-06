@@ -6,6 +6,7 @@ import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import Skeleton from "@/components/ui/Skeleton";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import { useToast } from "@/components/ui/Toast";
 import { formatBytes } from "@/lib/utils";
 import type { MediaItem } from "@/app/api/admin/media/route";
@@ -16,6 +17,8 @@ export default function AdminMediaPage() {
   const [uploading, setUploading] = useState(false);
   const [urlInput, setUrlInput] = useState("");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<MediaItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -82,15 +85,31 @@ export default function AdminMediaPage() {
     }
   };
 
-  const remove = async (item: MediaItem) => {
-    if (!confirm(`Delete "${item.name}" from the media library?`)) return;
-    const res = await fetch(`/api/admin/media?id=${encodeURIComponent(item.id)}`, { method: "DELETE" });
-    if (!res.ok) {
-      toast({ title: "Delete failed", variant: "error" });
-      return;
+  const remove = async () => {
+    const item = deleteTarget;
+    if (!item) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/media?id=${encodeURIComponent(item.id)}`, { method: "DELETE" });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json.ok === false) throw new Error(json.error || "Delete failed");
+      // Re-GET and confirm the row is really gone before announcing success.
+      const check = await fetch("/api/admin/media");
+      const list = await check.json().catch(() => ({}));
+      const remaining: MediaItem[] = list.items ?? [];
+      if (remaining.some((m) => m.id === item.id)) {
+        toast({ title: "Delete failed — still present", variant: "error" });
+        setItems(remaining);
+        return;
+      }
+      toast({ title: "Deleted", variant: "success" });
+      setItems(remaining);
+      setDeleteTarget(null);
+    } catch (e) {
+      toast({ title: e instanceof Error ? e.message : "Delete failed", variant: "error" });
+    } finally {
+      setDeleting(false);
     }
-    toast({ title: "Deleted", variant: "success" });
-    load(); // re-GET to confirm the delete stuck
   };
 
   return (
@@ -180,7 +199,7 @@ export default function AdminMediaPage() {
                       size="sm"
                       variant="ghost"
                       className="text-red-600 hover:text-red-700"
-                      onClick={() => remove(item)}
+                      onClick={() => setDeleteTarget(item)}
                       title="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -192,6 +211,15 @@ export default function AdminMediaPage() {
           </div>
         )}
       </div>
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete media?"
+        message={deleteTarget ? `Delete "${deleteTarget.name}" from the media library? Pages using this image will lose it.` : ""}
+        onConfirm={remove}
+        onClose={() => !deleting && setDeleteTarget(null)}
+        busy={deleting}
+      />
     </div>
   );
 }
