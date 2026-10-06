@@ -127,6 +127,34 @@ export async function getKVWithMeta<T>(
   }
 }
 
+/** Read a JSON value by key using the simplest possible query shape
+ * (no null-filter, no limit — take the newest row in JS). This matches the
+ * diagnostic query that provably returns correct data in production.
+ * Used for branding where the ordered/limited query shape returned stale rows.
+ */
+export async function getKVSimple<T>(key: string, fallback: T): Promise<T> {
+  try {
+    const supabase = createAdminClient();
+    const { data, error } = await supabase
+      .from("seo_settings")
+      .select("value, updated_at")
+      .eq("key", key)
+      .order("updated_at", { ascending: false });
+    if (error || !Array.isArray(data) || data.length === 0) return fallback;
+    // Pick the newest non-null updated_at row in JS (deterministic).
+    const valid = data.filter((r) => r?.updated_at != null && r?.value != null);
+    const row = valid.length > 0 ? valid[0] : data[0];
+    if (!row?.value) return fallback;
+    try {
+      return JSON.parse(row.value) as T;
+    } catch {
+      return fallback;
+    }
+  } catch {
+    return fallback;
+  }
+}
+
 /** Raw string read (for non-JSON values like timestamps). */
 export async function getKVRaw(key: string): Promise<string | null> {
   try {
