@@ -5,7 +5,9 @@ import { guardApi } from "@/lib/api-security";
 import { getKV, setKV } from "@/lib/kv";
 import { logActivity } from "@/lib/activity";
 
-const KV_KEY = "site_branding";
+// v2 key: the original "site_branding" key has legacy corrupt/duplicate rows
+// in production that cause stale reads. Using a fresh key bypasses them.
+const KV_KEY = "site_branding_v2";
 
 // Public GET must be dynamic: branding is edited live in admin. A static
 // prerender would bake build-time defaults forever.
