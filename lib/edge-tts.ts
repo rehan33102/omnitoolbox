@@ -104,7 +104,7 @@ export interface EdgeStyle { label: string; rate: number; pitch: number; pause: 
 export const EDGE_STYLES: Record<string, EdgeStyle> = {
   sleep:     { label: " Sleep / Deep Calm",  rate: -14, pitch: -6, pause: 0.8 },
   calm:      { label: " Calm Story",         rate: -8,  pitch: -3, pause: 0.5 },
-  normal:    { label: "️ Normal",             rate: 0,   pitch: 0,  pause: 0.3 },
+  normal:    { label: " Normal",             rate: 0,   pitch: 0,  pause: 0.3 },
   energetic: { label: " Energetic / YouTube", rate: 8,   pitch: 2,  pause: 0.2 },
 };
 

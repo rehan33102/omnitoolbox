@@ -212,7 +212,7 @@ const spongebob = (s: string) => {
   return [...s].map((c) => (/[a-zA-Z]/.test(c) ? (i++ % 2 === 0 ? c.toUpperCase() : c.toLowerCase()) : c)).join("");
 };
 const backwards = (s: string) => [...s].reverse().join("");
-const clap = (s: string) => s.split(" ").join("  ");
+const clap = (s: string) => s.split(" ").join(" ");
 const spaced = (s: string) => [...s].join(" ");
 const vaporwave = (s: string) =>
   [...s].map((c) => { const n = c.codePointAt(0)!; return n >= 0x21 && n <= 0x7e ? String.fromCodePoint(n + 0xfee0) : c; }).join("　");
@@ -297,24 +297,24 @@ export const FANCY_STYLES: FancyStyle[] = [
   { id: "deco-dblangle", label: "《 Angles 》", transform: wrap("《", "》") },
   { id: "deco-tortoise", label: "〖 Tortoise 〗", transform: wrap("〖", "〗") },
   { id: "deco-corner", label: "「 Corner 」", transform: wrap("「", "」") },
-  { id: "deco-ornparen", label: "❨ Ornate Paren ❩", transform: wrap("❨", "❩") },
-  { id: "deco-orncurl", label: "❴ Ornate Curl ❵", transform: wrap("❴", "❵") },
+  { id: "deco-ornparen", label: " Ornate Paren ", transform: wrap("", "") },
+  { id: "deco-orncurl", label: " Ornate Curl ", transform: wrap("", "") },
   { id: "deco-mathangle", label: "⟪ Math Angle ⟫", transform: wrap("⟪", "⟫") },
   { id: "deco-whitesquare", label: "⟦ White Square ⟧", transform: wrap("⟦", "⟧") },
   { id: "deco-turtle", label: "⦃ Turtle ⦄", transform: wrap("⦃", "⦄") },
-  { id: "deco-quote1", label: "❝ Quote ❞", transform: wrap("❝", "❞") },
-  { id: "deco-quote2", label: "❛ Quote ❜", transform: wrap("❛", "❜") },
+  { id: "deco-quote1", label: " Quote ", transform: wrap("", "") },
+  { id: "deco-quote2", label: " Quote ", transform: wrap("", "") },
 
   /* ---- Arrows & pointers ---- */
   { id: "deco-arrows", label: "→ Arrows ←", transform: wrap("→ ", " ←") },
   { id: "deco-guillemet", label: "» Guillemets «", transform: wrap("» ", " «") },
-  { id: "deco-fancyarrow", label: "➳ Fancy Arrows ➳", transform: wrap("➳ ", " ➳") },
+  { id: "deco-fancyarrow", label: " Fancy Arrows ", transform: wrap(" ", " ") },
   { id: "deco-pointer", label: " Pointer ", transform: wrap(" ", " ") },
 
   /* ---- Stars & sparkles ---- */
   { id: "deco-stars", label: " Stars ", transform: wrap(" ", " ") },
   { id: "deco-stars2", label: " Hollow Stars ", transform: wrap(" ", " ") },
-  { id: "deco-sparkle", label: "✧ Sparkles ✧", transform: wrap("✧･ﾟ: *✧･ﾟ:", ":･ﾟ✧*:･ﾟ✧") },
+  { id: "deco-sparkle", label: " Sparkles ", transform: wrap("･ﾟ: *･ﾟ:", ":･ﾟ*:･ﾟ") },
   { id: "deco-cutestars", label: "｡･:*:･ﾟ Cute ﾟ･:*:･｡", transform: wrap("｡･:*:･ﾟ ", " ﾟ･:*:･｡") },
   { id: "deco-stardivider", label: "⋆ Star Divider ⋆", transform: wrap("⋆ ", " ⋆") },
   { id: "deco-plus", label: "₊˚ Plus ˚₊", transform: wrap("₊˚ ", " ˚₊") },
@@ -330,16 +330,16 @@ export const FANCY_STYLES: FancyStyle[] = [
   { id: "deco-crown", label: " Crown ", transform: wrap(" ", " ") },
   { id: "deco-music", label: " Music ", transform: wrap(" ", " ") },
   { id: "deco-music2", label: " Music ", transform: wrap(" ", " ") },
-  { id: "deco-flower", label: "❀ Flower ❀", transform: wrap("❀ ", " ❀") },
-  { id: "deco-snow", label: "❄ Snow ❄", transform: wrap("❄ ", " ❄") },
+  { id: "deco-flower", label: " Flower ", transform: wrap(" ", " ") },
+  { id: "deco-snow", label: " Snow ", transform: wrap(" ", " ") },
   { id: "deco-moon", label: " Moon ", transform: wrap(" ", " ") },
   { id: "deco-skull", label: " Skull ", transform: wrap(" ", " ") },
   { id: "deco-diamond", label: "◆ Diamond ◆", transform: wrap("◆ ", " ◆") },
   { id: "deco-diamond2", label: "◇ Hollow Diamond ◇", transform: wrap("◇ ", " ◇") },
   { id: "deco-spade", label: " Spade ", transform: wrap(" ", " ") },
   { id: "deco-club", label: " Club ", transform: wrap(" ", " ") },
-  { id: "deco-check", label: "✔ Check ✔", transform: wrap("✔ ", " ✔") },
-  { id: "deco-cross", label: "✖ Cross ✖", transform: wrap("✖ ", " ✖") },
+  { id: "deco-check", label: " Check ", transform: wrap(" ", " ") },
+  { id: "deco-cross", label: " Cross ", transform: wrap(" ", " ") },
 
   /* ---- Lines, waves, dots ---- */
   { id: "deco-wave", label: "〜 Wave 〜", transform: wrap("〜", "〜") },

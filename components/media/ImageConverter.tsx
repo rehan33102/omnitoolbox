@@ -107,7 +107,7 @@ export default function ImageConverter() {
       } catch {
         /* library save is non-critical */
       }
-      toast({ title: "Converted ✅", variant: "success", description: `${file.name} → ${format.toUpperCase()}` });
+      toast({ title: "Converted ", variant: "success", description: `${file.name} → ${format.toUpperCase()}` });
     } catch {
       toast({ title: "Conversion failed", variant: "error", description: "Try a different image" });
     } finally {
@@ -194,7 +194,7 @@ export default function ImageConverter() {
               <div className="text-sm">
                 <p className="font-medium">Ready to download</p>
                 <p className="text-zinc-500 text-xs">{formatBytes(file.size)} → {formatBytes(result.size)}</p>
-                {savedNote && <p className="text-emerald-700 dark:text-emerald-400 text-xs mt-1">Saved to Library ✓</p>}
+                {savedNote && <p className="text-emerald-700 dark:text-emerald-400 text-xs mt-1">Saved to Library </p>}
               </div>
               <Button size="sm" onClick={handleDownload}><Download size={14} /> Download</Button>
             </div>

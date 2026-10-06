@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Lock, Mail, UserPlus, LogIn, ShieldCheck, KeyRound, CheckCircle2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Lock, Mail, UserPlus, LogIn, ShieldCheck } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -12,29 +12,43 @@ import { cn } from "@/lib/utils";
 /**
  * Professional admin auth — Facebook-style.
  *
- * SIGNUP: email + password → OTP sent to email → enter 6-digit OTP →
- *         account verified → auto-login → dashboard.
- * LOGIN:  email + password → checks database → if verified, direct login.
- *         (OTP only needed once, during signup.)
+ * SIGNUP: email + password → instant activation → auto-login → dashboard.
+ * LOGIN:  email + password → direct login → dashboard.
+ * (No OTP anywhere — removed per owner directive.)
  */
-type Step = "form" | "otp";
 
 export default function AdminAuthPage() {
   const { toast } = useToast();
   const [mode, setMode] = useState<"login" | "signup">("login");
-  const [step, setStep] = useState<Step>("form");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [otp, setOtp] = useState("");
   const [busy, setBusy] = useState(false);
 
   const goToDashboard = () => {
     window.location.href = "/admin";
   };
 
+  // Already signed in? Skip the form — go straight to the dashboard.
+  // (Single deterministic redirect; never loops.)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const supabase = createClient();
+        const { data } = await supabase.auth.getUser();
+        if (!cancelled && data?.user) window.location.href = "/admin";
+      } catch {
+        /* stay on the form */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   /** After any successful auth: go to dashboard. */
   const finishAuth = async () => {
-    toast({ title: "Welcome, Boss! 🎉", variant: "success" });
+    toast({ title: "Welcome back!", variant: "success" });
     goToDashboard();
   };
 
@@ -98,51 +112,6 @@ export default function AdminAuthPage() {
     }
   };
 
-  const handleOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.trim().length < 6) {
-      toast({ title: "Please enter the 6-digit OTP.", variant: "error" });
-      return;
-    }
-    setBusy(true);
-    try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.verifyOtp({
-        email: email.trim(),
-        token: otp.trim(),
-        type: "signup",
-      });
-      if (error) throw error;
-      await finishAuth();
-    } catch (err) {
-      toast({ title: "Incorrect OTP", description: (err as Error).message, variant: "error" });
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const resendOtp = async () => {
-    setBusy(true);
-    try {
-      const supabase = createClient();
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: email.trim(),
-      });
-      if (error) throw error;
-      toast({ title: "OTP resent! 📧", variant: "success" });
-    } catch (err) {
-      toast({ title: "Resend failed", description: (err as Error).message, variant: "error" });
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const backToForm = () => {
-    setStep("form");
-    setOtp("");
-  };
-
   return (
     <div className="container py-16 max-w-md mx-auto">
       <Card className="border-2 border-amber-500/20">
@@ -152,55 +121,12 @@ export default function AdminAuthPage() {
           </span>
           <div>
             <h1 className="font-display text-2xl font-bold">Admin Panel</h1>
-            <p className="text-sm text-zinc-500">Owner access only 🔐</p>
+            <p className="text-sm text-zinc-500">Owner access only</p>
           </div>
         </div>
 
-        {step === "otp" ? (
-          /* ============ OTP VERIFICATION STEP ============ */
-          <div className="mt-6">
-            <div className="text-center mb-6">
-              <span className="inline-flex p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mb-3">
-                <CheckCircle2 size={24} />
-              </span>
-              <h2 className="font-bold text-lg">Verify Your Email</h2>
-              <p className="text-sm text-zinc-500 mt-1">
-                We&apos;ve sent a 6-digit OTP to <b>{email}</b>.
-                <br />Enter the code here:
-              </p>
-            </div>
-            <form onSubmit={handleOtpSubmit} className="space-y-4">
-              <Input
-                type="text"
-                inputMode="numeric"
-                placeholder="6-digit OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                className="text-center text-2xl font-mono tracking-[0.5em] py-4"
-                maxLength={6}
-                required
-                autoFocus
-              />
-              <Button type="submit" disabled={busy} className="w-full" size="lg">
-                {busy ? "Verifying..." : "Verify & Open Dashboard 🚀"}
-              </Button>
-            </form>
-            <div className="flex justify-between mt-4 text-sm">
-              <button onClick={backToForm} className="text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200">
-                ← Back
-              </button>
-              <button
-                onClick={resendOtp}
-                disabled={busy}
-                className="text-amber-600 dark:text-amber-400 font-semibold hover:underline disabled:opacity-50"
-              >
-                Resend OTP
-              </button>
-            </div>
-          </div>
-        ) : (
-          /* ============ LOGIN / SIGNUP FORM ============ */
-          <>
+        {/* ============ LOGIN / SIGNUP FORM ============ */}
+        <>
             <div className="flex gap-2 my-6 p-1 rounded-full bg-black/5 dark:bg-white/5">
               {(["login", "signup"] as const).map((m) => (
                 <button
@@ -244,7 +170,7 @@ export default function AdminAuthPage() {
                 />
               </div>
               <Button type="submit" disabled={busy} className="w-full" size="lg">
-                {busy ? "Please wait..." : mode === "login" ? "Open Dashboard 🚀" : "Create Account ✨"}
+                {busy ? "Please wait..." : mode === "login" ? "Open Dashboard" : "Create Account"}
               </Button>
             </form>
 
@@ -256,7 +182,6 @@ export default function AdminAuthPage() {
               )}
             </p>
           </>
-        )}
       </Card>
     </div>
   );

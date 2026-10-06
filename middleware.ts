@@ -2,8 +2,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
 
-/** Owner's secret bypass key — ADMIN_BYPASS_KEY env var preferred, fallback for continuity. */
-const BOSS_KEY = process.env.ADMIN_BYPASS_KEY || "boss-x7k9m2-2026";
+/** Owner's secret bypass key — ADMIN_BYPASS_KEY env var only. No hardcoded fallback. */
+const BOSS_KEY = process.env.ADMIN_BYPASS_KEY || "";
 
 /** Admin emails — must match lib/auth.ts owner list */
 const ADMIN_EMAILS = ["rehan.work3310@gmail.com", "info.rehan3310@gmail.com"];
@@ -41,11 +41,20 @@ export async function middleware(req: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   const isApi = req.nextUrl.pathname.startsWith("/api/");
+  const isAdminAuthPage = req.nextUrl.pathname === "/admin/auth";
+
+  // The dedicated admin login page must always render — never redirect it,
+  // otherwise logged-out visitors bounce between /admin/auth and /login.
+  if (isAdminAuthPage && !isApi) {
+    return res;
+  }
 
   if (!user) {
     if (isApi) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // All admin paths share one canonical login: /admin/auth (matches the
+    // admin layout's own redirect target — no contradictory /login hop).
     const url = req.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = "/admin/auth";
     url.searchParams.set("next", req.nextUrl.pathname);
     return NextResponse.redirect(url);
   }

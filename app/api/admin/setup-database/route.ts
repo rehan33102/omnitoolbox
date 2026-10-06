@@ -131,14 +131,18 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ sql: MIGRATIONS.join(";\n\n") + ";" });
   }
 
-  // Check which tables exist
+  // Check which tables exist. NOTE: not every table has an `id` column
+  // (seo_settings uses `key` as its primary key), so probe information_schema
+  // instead of selecting a column — this is schema-agnostic and honest.
   const supabase = createAdminClient();
-  const tables = ["analytics_events", "profiles", "tools_cms", "blog_posts", "ads_config", "user_library", "seo_settings"];
+  const tables = ["analytics_events", "profiles", "tools_cms", "blog_posts", "ad_configs", "user_library", "seo_settings"];
   const status: Record<string, boolean> = {};
 
   for (const t of tables) {
     try {
-      const { error } = await supabase.from(t).select("id", { head: true, count: "exact" });
+      // Zero-row read: schema-agnostic (works for tables keyed by `key`
+      // like seo_settings, not just `id`) and proves the table is usable.
+      const { error } = await supabase.from(t).select("*", { head: true }).limit(0);
       status[t] = !error;
     } catch {
       status[t] = false;

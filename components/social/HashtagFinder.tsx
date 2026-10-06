@@ -15,7 +15,7 @@ function generateDescription(topic: string): string {
   const t = topic.trim();
   if (!t) return "";
   const cap = t.charAt(0).toUpperCase() + t.slice(1);
-  return `${cap} ✨\n\nWhat an unforgettable moment! This is one of those memories I'll cherish forever. Every second was worth it! 💫\n\nDrop a ❤️ if you can relate!\nTag someone who needs to see this! 👇\n\nFollow for more amazing moments! 🔔`;
+  return `${cap} \n\nWhat an unforgettable moment! This is one of those memories I'll cherish forever. Every second was worth it! \n\nDrop a  if you can relate!\nTag someone who needs to see this! \n\nFollow for more amazing moments! `;
 }
 
 /** Generate SEO keywords + meta for any topic. */

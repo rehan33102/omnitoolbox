@@ -7,6 +7,11 @@ import { logActivity } from "@/lib/activity";
 
 const KV_KEY = "site_branding";
 
+// Public GET must be dynamic: branding is edited live in admin. A static
+// prerender would bake build-time defaults forever.
+/** @public */
+export const dynamic = "force-dynamic";
+
 const urlField = (max: number) =>
   z
     .string()

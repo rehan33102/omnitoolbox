@@ -16,22 +16,22 @@ function buildBios(name: string, niche: string, vibe: string): string[] {
   const n = name.trim() || "yourname";
   const templates: Record<string, string[]> = {
     Professional: [
-      `👋 ${n} | ${niche}\n📈 Helping you grow, one post at a time\n👇 Work with me`,
-      `${niche} strategist 🚀\n✨ Daily tips that actually work\n📩 DM "START" to connect`,
-      `Hi, I'm ${n} 👋\n${niche} expert | Speaker | Creator\n🔗 Latest below`,
+      ` ${n} | ${niche}\n Helping you grow, one post at a time\n Work with me`,
+      `${niche} strategist \n Daily tips that actually work\n DM "START" to connect`,
+      `Hi, I'm ${n} \n${niche} expert | Speaker | Creator\n Latest below`,
     ],
     Bold: [
-      `⚡ ${n} — ${niche} with NO filter\n🔥 I say what others won't\n👇 Join the rebellion`,
-      `STOP scrolling 🛑\n${n} turns ${niche.toLowerCase()} chaos into clarity\n💥 New heat daily`,
-      `${n} | ${niche} disruptor\n🎯 Results > excuses\n👇 Prove me wrong`,
+      ` ${n} — ${niche} with NO filter\n I say what others won't\n Join the rebellion`,
+      `STOP scrolling \n${n} turns ${niche.toLowerCase()} chaos into clarity\n New heat daily`,
+      `${n} | ${niche} disruptor\n Results > excuses\n Prove me wrong`,
     ],
     Funny: [
-      `Professional overthinker 🧠\nPart-time ${niche.toLowerCase()} enthusiast, full-time snacker 🍕\n— ${n}`,
-      `${n} here 👋\nI do ${niche.toLowerCase()} so you don't have to\n⚠️ Side effects: laughter`,
-      `Certified ${niche.toLowerCase()} nerd 🤓\nRunning on coffee & chaos ☕\n👇 Come for the memes`,
+      `Professional overthinker \nPart-time ${niche.toLowerCase()} enthusiast, full-time snacker \n— ${n}`,
+      `${n} here \nI do ${niche.toLowerCase()} so you don't have to\n Side effects: laughter`,
+      `Certified ${niche.toLowerCase()} nerd \nRunning on coffee & chaos \n Come for the memes`,
     ],
     Minimal: [
-      `${n}\n${niche}\n👇`,
+      `${n}\n${niche}\n`,
       `— ${n} · ${niche.toLowerCase()} —\nless, but better`,
       `${niche} · est. 2026\n${n}`,
     ],

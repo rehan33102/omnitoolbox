@@ -622,12 +622,12 @@ export default function BackgroundStudio() {
   }
 
   const tabs: { id: BgKind; label: string }[] = [
-    { id: "transparent", label: "◻️ None" },
+    { id: "transparent", label: "◻ None" },
     { id: "color", label: " Color" },
     { id: "gradient", label: " Gradient" },
     { id: "blur", label: " Blur" },
-    { id: "image", label: "️ Photo" },
-    { id: "preset", label: "️ Scenes" },
+    { id: "image", label: " Photo" },
+    { id: "preset", label: " Scenes" },
   ];
 
   return (
@@ -750,7 +750,7 @@ export default function BackgroundStudio() {
 
       {/* foreground */}
       <div className="space-y-2.5 rounded-2xl bg-white/[0.04] p-3 ring-1 ring-white/10">
-        <p className="text-sm font-semibold text-zinc-200">✨ Subject adjustments</p>
+        <p className="text-sm font-semibold text-zinc-200"> Subject adjustments</p>
         <Slider label="Brightness" value={brightness} min={50} max={150} onChange={setBrightness} fmt={v => `${v}%`} />
         <Slider label="Contrast" value={contrast} min={50} max={150} onChange={setContrast} fmt={v => `${v}%`} />
       </div>
@@ -759,7 +759,7 @@ export default function BackgroundStudio() {
       <div className="flex flex-wrap gap-2">
         <button onClick={() => download(true)} disabled={busy}
           className="flex-1 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/25 transition hover:brightness-110 disabled:opacity-50">
-          ️ Download HD
+           Download HD
         </button>
         <button onClick={() => download(false)} disabled={busy}
           className="rounded-xl bg-white/5 px-4 py-3 text-sm font-semibold text-zinc-200 ring-1 ring-white/10 hover:bg-white/10 disabled:opacity-50">

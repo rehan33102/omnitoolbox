@@ -130,6 +130,10 @@ export async function buildMetadata({ title, description, path = "/", keywords =
   if (!d && def.description) d = def.description;
   if (!img && def.ogImage) img = def.ogImage;
 
+  // 3. Ultimate fallback: the auto-generated OG image route, so NO page
+  // ever ships without an og:image (this was the SEO audit's red-X cause).
+  if (!img) img = "/opengraph-image";
+
   const url = serverSiteUrl(path);
   const imgUrl = resolveImage(img);
   return {

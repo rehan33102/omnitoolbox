@@ -210,7 +210,7 @@ function AuthForm() {
         </span>
         <div>
           <h1 className="font-display text-2xl font-bold">Your Account</h1>
-          <p className="text-sm text-zinc-500">Save work, sync library, vote on tools ✨</p>
+          <p className="text-sm text-zinc-500">Save work, sync library, vote on tools </p>
         </div>
       </div>
 

@@ -50,7 +50,10 @@ async function readAll() {
     lastGenerated,
     urlCount: meta?.urlCount ?? null,
     sitemapUrl: siteUrl("/sitemap.xml"),
-    robotsUrl: siteUrl("/robots.txt"),
+    // Relative URL: the admin UI fetches from the same origin. An absolute
+    // URL built from NEXT_PUBLIC_SITE_URL breaks when the env var is unset
+    // (falls back to localhost:3000) — that was the "Could not load robots.txt" bug.
+    robotsUrl: "/robots.txt",
   };
 }
 

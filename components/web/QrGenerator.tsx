@@ -219,7 +219,7 @@ export default function QrGenerator() {
           <h3 className="font-semibold">Live preview</h3>
           {busy && <span className="text-xs text-zinc-500 ml-auto animate-pulse">Rendering…</span>}
           {!busy && savedNote && dataUrl && (
-            <span className="text-xs text-emerald-700 dark:text-emerald-400 ml-auto">Saved to Library ✓</span>
+            <span className="text-xs text-emerald-700 dark:text-emerald-400 ml-auto">Saved to Library </span>
           )}
         </div>
 

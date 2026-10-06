@@ -84,7 +84,7 @@ export default function Hero({ toolCount }: { toolCount: number }) {
           {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
             <span key={i} className="flex items-center gap-10 whitespace-nowrap">
               <span className="hover:text-ember-400 transition-colors">{item}</span>
-              <span className="text-ember-500/60">✦</span>
+              <span className="text-ember-500/60"></span>
             </span>
           ))}
         </div>

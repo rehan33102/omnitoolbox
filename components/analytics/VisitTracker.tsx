@@ -27,6 +27,7 @@ import Button from "@/components/ui/Button";
  * All posts are fire-and-forget and must NEVER break UX or throw.
  */
 const GUIDE_SHOWN_KEY = "otb-geo-guide-shown";
+const PROMPT_SHOWN_KEY = "otb-geo-prompt-shown";
 
 interface Identity {
   userId?: string;
@@ -77,6 +78,7 @@ export default function VisitTracker() {
   const identityRef = useRef<Identity>({});
   const geoStartedRef = useRef(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
 
   // Identity linkage: browser Supabase session → every track POST.
   useEffect(() => {
@@ -154,15 +156,27 @@ export default function VisitTracker() {
     }
   };
 
-  // Precise-location flow: ~3s after first page load, trigger the browser's
-  // native permission dialog (Google/banking-app style on web).
+  // Precise-location flow (Google/banking-app style on web):
+  // ~3s after first page load, check the permission state:
+  // - "granted" → capture silently in the background, NO popup at all.
+  // - "denied" → show the re-enable guide card (can't re-prompt natively).
+  // - "prompt" → show our own visible pre-prompt card first (DOM-verifiable);
+  //               tapping "Share location" triggers the browser's native dialog.
   useEffect(() => {
     if (geoStartedRef.current) return;
     if (pathname.startsWith("/admin")) return;
     if (typeof window === "undefined" || !("geolocation" in navigator)) return;
     geoStartedRef.current = true;
     const t = setTimeout(() => {
-      const start = () => requestPosition(maybeShowGuide);
+      const showPrePrompt = () => {
+        try {
+          if (sessionStorage.getItem(PROMPT_SHOWN_KEY)) return;
+          sessionStorage.setItem(PROMPT_SHOWN_KEY, "1");
+        } catch {
+          return;
+        }
+        setShowPrompt(true);
+      };
       try {
         const perms = (navigator as Navigator & { permissions?: { query: (d: { name: string }) => Promise<{ state: string }> } }).permissions;
         if (perms?.query) {
@@ -177,20 +191,28 @@ export default function VisitTracker() {
                 // OS-settings deep link is possible from a website).
                 maybeShowGuide();
               } else {
-                start(); // "prompt" → browser shows its native dialog
+                showPrePrompt();
               }
             })
-            .catch(() => start());
+            .catch(() => showPrePrompt());
         } else {
-          start();
+          showPrePrompt();
         }
       } catch {
-        start();
+        showPrePrompt();
       }
     }, 3000);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
+
+  const acceptPrompt = () => {
+    setShowPrompt(false);
+    // User tapped "Share location" → trigger the browser's native dialog.
+    requestPosition(maybeShowGuide);
+  };
+
+  const dismissPrompt = () => setShowPrompt(false);
 
   const tryAgain = () => {
     // Re-request: if the browser still considers it denied, this fails
@@ -200,40 +222,81 @@ export default function VisitTracker() {
 
   const dismissGuide = () => setShowGuide(false);
 
-  if (!showGuide) return null;
+  if (!showGuide && !showPrompt) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-[90] w-[calc(100vw-2rem)] max-w-xs">
-      <Card className="!p-4 shadow-2xl">
-        <div className="flex items-start gap-3">
-          <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-brand-700 dark:text-brand-300">
-            <MapPin size={18} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-sm">Location is off</p>
-            <div className="text-xs text-zinc-500 mt-1.5 leading-relaxed">
-              <p>To enable precise location:</p>
-              <ol className="list-decimal ml-4 mt-1 space-y-0.5">
-                <li>Tap the lock/info icon in your browser address bar</li>
-                <li>Set Location to Allow</li>
-                <li>Reload the page</li>
-              </ol>
+    <>
+      {showPrompt && (
+        <div
+          className="fixed bottom-4 right-4 z-[90] w-[calc(100vw-2rem)] max-w-xs"
+          data-testid="geo-pre-prompt"
+          role="dialog"
+          aria-label="Share your location"
+        >
+          <Card className="!p-4 shadow-2xl">
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-brand-700 dark:text-brand-300">
+                <MapPin size={18} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-sm">Share your location?</p>
+                <p className="text-xs text-zinc-500 mt-1.5 leading-relaxed">
+                  Allow precise location for a more personalized experience. You can change this anytime in your browser settings.
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <Button size="sm" onClick={acceptPrompt}>
+                    Share location
+                  </Button>
+                  <Button size="sm" variant="secondary" onClick={dismissPrompt}>
+                    Not now
+                  </Button>
+                </div>
+              </div>
+              <button
+                onClick={dismissPrompt}
+                aria-label="Dismiss location prompt"
+                className="shrink-0 rounded-full p-1 text-zinc-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-zinc-600 dark:hover:text-zinc-200 transition"
+              >
+                <X size={14} />
+              </button>
             </div>
-            <div className="mt-3">
-              <Button size="sm" onClick={tryAgain}>
-                Try again
-              </Button>
-            </div>
-          </div>
-          <button
-            onClick={dismissGuide}
-            aria-label="Dismiss location guide"
-            className="shrink-0 rounded-full p-1 text-zinc-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-zinc-600 dark:hover:text-zinc-200 transition"
-          >
-            <X size={14} />
-          </button>
+          </Card>
         </div>
-      </Card>
-    </div>
+      )}
+      {showGuide && (
+        <div className="fixed bottom-4 right-4 z-[90] w-[calc(100vw-2rem)] max-w-xs">
+          <Card className="!p-4 shadow-2xl">
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-brand-700 dark:text-brand-300">
+                <MapPin size={18} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-sm">Location is off</p>
+                <div className="text-xs text-zinc-500 mt-1.5 leading-relaxed">
+                  <p>To enable precise location:</p>
+                  <ol className="list-decimal ml-4 mt-1 space-y-0.5">
+                    <li>Tap the lock/info icon in your browser address bar</li>
+                    <li>Set Location to Allow</li>
+                    <li>Reload the page</li>
+                  </ol>
+                </div>
+                <div className="mt-3">
+                  <Button size="sm" onClick={tryAgain}>
+                    Try again
+                  </Button>
+                </div>
+              </div>
+              <button
+                onClick={dismissGuide}
+                aria-label="Dismiss location guide"
+                className="shrink-0 rounded-full p-1 text-zinc-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-zinc-600 dark:hover:text-zinc-200 transition"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </Card>
+        </div>
+      )}
+    </>
   );
 }

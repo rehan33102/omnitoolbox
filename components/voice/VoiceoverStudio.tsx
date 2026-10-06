@@ -27,7 +27,7 @@ const EDGE_LANGS_FALLBACK = [
 const EDGE_STYLES_FALLBACK = [
   { key: "sleep", label: " Sleep / Deep Calm" },
   { key: "calm", label: " Calm Story" },
-  { key: "normal", label: "️ Normal" },
+  { key: "normal", label: " Normal" },
   { key: "energetic", label: " Energetic / YouTube" },
 ];
 
@@ -585,11 +585,11 @@ export default function VoiceoverStudio() {
           <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4 space-y-3 animate-fade-up">
             {engine === "edge" || engine === "elevenlabs" ? (
               <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1">
-                ✨ {engine === "edge" ? "HD AI Voice" : "Premium AI Voice"}
+                 {engine === "edge" ? "HD AI Voice" : "Premium AI Voice"}
               </p>
             ) : engine === "google-fallback" || engine === "google" ? (
               <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1">
-                ️ Basic voice — HD voice was unavailable, please try again
+                 Basic voice — HD voice was unavailable, please try again
               </p>
             ) : null}
             <audio controls src={audioUrl} className="w-full" />

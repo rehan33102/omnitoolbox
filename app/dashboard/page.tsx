@@ -152,7 +152,7 @@ export default function DashboardPage() {
               <h1 className="font-display text-2xl font-bold truncate">{profile.fullName}</h1>
               {profile.isAdmin && <Badge variant="new">Admin</Badge>}
               <Badge variant={profile.verified ? "new" : "default"}>
-                {profile.verified ? "✓ Verified" : "Unverified"}
+                {profile.verified ? " Verified" : "Unverified"}
               </Badge>
             </div>
             <p className="text-sm text-zinc-500 flex items-center gap-1.5 mt-1">

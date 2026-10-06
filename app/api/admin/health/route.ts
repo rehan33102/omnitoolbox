@@ -43,14 +43,21 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  // Derive the base URL from the incoming request — never from
+  // NEXT_PUBLIC_SITE_URL (unset/wrong env var was the "Homepage: fetch
+  // failed" bug: it fell back to http://localhost:3000).
+  const proto = req.headers.get("x-forwarded-proto") ?? "https";
+  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host") ?? "";
+  const base = host ? `${proto}://${host}` : siteUrl();
+
   const checks: HealthCheck[] = await Promise.all([
     timed("Homepage", async () => {
       const t = withTimeout(TIMEOUT_MS);
       try {
-        const res = await fetch(siteUrl("/"), { signal: t.signal, cache: "no-store" });
+        const res = await fetch(`${base}/`, { signal: t.signal, cache: "no-store" });
         return {
           ok: res.status === 200,
-          detail: res.status === 200 ? `HTTP 200 from ${siteUrl()}` : `HTTP ${res.status}`,
+          detail: res.status === 200 ? `HTTP 200 from ${base}` : `HTTP ${res.status}`,
         };
       } catch (e) {
         if (e instanceof DOMException && e.name === "AbortError") {
@@ -65,7 +72,7 @@ export async function GET(req: NextRequest) {
     timed("App version API", async () => {
       const t = withTimeout(TIMEOUT_MS);
       try {
-        const res = await fetch(siteUrl("/api/app-version"), { signal: t.signal, cache: "no-store" });
+        const res = await fetch(`${base}/api/app-version`, { signal: t.signal, cache: "no-store" });
         if (res.status !== 200) return { ok: false, detail: `HTTP ${res.status}` };
         const json = await res.json().catch(() => ({}));
         const version = json.versionName ?? json.version ?? "unknown";

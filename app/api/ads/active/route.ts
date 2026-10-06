@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getKV } from "@/lib/kv";
 
+// Must be dynamic: this feed reflects live admin changes. A static
+// prerender would bake the build-time (empty) result forever.
+/** @public */
+export const dynamic = "force-dynamic";
+
 /**
  * GET /api/ads/active — public feed of enabled popup ads for the AdPopup
  * client component. No auth. Response is cacheable for 60s.

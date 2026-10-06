@@ -55,7 +55,7 @@ async function main() {
     { onConflict: "placement", ignoreDuplicates: true }
   );
 
-  console.log("✅ Seed complete. Add your AdSense slot IDs in /admin → Monetization.");
+  console.log(" Seed complete. Add your AdSense slot IDs in /admin → Monetization.");
 }
 
 main().catch((e) => {

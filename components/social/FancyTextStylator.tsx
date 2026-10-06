@@ -9,7 +9,7 @@ import { FANCY_STYLES } from "@/data/fancy-text-maps";
 import { saveRecord } from "@/lib/db";
 
 export default function FancyTextStylator() {
-  const [input, setInput] = useState("Make my bio pop ✨");
+  const [input, setInput] = useState("Make my bio pop ");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const { copy } = useCopyToClipboard();
 
