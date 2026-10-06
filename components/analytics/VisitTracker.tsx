@@ -17,17 +17,26 @@ import Button from "@/components/ui/Button";
  *    every track POST carries {userId, userEmail, userName}. Anonymous
  *    visitors send nothing extra.
  * 4. Precise location (Google/banking-app style): ~3s after first page load,
- *    navigator.geolocation is called directly so the BROWSER's native
- *    permission dialog appears. If the visitor denies (or permission is
- *    already denied), a clean one-per-session guide card explains how to
- *    re-enable location in the browser, with a [Try again] button.
- *    Geolocation is NEVER requested silently in the background and is never
- *    retried after a denial within the same session.
+ *    the permission state is checked:
+ *    - "granted" → capture silently in the background, NO popup at all.
+ *    - "denied" → show the re-enable guide card (can't re-prompt natively).
+ *    - "prompt" → show our own visible pre-prompt card first (DOM-verifiable);
+ *                  tapping "Share location" triggers the browser's native dialog.
+ *    If the visitor later grants permission (e.g. enables it in the browser
+ *    site settings while the page is open), any visible prompt/guide card
+ *    auto-dismisses and the location is captured silently — no manual
+ *    dismiss needed. This is watched via PermissionStatus.onchange plus
+ *    visibilitychange/focus re-checks.
  *
  * All posts are fire-and-forget and must NEVER break UX or throw.
  */
 const GUIDE_SHOWN_KEY = "otb-geo-guide-shown";
 const PROMPT_SHOWN_KEY = "otb-geo-prompt-shown";
+
+interface GeoPermissionStatus {
+  state: string;
+  onchange: ((this: unknown, ev: Event) => void) | null;
+}
 
 interface Identity {
   userId?: string;
@@ -135,6 +144,11 @@ export default function VisitTracker() {
     setShowGuide(true);
   };
 
+  const dismissGeoCards = () => {
+    setShowGuide(false);
+    setShowPrompt(false);
+  };
+
   const requestPosition = (onDenied: () => void) => {
     try {
       navigator.geolocation.getCurrentPosition(
@@ -143,7 +157,9 @@ export default function VisitTracker() {
             lat: pos.coords.latitude,
             lng: pos.coords.longitude,
           });
+          // Success (including silent capture after a grant) always clears cards.
           setShowGuide(false);
+          setShowPrompt(false);
         },
         (err) => {
           // 1 = PERMISSION_DENIED. Other errors (timeout/unavailable) stay silent.
@@ -162,11 +178,53 @@ export default function VisitTracker() {
   // - "denied" → show the re-enable guide card (can't re-prompt natively).
   // - "prompt" → show our own visible pre-prompt card first (DOM-verifiable);
   //               tapping "Share location" triggers the browser's native dialog.
+  // If permission later flips to granted (visitor enabled it in the browser
+  // site settings and came back), any visible card auto-dismisses and the
+  // location is captured silently — watched via PermissionStatus.onchange
+  // plus visibilitychange/focus re-checks.
   useEffect(() => {
     if (geoStartedRef.current) return;
     if (pathname.startsWith("/admin")) return;
     if (typeof window === "undefined" || !("geolocation" in navigator)) return;
     geoStartedRef.current = true;
+
+    const perms = (
+      navigator as unknown as {
+        permissions?: { query: (d: { name: string }) => Promise<GeoPermissionStatus> };
+      }
+    ).permissions;
+
+    // Permission just became granted (or is granted on re-check): clear any
+    // visible cards and capture silently — never show a popup here.
+    const handleGranted = () => {
+      dismissGeoCards();
+      requestPosition(() => {});
+    };
+
+    // Re-check on return-to-page: the visitor may have flipped the permission
+    // in the browser site settings while the tab was hidden/backgrounded.
+    const recheckPermission = () => {
+      try {
+        if (!perms?.query) return;
+        perms
+          .query({ name: "geolocation" })
+          .then((s) => {
+            if (s && s.state === "granted") handleGranted();
+            // Other states: leave cards exactly as they are (no nagging).
+          })
+          .catch(() => {});
+      } catch {
+        /* ignore */
+      }
+    };
+
+    const onVisibility = () => {
+      if (typeof document !== "undefined" && document.visibilityState === "visible") {
+        recheckPermission();
+      }
+    };
+
+    let permStatus: GeoPermissionStatus | null = null;
     const t = setTimeout(() => {
       const showPrePrompt = () => {
         try {
@@ -178,11 +236,19 @@ export default function VisitTracker() {
         setShowPrompt(true);
       };
       try {
-        const perms = (navigator as Navigator & { permissions?: { query: (d: { name: string }) => Promise<{ state: string }> } }).permissions;
         if (perms?.query) {
           perms
             .query({ name: "geolocation" })
             .then((status) => {
+              permStatus = status;
+              try {
+                // Live-watch for the denied→granted flip.
+                status.onchange = () => {
+                  if (status.state === "granted") handleGranted();
+                };
+              } catch {
+                /* older browsers without onchange support */
+              }
               if (status.state === "granted") {
                 // Already allowed — capture silently, no dialog needed.
                 requestPosition(() => {});
@@ -202,7 +268,20 @@ export default function VisitTracker() {
         showPrePrompt();
       }
     }, 3000);
-    return () => clearTimeout(t);
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("focus", recheckPermission);
+    return () => {
+      clearTimeout(t);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("focus", recheckPermission);
+      if (permStatus) {
+        try {
+          permStatus.onchange = null;
+        } catch {
+          /* ignore */
+        }
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 

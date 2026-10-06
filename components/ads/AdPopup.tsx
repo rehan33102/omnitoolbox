@@ -27,6 +27,9 @@ export default function AdPopup() {
   const dismissedRef = useRef(false);
 
   useEffect(() => {
+    // Ads are for website visitors only — never render inside the admin.
+    const p = pathname ?? "/";
+    if (p.startsWith("/admin")) return;
     let cancelled = false;
     (async () => {
       try {
@@ -39,7 +42,7 @@ export default function AdPopup() {
         const match = ads.find(
           (a) =>
             a &&
-            adMatchesPage(a.pages, pathname ?? "/") &&
+            adMatchesPage(a.pages, p) &&
             !sessionStorage.getItem(`otb-ad-dismissed-${a.id}`)
         );
         if (!cancelled && match) setAd(match);
@@ -64,6 +67,8 @@ export default function AdPopup() {
   }, [ad]);
 
   if (!ad || dismissedRef.current) return null;
+  // Safety net: ads must never render on admin routes, even if state raced.
+  if ((pathname ?? "/").startsWith("/admin")) return null;
 
   const close = () => {
     try {
