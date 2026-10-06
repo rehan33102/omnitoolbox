@@ -14,14 +14,19 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function getKV<T>(key: string, fallback: T): Promise<T> {
   try {
     const supabase = createAdminClient();
+    // Take the latest row explicitly: never use maybeSingle() here, because
+    // legacy duplicate rows (from before the PK constraint) make it throw
+    // and silently return the fallback — that was the "branding save fails" bug.
     const { data, error } = await supabase
       .from("seo_settings")
       .select("value")
       .eq("key", key)
-      .maybeSingle();
-    if (error || !data?.value) return fallback;
+      .order("updated_at", { ascending: false })
+      .limit(1);
+    const row = Array.isArray(data) ? data[0] : null;
+    if (error || !row?.value) return fallback;
     try {
-      return JSON.parse(data.value) as T;
+      return JSON.parse(row.value) as T;
     } catch {
       return fallback;
     }
@@ -30,13 +35,20 @@ export async function getKV<T>(key: string, fallback: T): Promise<T> {
   }
 }
 
-/** Write a JSON value by key (upsert). Returns true on success. */
+/** Write a JSON value by key. Returns true on success. */
 export async function setKV(key: string, value: unknown): Promise<boolean> {
   try {
     const supabase = createAdminClient();
-    const { error } = await supabase
-      .from("seo_settings")
-      .upsert({ key, value: JSON.stringify(value), updated_at: new Date().toISOString() });
+    // Delete-then-insert instead of upsert: robust even if legacy duplicate
+    // rows exist for this key (upsert without a matching unique constraint
+    // can silently no-op, which was the "branding save fails" bug).
+    const del = await supabase.from("seo_settings").delete().eq("key", key);
+    if (del.error) return false;
+    const { error } = await supabase.from("seo_settings").insert({
+      key,
+      value: JSON.stringify(value),
+      updated_at: new Date().toISOString(),
+    });
     return !error;
   } catch {
     return false;
