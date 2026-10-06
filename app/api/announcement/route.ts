@@ -9,6 +9,11 @@ export async function GET() {
   const announcement = await getKV<SiteAnnouncement>("site_announcement", DEFAULT_ANNOUNCEMENT);
   return NextResponse.json(
     { announcement },
-    { headers: { "Cache-Control": "no-store, max-age=0" } }
+    {
+      headers: {
+        "Cache-Control": "no-store, max-age=0",
+        "X-KV-Code": "v2-robust",
+      },
+    }
   );
 }
