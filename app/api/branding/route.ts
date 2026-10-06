@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requirePermission } from "@/lib/permissions";
 import { guardApi } from "@/lib/api-security";
-import { getKV, setKV } from "@/lib/kv";
+import { setKV } from "@/lib/kv";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { logActivity } from "@/lib/activity";
 
 const KV_KEY = "site_branding";
@@ -56,6 +57,27 @@ const DEFAULT_BRANDING: BrandingPayload = {
   socialTiktok: "",
 };
 
+/** Direct DB read for branding — bypasses lib/kv to avoid any bundling staleness. */
+async function readBranding(): Promise<BrandingPayload> {
+  try {
+    const supabase = createAdminClient();
+    const { data } = await supabase
+      .from("seo_settings")
+      .select("value")
+      .eq("key", KV_KEY)
+      .order("updated_at", { ascending: false })
+      .limit(1);
+    const row = Array.isArray(data) ? data[0] : null;
+    if (row?.value) {
+      const parsed = JSON.parse(row.value);
+      return { ...DEFAULT_BRANDING, ...parsed };
+    }
+  } catch {
+    /* fall through to defaults */
+  }
+  return { ...DEFAULT_BRANDING };
+}
+
 async function guard(req: NextRequest) {
   // 30 req/min per IP + same-origin enforcement before any auth/DB work.
   const sec = guardApi(req, { key: "admin:branding", max: 30 });
@@ -67,14 +89,10 @@ async function guard(req: NextRequest) {
 
 /** GET — public. Returns the site branding JSON, cached 60s at the edge/browser. */
 export async function GET() {
-  const branding = await getKV<BrandingPayload>(KV_KEY, DEFAULT_BRANDING);
-  const merged = { ...DEFAULT_BRANDING, ...branding };
-  return NextResponse.json(
-    { ...merged, _v: "kvfix2" },
-    {
-      headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120" },
-    }
-  );
+  const branding = await readBranding();
+  return NextResponse.json(branding, {
+    headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120" },
+  });
 }
 
 /** PUT — admin only. Validates + persists branding to the KV store. */
