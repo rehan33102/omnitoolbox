@@ -14,6 +14,10 @@ const KV_KEY = "site_branding_v2";
 /** @public */
 export const dynamic = "force-dynamic";
 
+// Disable Next.js Data Cache: supabase-js uses fetch() internally and Next
+// would otherwise cache those DB queries, serving stale branding.
+export const fetchCache = "force-no-store";
+
 const urlField = (max: number) =>
   z
     .string()

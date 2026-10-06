@@ -6,6 +6,10 @@ import { getKV } from "@/lib/kv";
 /** @public */
 export const dynamic = "force-dynamic";
 
+// Disable Next.js Data Cache: supabase-js uses fetch() internally and Next
+// would otherwise cache those DB queries, serving stale rows.
+export const fetchCache = "force-no-store";
+
 /**
  * GET /api/ads/active — public feed of enabled popup ads for the AdPopup
  * client component. No auth.
