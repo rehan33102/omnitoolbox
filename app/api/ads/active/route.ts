@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getKVWithMeta } from "@/lib/kv";
+import { getKV } from "@/lib/kv";
 
 // Must be dynamic: this feed reflects live admin changes. A static
 // prerender would bake the build-time (empty) result forever.
@@ -29,7 +29,9 @@ export interface SiteAd {
 const KEY = "site_ads";
 
 export async function GET() {
-  const { value: all, updatedAt } = await getKVWithMeta<SiteAd[]>(KEY, []);
+  // Uses the exact same getKV query as the admin site-ads API so public
+  // and admin can never disagree on the current ads.
+  const all = await getKV<SiteAd[]>(KEY, []);
   const ads = all
     .filter((a) => a && a.enabled)
     .map((a) => ({
@@ -47,8 +49,6 @@ export async function GET() {
       headers: {
         "Cache-Control": "no-store, no-cache, must-revalidate",
         Pragma: "no-cache",
-        // Lets clients/admins confirm they are seeing the latest write.
-        "X-Ads-Version": updatedAt ?? "none",
       },
     }
   );
