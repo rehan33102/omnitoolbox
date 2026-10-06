@@ -60,6 +60,7 @@ export default function AdminSettingsPage() {
   return (
     <div className="space-y-4 max-w-2xl">
       <BrandingCard />
+      <MaintenanceModeCard />
 
       <Card>
         <div className="flex items-center gap-2 mb-4">
@@ -320,6 +321,81 @@ function BrandingCard() {
         <div className="flex justify-end">
           <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save branding"}</Button>
         </div>
+      </div>
+    </Card>
+  );
+}
+
+/** Maintenance mode toggle — shows a site-wide "Website on maintenance" banner. */
+function MaintenanceModeCard() {
+  const { toast } = useToast();
+  const [enabled, setEnabled] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/maintenance", { cache: "no-store" })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (typeof d?.enabled === "boolean") setEnabled(d.enabled);
+        setLoaded(true);
+      })
+      .catch(() => setLoaded(true));
+  }, []);
+
+  const toggle = async () => {
+    const next = !enabled;
+    setSaving(true);
+    try {
+      const res = await fetch("/api/admin/maintenance", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enabled: next }),
+      });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || !j.ok) throw new Error(j.error || "Save failed");
+      setEnabled(next);
+      toast({
+        title: next ? "Maintenance mode ON" : "Maintenance mode OFF",
+        description: next
+          ? "Visitors now see the maintenance banner."
+          : "Banner removed from the site.",
+        variant: "success",
+      });
+    } catch (e) {
+      toast({ title: "Save failed", description: (e as Error).message, variant: "error" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h2 className="font-display font-bold">Maintenance mode</h2>
+          <p className="text-sm text-zinc-500 mt-1">
+            Shows a site-wide &quot;Website on maintenance&quot; banner to all visitors.
+            Turn it on while updating the site, off when done.
+          </p>
+        </div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={enabled}
+          aria-label="Toggle maintenance mode"
+          onClick={toggle}
+          disabled={!loaded || saving}
+          className={`relative h-8 w-14 shrink-0 rounded-full transition-colors disabled:opacity-50 ${
+            enabled ? "bg-amber-500" : "bg-zinc-300 dark:bg-zinc-700"
+          }`}
+        >
+          <span
+            className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition-all ${
+              enabled ? "left-7" : "left-1"
+            }`}
+          />
+        </button>
       </div>
     </Card>
   );

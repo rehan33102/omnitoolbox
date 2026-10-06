@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { ShieldAlert } from "lucide-react";
 import { getSessionUser } from "@/lib/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
@@ -14,6 +14,15 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
+  // The /admin/auth login page must render WITHOUT the guard — otherwise the
+  // layout redirects /admin/auth → /admin/auth in an infinite self-loop,
+  // which surfaces as "Application error: a client-side exception has occurred".
+  // Middleware flags it via the x-admin-auth-page request header.
+  const headersList = await headers();
+  if (headersList.get("x-admin-auth-page") === "1") {
+    return <>{children}</>;
+  }
+
   // SECRET BYPASS: owner's private link sets boss_key cookie — skip all auth.
   // Middleware redirects ?boss=... to clean URL after setting cookie, so cookie is always present here.
   const cookieStore = await cookies();

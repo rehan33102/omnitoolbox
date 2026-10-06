@@ -11,6 +11,7 @@ import AutoUpdater from "@/components/AutoUpdater";
 import AdPopup from "@/components/ads/AdPopup";
 import VisitTracker from "@/components/analytics/VisitTracker";
 import AnnouncementBar from "@/components/AnnouncementBar";
+import MaintenanceBanner from "@/components/MaintenanceBanner";
 import CommandPalette from "@/components/CommandPalette";
 import VerificationTags from "@/components/seo/VerificationTags";
 import { Toaster, ToastProvider } from "@/components/ui/Toast";
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <GlobalErrorHooks />
             <ErrorBoundary name="root">
               <AnnouncementBar />
+              <MaintenanceBanner />
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />

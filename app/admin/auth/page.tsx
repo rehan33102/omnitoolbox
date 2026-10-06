@@ -126,62 +126,60 @@ export default function AdminAuthPage() {
         </div>
 
         {/* ============ LOGIN / SIGNUP FORM ============ */}
-        <>
-            <div className="flex gap-2 my-6 p-1 rounded-full bg-black/5 dark:bg-white/5">
-              {(["login", "signup"] as const).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => setMode(m)}
-                  className={cn(
-                    "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-semibold transition-all",
-                    mode === m
-                      ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg"
-                      : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
-                  )}
-                >
-                  {m === "login" ? <LogIn size={15} /> : <UserPlus size={15} />}
-                  {m === "login" ? "Login" : "Signup"}
-                </button>
-              ))}
-            </div>
-
-            <form onSubmit={handleFormSubmit} className="space-y-4">
-              <div className="relative">
-                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                <Input
-                  type="email"
-                  placeholder="Admin email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-11"
-                  required
-                />
-              </div>
-              <div className="relative">
-                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                <Input
-                  type="password"
-                  placeholder={mode === "signup" ? "Password (min 6 characters)" : "Password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-11"
-                  required
-                  minLength={6}
-                />
-              </div>
-              <Button type="submit" disabled={busy} className="w-full" size="lg">
-                {busy ? "Please wait..." : mode === "login" ? "Open Dashboard" : "Create Account"}
-              </Button>
-            </form>
-
-            <p className="text-xs text-zinc-500 text-center mt-6">
-              {mode === "signup" ? (
-                <>Your account will be created instantly — the dashboard opens right away!</>
-              ) : (
-                <>First time here? Create an account from the <b>Signup</b> tab, then <b>Log in</b>.</>
+        <div className="flex gap-2 my-6 p-1 rounded-full bg-black/5 dark:bg-white/5">
+          {(["login", "signup"] as const).map((m) => (
+            <button
+              key={m}
+              onClick={() => setMode(m)}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-full text-sm font-semibold transition-all",
+                mode === m
+                  ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg"
+                  : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200"
               )}
-            </p>
-          </>
+            >
+              {m === "login" ? <LogIn size={15} /> : <UserPlus size={15} />}
+              {m === "login" ? "Login" : "Signup"}
+            </button>
+          ))}
+        </div>
+
+        <form onSubmit={handleFormSubmit} className="space-y-4">
+          <div className="relative">
+            <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <Input
+              type="email"
+              placeholder="Admin email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="pl-11"
+              required
+            />
+          </div>
+          <div className="relative">
+            <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <Input
+              type="password"
+              placeholder={mode === "signup" ? "Password (min 6 characters)" : "Password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pl-11"
+              required
+              minLength={6}
+            />
+          </div>
+          <Button type="submit" disabled={busy} className="w-full" size="lg">
+            {busy ? "Please wait..." : mode === "login" ? "Open Dashboard" : "Create Account"}
+          </Button>
+        </form>
+
+        <p className="text-xs text-zinc-500 text-center mt-6">
+          {mode === "signup" ? (
+            <>Your account will be created instantly — the dashboard opens right away!</>
+          ) : (
+            <>First time here? Create an account from the <b>Signup</b> tab, then <b>Log in</b>.</>
+          )}
+        </p>
       </Card>
     </div>
   );

@@ -17,10 +17,13 @@ export async function getKV<T>(key: string, fallback: T): Promise<T> {
     // Take the latest row explicitly: never use maybeSingle() here, because
     // legacy duplicate rows (from before the PK constraint) make it throw
     // and silently return the fallback — that was the "branding save fails" bug.
+    // Filter out NULL updated_at (Postgres sorts NULLs first in DESC order,
+    // which would return stale legacy rows instead of the latest write).
     const { data, error } = await supabase
       .from("seo_settings")
       .select("value")
       .eq("key", key)
+      .not("updated_at", "is", null)
       .order("updated_at", { ascending: false })
       .limit(1);
     const row = Array.isArray(data) ? data[0] : null;
@@ -63,9 +66,12 @@ export async function getKVRaw(key: string): Promise<string | null> {
       .from("seo_settings")
       .select("value")
       .eq("key", key)
-      .maybeSingle();
-    if (error || !data?.value) return null;
-    return data.value;
+      .not("updated_at", "is", null)
+      .order("updated_at", { ascending: false })
+      .limit(1);
+    const row = Array.isArray(data) ? data[0] : null;
+    if (error || !row?.value) return null;
+    return row.value;
   } catch {
     return null;
   }

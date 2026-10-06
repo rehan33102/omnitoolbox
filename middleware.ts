@@ -45,8 +45,14 @@ export async function middleware(req: NextRequest) {
 
   // The dedicated admin login page must always render — never redirect it,
   // otherwise logged-out visitors bounce between /admin/auth and /login.
+  // Flag it via REQUEST header so the admin layout skips its auth guard
+  // (the layout would otherwise redirect /admin/auth → /admin/auth in a self-loop).
   if (isAdminAuthPage && !isApi) {
-    return res;
+    const requestHeaders = new Headers(req.headers);
+    requestHeaders.set("x-admin-auth-page", "1");
+    return NextResponse.next({
+      request: { headers: requestHeaders },
+    });
   }
 
   if (!user) {
