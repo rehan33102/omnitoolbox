@@ -58,11 +58,51 @@ function locationLabel(v: LiveVisitor): string {
   return "Unknown";
 }
 
+/** Reverse-geocode cache (in-memory, per page load). Nominatim is free for
+ * light use; we cache by rounded coords and never refetch the same spot. */
+const geoCache = new Map<string, string>();
+
+function useReverseGeocode(lat: number | null, lng: number | null): string | null {
+  const [address, setAddress] = useState<string | null>(null);
+  useEffect(() => {
+    if (typeof lat !== "number" || typeof lng !== "number") return;
+    const key = `${lat.toFixed(4)},${lng.toFixed(4)}`;
+    const cached = geoCache.get(key);
+    if (cached) {
+      setAddress(cached);
+      return;
+    }
+    let cancelled = false;
+    fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=jsonv2&zoom=14`,
+      { headers: { Accept: "application/json" } }
+    )
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => {
+        if (cancelled || !j) return;
+        const display: string | undefined = j.display_name;
+        if (display) {
+          // Shorten: keep the most specific parts (road, suburb, city).
+          const parts = display.split(",").map((s: string) => s.trim()).filter(Boolean);
+          const short = parts.slice(0, 3).join(", ");
+          geoCache.set(key, short);
+          setAddress(short);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [lat, lng]);
+  return address;
+}
+
 function VisitorRow({ v }: { v: LiveVisitor }) {
   const identity = v.userId
     ? { title: v.userName || v.userEmail || "Logged-in visitor", sub: v.userEmail || null, anonymous: false }
     : { title: "Someone using website", sub: null, anonymous: true };
   const precise = typeof v.latitude === "number" && typeof v.longitude === "number";
+  const address = useReverseGeocode(v.latitude, v.longitude);
 
   return (
     <div className="flex items-center justify-between gap-3 glass rounded-xl px-3 py-2.5 text-sm">
@@ -73,6 +113,11 @@ function VisitorRow({ v }: { v: LiveVisitor }) {
         <span className="min-w-0">
           <span className="block font-medium truncate">{identity.title}</span>
           {identity.sub && <span className="block text-xs text-zinc-500 truncate">{identity.sub}</span>}
+          {precise && (
+            <span className="block text-xs text-zinc-500 truncate" title={address ?? undefined}>
+              {address ?? `${v.latitude?.toFixed(5)}, ${v.longitude?.toFixed(5)}`}
+            </span>
+          )}
         </span>
       </span>
       <span className="flex items-center gap-2 shrink-0 text-xs text-zinc-500">
@@ -84,6 +129,7 @@ function VisitorRow({ v }: { v: LiveVisitor }) {
               href={`https://www.google.com/maps?q=${v.latitude},${v.longitude}`}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`Open precise location on Google Maps`}
               className="inline-flex items-center gap-1 text-brand-700 dark:text-brand-400 hover:underline font-medium"
             >
               Map <ExternalLink size={12} />
