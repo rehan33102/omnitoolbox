@@ -9,6 +9,12 @@ import { adMatchesPage } from "@/lib/ad-pages";
  * AdPopup — self-contained promo popup, completely separate from the
  * (silent) AutoUpdater. Renders a centered modal with the ad image; click
  * anywhere on the card opens the destination link in a new tab.
+ *
+ * Rotation: every page load picks a RANDOM ad from all enabled ads matching
+ * the current route (and not dismissed this session), so visitors see
+ * different ads across loads. X-close dismisses an ad for the session, after
+ * which the next load rotates among the remaining ads.
+ * Ads never render on /admin routes.
  */
 
 interface ActiveAd {
@@ -38,13 +44,19 @@ export default function AdPopup() {
         if (!res.ok) return;
         const json = await res.json();
         const ads: ActiveAd[] = json.ads ?? [];
-        // API returns newest-first; pick the newest enabled ad matching this route.
-        const match = ads.find(
+        // Rotation: collect every enabled ad matching this route that was
+        // not dismissed this session, then pick one at random — each page
+        // load can show a different ad.
+        const eligible = ads.filter(
           (a) =>
             a &&
             adMatchesPage(a.pages, p) &&
             !sessionStorage.getItem(`otb-ad-dismissed-${a.id}`)
         );
+        const match =
+          eligible.length > 0
+            ? eligible[Math.floor(Math.random() * eligible.length)]
+            : undefined;
         if (!cancelled && match) setAd(match);
       } catch {
         /* never break the site for an ad */
