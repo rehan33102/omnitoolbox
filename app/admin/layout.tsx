@@ -6,6 +6,7 @@ import { getSessionUser } from "@/lib/auth";
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import AdminMobileNav from "@/components/admin/AdminMobileNav";
 import AdminSearch from "@/components/admin/AdminSearch";
+import Breadcrumbs from "@/components/admin/Breadcrumbs";
 import Card from "@/components/ui/Card";
 
 export const metadata: Metadata = {
@@ -38,7 +39,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <AdminMobileNav />
         <div className="flex gap-6 items-start">
           <AdminSidebar />
-          <div className="flex-1 min-w-0">{children}</div>
+          <div className="flex-1 min-w-0">
+            <Breadcrumbs />
+            {children}
+          </div>
         </div>
       </div>
     );
@@ -78,7 +82,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <AdminMobileNav />
       <div className="flex gap-6 items-start">
         <AdminSidebar />
-        <div className="flex-1 min-w-0">{children}</div>
+        <div className="flex-1 min-w-0">
+          <Breadcrumbs />
+          {children}
+        </div>
       </div>
     </div>
   );

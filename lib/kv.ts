@@ -10,24 +10,26 @@
  */
 import { createAdminClient } from "@/lib/supabase/admin";
 
-/** Read a JSON value by key. Returns `fallback` when missing/unparseable. */
+/** Read a JSON value by key. Returns `fallback` when missing/unparseable.
+ *
+ * Uses the simple query shape (no null-filter, no limit — newest valid row
+ * picked in JS). The ordered/limited variant returned stale rows in
+ * production for keys with legacy duplicates; this shape matches the
+ * diagnostic query that provably reads the current row.
+ */
 export async function getKV<T>(key: string, fallback: T): Promise<T> {
   try {
     const supabase = createAdminClient();
-    // Take the latest row explicitly: never use maybeSingle() here, because
-    // legacy duplicate rows (from before the PK constraint) make it throw
-    // and silently return the fallback — that was the "branding save fails" bug.
-    // Filter out NULL updated_at (Postgres sorts NULLs first in DESC order,
-    // which would return stale legacy rows instead of the latest write).
     const { data, error } = await supabase
       .from("seo_settings")
-      .select("value")
+      .select("value, updated_at")
       .eq("key", key)
-      .not("updated_at", "is", null)
-      .order("updated_at", { ascending: false })
-      .limit(1);
-    const row = Array.isArray(data) ? data[0] : null;
-    if (error || !row?.value) return fallback;
+      .order("updated_at", { ascending: false });
+    if (error || !Array.isArray(data) || data.length === 0) return fallback;
+    // Newest non-null row first; fall back to the first row if all are null.
+    const valid = data.filter((r) => r?.updated_at != null && r?.value != null);
+    const row = valid.length > 0 ? valid[0] : data[0];
+    if (!row?.value) return fallback;
     try {
       return JSON.parse(row.value) as T;
     } catch {
@@ -124,34 +126,6 @@ export async function getKVWithMeta<T>(
     }
   } catch {
     return { value: fallback, updatedAt: null };
-  }
-}
-
-/** Read a JSON value by key using the simplest possible query shape
- * (no null-filter, no limit — take the newest row in JS). This matches the
- * diagnostic query that provably returns correct data in production.
- * Used for branding where the ordered/limited query shape returned stale rows.
- */
-export async function getKVSimple<T>(key: string, fallback: T): Promise<T> {
-  try {
-    const supabase = createAdminClient();
-    const { data, error } = await supabase
-      .from("seo_settings")
-      .select("value, updated_at")
-      .eq("key", key)
-      .order("updated_at", { ascending: false });
-    if (error || !Array.isArray(data) || data.length === 0) return fallback;
-    // Pick the newest non-null updated_at row in JS (deterministic).
-    const valid = data.filter((r) => r?.updated_at != null && r?.value != null);
-    const row = valid.length > 0 ? valid[0] : data[0];
-    if (!row?.value) return fallback;
-    try {
-      return JSON.parse(row.value) as T;
-    } catch {
-      return fallback;
-    }
-  } catch {
-    return fallback;
   }
 }
 

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requirePermission } from "@/lib/permissions";
 import { guardApi } from "@/lib/api-security";
-import { getKVSimple, setKV } from "@/lib/kv";
+import { getKV, setKV } from "@/lib/kv";
 import { logActivity } from "@/lib/activity";
 
 // v2 key: the original "site_branding" key has legacy corrupt/duplicate rows
@@ -69,10 +69,7 @@ async function guard(req: NextRequest) {
 
 /** GET — public. Returns the site branding JSON. No cache: branding must be live. */
 export async function GET() {
-  // getKVSimple: the ordered/limited getKV shape returned stale rows for
-  // this key in production; the simple shape matches the diagnostic query
-  // that provably reads the current row.
-  const branding = await getKVSimple<BrandingPayload>(KV_KEY, DEFAULT_BRANDING);
+  const branding = await getKV<BrandingPayload>(KV_KEY, DEFAULT_BRANDING);
   const merged = { ...DEFAULT_BRANDING, ...branding };
   return NextResponse.json(merged, {
     headers: {
