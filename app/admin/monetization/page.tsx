@@ -12,13 +12,29 @@ import Skeleton from "@/components/ui/Skeleton";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import { useToast } from "@/components/ui/Toast";
 import { PAGE_TARGETS } from "@/lib/ad-pages";
+import {
+  AD_ANIMATIONS,
+  AD_ANIMATION_LABELS,
+  AD_FREQUENCIES,
+  AD_FREQUENCY_LABELS,
+  AD_POSITIONS,
+  AD_POSITION_LABELS,
+  AD_BACKDROPS,
+  AD_BACKDROP_LABELS,
+  AD_DEVICES,
+  AD_DEVICE_LABELS,
+  AD_DEFAULTS,
+  type AdAnimation,
+  type AdFrequency,
+  type AdPosition,
+  type AdBackdrop,
+  type AdDevices,
+} from "@/lib/ad-options";
 import type { AdConfig, AdType } from "@/types";
 
 /* ------------------------------------------------------------------ */
 /* Popup ads (KV-backed site_ads)                                       */
 /* ------------------------------------------------------------------ */
-
-type AdAnimation = "fade" | "slide-up" | "slide-in-right" | "zoom" | "bounce";
 
 interface SiteAd {
   id: string;
@@ -30,15 +46,16 @@ interface SiteAd {
   pages: string[];
   enabled: boolean;
   createdAt: string;
+  // Optional — ads saved before these options existed lack them.
+  showDelaySec?: number;
+  frequency?: AdFrequency;
+  position?: AdPosition;
+  backdrop?: AdBackdrop;
+  closeDelaySec?: number;
+  devices?: AdDevices;
+  scheduleStart?: string | null;
+  scheduleEnd?: string | null;
 }
-
-const ANIMATIONS: { value: AdAnimation; label: string }[] = [
-  { value: "fade", label: "Fade" },
-  { value: "slide-up", label: "Slide up" },
-  { value: "slide-in-right", label: "Slide in right" },
-  { value: "zoom", label: "Zoom" },
-  { value: "bounce", label: "Bounce" },
-];
 
 const emptyPopupForm = {
   name: "",
@@ -48,7 +65,45 @@ const emptyPopupForm = {
   durationSec: 30,
   pages: [] as string[],
   enabled: true,
+  showDelaySec: AD_DEFAULTS.showDelaySec,
+  frequency: AD_DEFAULTS.frequency,
+  position: AD_DEFAULTS.position,
+  backdrop: AD_DEFAULTS.backdrop,
+  closeDelaySec: AD_DEFAULTS.closeDelaySec,
+  devices: AD_DEFAULTS.devices,
+  scheduleStart: "",
+  scheduleEnd: "",
 };
+
+/** ISO datetime → "YYYY-MM-DDTHH:mm" for datetime-local inputs (local time). */
+function toLocalInput(iso: string | null | undefined): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+/** Labeled <select> matching the admin form's visual style. */
+function FieldSelect({ label, value, onChange, options, hint }: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  hint?: string;
+}) {
+  return (
+    <div>
+      <span className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">{label}</span>
+      <select value={value} onChange={(e) => onChange(e.target.value)} className="input-base">
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>{o.label}</option>
+        ))}
+      </select>
+      {hint && <span className="block text-xs text-zinc-500 mt-1.5">{hint}</span>}
+    </div>
+  );
+}
 
 const MAX_UPLOAD_BYTES = 1024 * 1024; // 1MB cap for uploaded images
 
@@ -120,6 +175,14 @@ export default function AdminMonetizationPage() {
       durationSec: ad.durationSec,
       pages: ad.pages ?? [],
       enabled: ad.enabled,
+      showDelaySec: ad.showDelaySec ?? AD_DEFAULTS.showDelaySec,
+      frequency: ad.frequency ?? AD_DEFAULTS.frequency,
+      position: ad.position ?? AD_DEFAULTS.position,
+      backdrop: ad.backdrop ?? AD_DEFAULTS.backdrop,
+      closeDelaySec: ad.closeDelaySec ?? AD_DEFAULTS.closeDelaySec,
+      devices: ad.devices ?? AD_DEFAULTS.devices,
+      scheduleStart: toLocalInput(ad.scheduleStart),
+      scheduleEnd: toLocalInput(ad.scheduleEnd),
     });
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -170,11 +233,28 @@ export default function AdminMonetizationPage() {
       return toast({ title: "Destination link must be an http(s) URL", variant: "error" });
     if (!Number.isInteger(popupForm.durationSec) || popupForm.durationSec < 5 || popupForm.durationSec > 600)
       return toast({ title: "Duration must be 5–600 seconds", variant: "error" });
+    if (!Number.isInteger(popupForm.showDelaySec) || popupForm.showDelaySec < 0 || popupForm.showDelaySec > 300)
+      return toast({ title: "Show delay must be 0–300 seconds", variant: "error" });
+    if (!Number.isInteger(popupForm.closeDelaySec) || popupForm.closeDelaySec < 0 || popupForm.closeDelaySec > 120)
+      return toast({ title: "Close delay must be 0–120 seconds", variant: "error" });
+    const scheduleStart = popupForm.scheduleStart ? new Date(popupForm.scheduleStart).toISOString() : undefined;
+    const scheduleEnd = popupForm.scheduleEnd ? new Date(popupForm.scheduleEnd).toISOString() : undefined;
+    if (scheduleStart && Number.isNaN(Date.parse(scheduleStart)))
+      return toast({ title: "Schedule start is not a valid date/time", variant: "error" });
+    if (scheduleEnd && Number.isNaN(Date.parse(scheduleEnd)))
+      return toast({ title: "Schedule end is not a valid date/time", variant: "error" });
+    if (scheduleStart && scheduleEnd && Date.parse(scheduleEnd) <= Date.parse(scheduleStart))
+      return toast({ title: "Schedule end must be after start", variant: "error" });
 
     setPopupSaving(true);
     try {
       const method = editingId ? "PATCH" : "POST";
-      const body = editingId ? { id: editingId, ...popupForm } : popupForm;
+      const payload = {
+        ...popupForm,
+        scheduleStart,
+        scheduleEnd,
+      };
+      const body = editingId ? { id: editingId, ...payload } : payload;
       const res = await fetch("/api/admin/site-ads", {
         method,
         headers: { "Content-Type": "application/json" },
@@ -306,7 +386,7 @@ export default function AdminMonetizationPage() {
           )}
         </div>
         <p className="text-xs text-zinc-500 mb-4">
-          Full-screen promo modal shown once per session on the pages you pick. Goes live immediately — no code deploy needed.
+          Promo popup shown on the pages you pick, with your animation, timing and targeting. Goes live immediately — no code deploy needed.
         </p>
         <div className="grid sm:grid-cols-2 gap-3">
           <Input label="Ad name" placeholder="Sponsor of the week" value={popupForm.name} onChange={(e) => setPopupForm({ ...popupForm, name: e.target.value })} />
@@ -331,23 +411,66 @@ export default function AdminMonetizationPage() {
               </div>
             )}
           </div>
-          <div>
-            <span className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">Animation</span>
-            <select
-              value={popupForm.animation}
-              onChange={(e) => setPopupForm({ ...popupForm, animation: e.target.value as AdAnimation })}
-              className="input-base"
-            >
-              {ANIMATIONS.map((a) => (
-                <option key={a.value} value={a.value}>{a.label}</option>
-              ))}
-            </select>
+          {/* ---------- Animation & Style ---------- */}
+          <div className="sm:col-span-2 mt-1">
+            <h3 className="text-sm font-display font-semibold mb-2">Animation &amp; Style</h3>
+            <div className="grid sm:grid-cols-3 gap-3">
+              <FieldSelect
+                label="Animation"
+                value={popupForm.animation}
+                onChange={(v) => setPopupForm({ ...popupForm, animation: v as AdAnimation })}
+                options={AD_ANIMATIONS.map((a) => ({ value: a, label: AD_ANIMATION_LABELS[a] }))}
+              />
+              <FieldSelect
+                label="Position"
+                value={popupForm.position}
+                onChange={(v) => setPopupForm({ ...popupForm, position: v as AdPosition })}
+                options={AD_POSITIONS.map((p) => ({ value: p, label: AD_POSITION_LABELS[p] }))}
+                hint="Corners render as a small card; center as a modal."
+              />
+              <FieldSelect
+                label="Backdrop"
+                value={popupForm.backdrop}
+                onChange={(v) => setPopupForm({ ...popupForm, backdrop: v as AdBackdrop })}
+                options={AD_BACKDROPS.map((b) => ({ value: b, label: AD_BACKDROP_LABELS[b] }))}
+              />
+            </div>
           </div>
-          <Input label="Auto-dismiss (seconds)" type="number" min={5} max={600} value={popupForm.durationSec}
-            onChange={(e) => setPopupForm({ ...popupForm, durationSec: Number(e.target.value) || 0 })} />
+
+          {/* ---------- Timing & Frequency ---------- */}
+          <div className="sm:col-span-2 mt-1">
+            <h3 className="text-sm font-display font-semibold mb-2">Timing &amp; Frequency</h3>
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Input label="Auto-dismiss (seconds)" type="number" min={5} max={600} value={popupForm.durationSec}
+                onChange={(e) => setPopupForm({ ...popupForm, durationSec: Number(e.target.value) || 0 })} />
+              <FieldSelect
+                label="Frequency"
+                value={popupForm.frequency}
+                onChange={(v) => setPopupForm({ ...popupForm, frequency: v as AdFrequency })}
+                options={AD_FREQUENCIES.map((f) => ({ value: f, label: AD_FREQUENCY_LABELS[f] }))}
+                hint="Once per session = X dismisses for the session. Every page view = shows each load."
+              />
+              <Input label="Show delay (seconds)" type="number" min={0} max={300} value={popupForm.showDelaySec}
+                hint="Wait after page load before showing. 0 = immediate."
+                onChange={(e) => setPopupForm({ ...popupForm, showDelaySec: Math.max(0, Number(e.target.value) || 0) })} />
+              <Input label="Close delay (seconds)" type="number" min={0} max={120} value={popupForm.closeDelaySec}
+                hint="Hide the X button until this long passes. 0 = immediate."
+                onChange={(e) => setPopupForm({ ...popupForm, closeDelaySec: Math.max(0, Number(e.target.value) || 0) })} />
+            </div>
+          </div>
         </div>
 
+        {/* ---------- Targeting ---------- */}
         <div className="mt-4">
+          <h3 className="text-sm font-display font-semibold mb-2">Targeting</h3>
+          <div className="grid sm:grid-cols-3 gap-3 mb-3">
+            <FieldSelect
+              label="Devices"
+              value={popupForm.devices}
+              onChange={(v) => setPopupForm({ ...popupForm, devices: v as AdDevices })}
+              options={AD_DEVICES.map((d) => ({ value: d, label: AD_DEVICE_LABELS[d] }))}
+            />
+          </div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Show on pages</span>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -377,6 +500,28 @@ export default function AdminMonetizationPage() {
               );
             })}
           </div>
+        </div>
+
+        {/* ---------- Schedule ---------- */}
+        <div className="mt-4">
+          <h3 className="text-sm font-display font-semibold mb-2">Schedule</h3>
+          <p className="text-xs text-zinc-500 mb-2">
+            Optional — the ad only shows inside this window. Leave both empty for no schedule.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <Input label="Start" type="datetime-local" value={popupForm.scheduleStart}
+              onChange={(e) => setPopupForm({ ...popupForm, scheduleStart: e.target.value })} />
+            <Input label="End" type="datetime-local" value={popupForm.scheduleEnd}
+              onChange={(e) => setPopupForm({ ...popupForm, scheduleEnd: e.target.value })} />
+          </div>
+          {(popupForm.scheduleStart || popupForm.scheduleEnd) && (
+            <button
+              onClick={() => setPopupForm({ ...popupForm, scheduleStart: "", scheduleEnd: "" })}
+              className="mt-2 text-xs text-red-600 dark:text-red-400 hover:underline"
+            >
+              Clear schedule
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-3 mt-4">
@@ -410,7 +555,7 @@ export default function AdminMonetizationPage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{a.name}</p>
                   <p className="text-xs text-zinc-500 truncate">
-                    {a.animation} · {a.durationSec}s · {a.pages.length === 0 ? "all pages" : `${a.pages.length} page${a.pages.length > 1 ? "s" : ""}`}
+                    {AD_ANIMATION_LABELS[a.animation] ?? a.animation} · {a.durationSec}s · {AD_FREQUENCY_LABELS[a.frequency ?? "session"]} · {AD_POSITION_LABELS[a.position ?? "center"]} · {a.pages.length === 0 ? "all pages" : `${a.pages.length} page${a.pages.length > 1 ? "s" : ""}`}
                   </p>
                 </div>
                 <Switch checked={a.enabled} onChange={(v) => toggleSiteAd(a.id, v)} label={`Toggle ${a.name}`} />

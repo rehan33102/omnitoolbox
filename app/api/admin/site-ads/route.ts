@@ -1,53 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
 import { requirePermission } from "@/lib/permissions";
 import { guardApi } from "@/lib/api-security";
 import { getKV, setKV, deleteKV } from "@/lib/kv";
 import { logActivity } from "@/lib/activity";
 import { PAGE_TARGETS } from "@/lib/ad-pages";
+import { makeAdSchemas, type SiteAd } from "@/lib/ad-schema";
+
+export type { SiteAd };
 
 const KEY = "site_ads";
 const VALID_PATHS = new Set(PAGE_TARGETS.map((p) => p.path));
 
-export interface SiteAd {
-  id: string;
-  name: string;
-  imageUrl: string;
-  linkUrl: string;
-  animation: "fade" | "slide-up" | "slide-in-right" | "zoom" | "bounce";
-  durationSec: number;
-  pages: string[];
-  enabled: boolean;
-  createdAt: string;
-}
-
-const httpUrl = z
-  .string()
-  .min(1, "Required")
-  .refine((s) => /^https?:\/\/.+/.test(s), { message: "Must be an http(s) URL" });
-
-const imageUrlSchema = z
-  .string()
-  .min(1, "Required")
-  .max(2 * 1024 * 1024, "Image too large (max ~2MB)")
-  .refine(
-    (s) => /^https?:\/\/.+/.test(s) || /^data:image\/[a-zA-Z+]+;base64,/.test(s),
-    { message: "Must be an http(s) URL or an image data URL" }
-  );
-
-const adSchema = z.object({
-  name: z.string().min(1, "Name required").max(80),
-  imageUrl: imageUrlSchema,
-  linkUrl: httpUrl,
-  animation: z.enum(["fade", "slide-up", "slide-in-right", "zoom", "bounce"]),
-  durationSec: z.number().int().min(5).max(600),
-  pages: z
-    .array(z.string())
-    .refine((arr) => arr.every((p) => VALID_PATHS.has(p)), { message: "Invalid page target" }),
-  enabled: z.boolean(),
-});
-
-const patchSchema = adSchema.partial().extend({ id: z.string().min(1) });
+// Schemas live in lib/ad-schema.ts so the public feed can never disagree
+// with the admin API on validation or option sets.
+const { adSchema, patchSchema } = makeAdSchemas(VALID_PATHS);
 
 async function guard(req: NextRequest) {
   const sec = guardApi(req, { key: "admin:site-ads", max: 30 });
