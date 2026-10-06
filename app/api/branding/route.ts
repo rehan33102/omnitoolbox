@@ -87,11 +87,14 @@ async function guard(req: NextRequest) {
   return null;
 }
 
-/** GET — public. Returns the site branding JSON, cached 60s at the edge/browser. */
+/** GET — public. Returns the site branding JSON. No cache: branding must be live. */
 export async function GET() {
   const branding = await readBranding();
   return NextResponse.json(branding, {
-    headers: { "Cache-Control": "public, max-age=60, stale-while-revalidate=120" },
+    headers: {
+      "Cache-Control": "no-store, no-cache, must-revalidate",
+      Pragma: "no-cache",
+    },
   });
 }
 
