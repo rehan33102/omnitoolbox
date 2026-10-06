@@ -9,6 +9,7 @@ import {
 import Card from "@/components/ui/Card";
 import Skeleton from "@/components/ui/Skeleton";
 import StatCard from "@/components/admin/StatCard";
+import AnalyticsSectionNav from "@/components/admin/AnalyticsSectionNav";
 import { formatCompact } from "@/lib/utils";
 
 const tooltipStyle = {
@@ -203,6 +204,9 @@ export default function VisitorsAnalyticsPage() {
         <h1 className="font-display text-2xl font-bold">Visitors & page views</h1>
         <p className="text-sm text-zinc-500">Last 14 days · all numbers from real analytics events</p>
         <p className="text-xs text-zinc-400 mt-1">Coarse IP-based location (country/city) — no GPS, no permission asked.</p>
+        <div className="mt-3">
+          <AnalyticsSectionNav />
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
