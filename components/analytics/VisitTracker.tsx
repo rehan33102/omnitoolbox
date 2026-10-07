@@ -27,6 +27,10 @@ import Button from "@/components/ui/Button";
  *    auto-dismisses and the location is captured silently — no manual
  *    dismiss needed. This is watched via PermissionStatus.onchange plus
  *    visibilitychange/focus re-checks.
+ * 5. The guide card's "Try again" re-checks the permission state first: if
+ *    now granted it captures silently, if reset to "prompt" it triggers the
+ *    native dialog, and if still denied it shows a clear inline hint instead
+ *    of silently doing nothing.
  *
  * All posts are fire-and-forget and must NEVER break UX or throw.
  */
@@ -88,6 +92,9 @@ export default function VisitTracker() {
   const geoStartedRef = useRef(false);
   const [showGuide, setShowGuide] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
+  // Shown inside the guide card when "Try again" is tapped while the
+  // permission is still denied — so the tap never feels like it did nothing.
+  const [guideHint, setGuideHint] = useState(false);
 
   // Identity linkage: browser Supabase session → every track POST.
   useEffect(() => {
@@ -147,6 +154,7 @@ export default function VisitTracker() {
   const dismissGeoCards = () => {
     setShowGuide(false);
     setShowPrompt(false);
+    setGuideHint(false);
   };
 
   const requestPosition = (onDenied: () => void) => {
@@ -160,6 +168,7 @@ export default function VisitTracker() {
           // Success (including silent capture after a grant) always clears cards.
           setShowGuide(false);
           setShowPrompt(false);
+          setGuideHint(false);
         },
         (err) => {
           // 1 = PERMISSION_DENIED. Other errors (timeout/unavailable) stay silent.
@@ -293,13 +302,46 @@ export default function VisitTracker() {
 
   const dismissPrompt = () => setShowPrompt(false);
 
-  const tryAgain = () => {
-    // Re-request: if the browser still considers it denied, this fails
-    // silently and the guide stays up.
+  // Smart "Try again": re-check the permission state BEFORE requesting, so a
+  // tap never silently does nothing.
+  const tryAgain = async () => {
+    try {
+      const perms = (
+        navigator as unknown as {
+          permissions?: { query: (d: { name: string }) => Promise<GeoPermissionStatus> };
+        }
+      ).permissions;
+      if (perms?.query) {
+        const status = await perms.query({ name: "geolocation" });
+        if (status.state === "granted") {
+          // Permission now granted — hide the guide and capture silently.
+          setShowGuide(false);
+          setGuideHint(false);
+          requestPosition(() => {});
+          return;
+        }
+        if (status.state === "prompt") {
+          // Permission was reset (or never decided) — behave like fresh:
+          // hide the guide and trigger the browser's native dialog.
+          setShowGuide(false);
+          setGuideHint(false);
+          requestPosition(maybeShowGuide);
+          return;
+        }
+      }
+    } catch {
+      /* fall through to the still-denied path */
+    }
+    // Still denied — request anyway (a no-op the browser swallows), but show
+    // a clear inline hint so the user knows what to do next.
+    setGuideHint(true);
     requestPosition(() => {});
   };
 
-  const dismissGuide = () => setShowGuide(false);
+  const dismissGuide = () => {
+    setShowGuide(false);
+    setGuideHint(false);
+  };
 
   if (!showGuide && !showPrompt) return null;
 
@@ -364,6 +406,11 @@ export default function VisitTracker() {
                     Try again
                   </Button>
                 </div>
+                {guideHint && (
+                  <p className="mt-2.5 rounded-lg bg-amber-500/10 px-2.5 py-2 text-xs leading-relaxed text-amber-700 dark:text-amber-300">
+                    Still blocked — allow Location in your browser&apos;s site settings first, then tap Try again.
+                  </p>
+                )}
               </div>
               <button
                 onClick={dismissGuide}
