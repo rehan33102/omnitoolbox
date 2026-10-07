@@ -31,6 +31,11 @@ import Button from "@/components/ui/Button";
  *    now granted it captures silently, if reset to "prompt" it triggers the
  *    native dialog, and if still denied it shows a clear inline hint instead
  *    of silently doing nothing.
+ * 6. Inside the OmniToolBox Android app (window.OmniBoxApp bridge present),
+ *    the guide card shows an app variant: "Open Settings" deep-links into
+ *    the phone's app-settings page (via the bridge), because browser site
+ *    settings don't exist there. Successful capture always dismisses the
+ *    guide card.
  *
  * All posts are fire-and-forget and must NEVER break UX or throw.
  */
@@ -95,6 +100,12 @@ export default function VisitTracker() {
   // Shown inside the guide card when "Try again" is tapped while the
   // permission is still denied — so the tap never feels like it did nothing.
   const [guideHint, setGuideHint] = useState(false);
+
+  // True when running inside the OmniToolBox Android app, which injects the
+  // window.OmniBoxApp bridge (v16+). In-app, the guide card must point at the
+  // app settings page (via the bridge), not at browser site settings.
+  const isInApp =
+    typeof window !== "undefined" && !!(window as any).OmniBoxApp;
 
   // Identity linkage: browser Supabase session → every track POST.
   useEffect(() => {
@@ -262,8 +273,9 @@ export default function VisitTracker() {
                 // Already allowed — capture silently, no dialog needed.
                 requestPosition(() => {});
               } else if (status.state === "denied") {
-                // Can't re-prompt; the guide is the correct pattern (no
-                // OS-settings deep link is possible from a website).
+                // Can't re-prompt; the guide is the correct pattern. From a
+                // plain website there is no settings deep link; inside the
+                // app the guide offers "Open Settings" via the native bridge.
                 maybeShowGuide();
               } else {
                 showPrePrompt();
@@ -343,6 +355,27 @@ export default function VisitTracker() {
     setGuideHint(false);
   };
 
+  // In-app only: opens the phone's app-settings page where the user can
+  // allow Location for the OmniToolBox app (window.OmniBoxApp bridge,
+  // app v16+). If the bridge is unavailable, just dismiss the guide.
+  const openAppSettings = () => {
+    try {
+      const bridge = (
+        window as unknown as {
+          OmniBoxApp?: { openLocationSettings?: () => void };
+        }
+      ).OmniBoxApp;
+      if (bridge && typeof bridge.openLocationSettings === "function") {
+        bridge.openLocationSettings();
+        return;
+      }
+    } catch {
+      /* bridge unavailable — fall through to dismiss */
+    }
+    setShowGuide(false);
+    setGuideHint(false);
+  };
+
   if (!showGuide && !showPrompt) return null;
 
   return (
@@ -392,24 +425,51 @@ export default function VisitTracker() {
                 <MapPin size={18} />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-sm">Location is off</p>
-                <div className="text-xs text-zinc-500 mt-1.5 leading-relaxed">
-                  <p>To enable precise location:</p>
-                  <ol className="list-decimal ml-4 mt-1 space-y-0.5">
-                    <li>Tap the lock/info icon in your browser address bar</li>
-                    <li>Set Location to Allow</li>
-                    <li>Reload the page</li>
-                  </ol>
-                </div>
-                <div className="mt-3">
-                  <Button size="sm" onClick={tryAgain}>
-                    Try again
-                  </Button>
-                </div>
-                {guideHint && (
-                  <p className="mt-2.5 rounded-lg bg-amber-500/10 px-2.5 py-2 text-xs leading-relaxed text-amber-700 dark:text-amber-300">
-                    Still blocked — allow Location in your browser&apos;s site settings first, then tap Try again.
-                  </p>
+                {isInApp ? (
+                  <>
+                    <p className="font-semibold text-sm">Location is blocked</p>
+                    <p className="text-xs text-zinc-500 mt-1.5 leading-relaxed">
+                      Location is blocked for the OmniToolBox app. Open Settings
+                      and allow Location, then come back and tap Try again.
+                    </p>
+                    <div className="mt-3 flex gap-2">
+                      <Button size="sm" onClick={openAppSettings}>
+                        Open Settings
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={tryAgain}>
+                        Try again
+                      </Button>
+                    </div>
+                    {guideHint && (
+                      <p className="mt-2.5 rounded-lg bg-amber-500/10 px-2.5 py-2 text-xs leading-relaxed text-amber-700 dark:text-amber-300">
+                        Still blocked — open Settings and allow Location first,
+                        then tap Try again.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <p className="font-semibold text-sm">Location is off</p>
+                    <div className="text-xs text-zinc-500 mt-1.5 leading-relaxed">
+                      <p>To enable precise location:</p>
+                      <ol className="list-decimal ml-4 mt-1 space-y-0.5">
+                        <li>Tap the lock/info icon in your browser address bar</li>
+                        <li>Set Location to Allow</li>
+                        <li>Reload the page</li>
+                      </ol>
+                    </div>
+                    <div className="mt-3">
+                      <Button size="sm" onClick={tryAgain}>
+                        Try again
+                      </Button>
+                    </div>
+                    {guideHint && (
+                      <p className="mt-2.5 rounded-lg bg-amber-500/10 px-2.5 py-2 text-xs leading-relaxed text-amber-700 dark:text-amber-300">
+                        Still blocked — allow Location in your browser&apos;s site
+                        settings first, then tap Try again.
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
               <button
