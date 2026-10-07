@@ -2,9 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requirePermission } from "@/lib/permissions";
 import { guardApi } from "@/lib/api-security";
-import { getKV, setKV } from "@/lib/kv";
+import {
+  getAnnouncements,
+  saveAnnouncements,
+  type SiteAnnouncement,
+} from "@/lib/announcement";
 import { logActivity } from "@/lib/activity";
-import { DEFAULT_ANNOUNCEMENT, type SiteAnnouncement } from "@/lib/announcement";
 
 const announcementSchema = z.object({
   text: z.string().min(1).max(200),
@@ -17,43 +20,46 @@ const announcementSchema = z.object({
     )
     .optional()
     .default(""),
-  enabled: z.boolean(),
+  enabled: z.boolean().optional().default(true),
 });
 
 async function guard(req: NextRequest) {
-  const sec = guardApi(req, { key: "admin:announcement", max: 30 });
+  const sec = guardApi(req, { key: "admin:announcement", max: 60 });
   if (sec) return sec;
   if (!(await requirePermission("settings"))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   return null;
 }
 
-/** Admin: read the current announcement. */
+/** Admin: read all announcements (newest first; runs legacy migration). */
 export async function GET(req: NextRequest) {
   const denied = await guard(req);
   if (denied) return denied;
-  const announcement = await getKV<SiteAnnouncement>("site_announcement", DEFAULT_ANNOUNCEMENT);
-  return NextResponse.json({ announcement });
+  const announcements = await getAnnouncements();
+  return NextResponse.json({ announcements });
 }
 
-/** Admin: create/replace the announcement. */
-export async function PUT(req: NextRequest) {
+/** Admin: create a NEW announcement. Never replaces existing ones. */
+export async function POST(req: NextRequest) {
   const denied = await guard(req);
   if (denied) return denied;
   const parsed = announcementSchema.safeParse(await req.json().catch(() => ({})));
   if (!parsed.success) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid payload" }, { status: 400 });
   }
+  const list = await getAnnouncements();
   const announcement: SiteAnnouncement = {
-    id: `ann-${Date.now()}`,
+    id: `ann-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     text: parsed.data.text.trim(),
     linkUrl: parsed.data.linkUrl?.trim() ?? "",
     enabled: parsed.data.enabled,
+    createdAt: new Date().toISOString(),
   };
-  const ok = await setKV("site_announcement", announcement);
+  // Prepend: newest first.
+  const ok = await saveAnnouncements([announcement, ...list]);
   if (!ok) return NextResponse.json({ error: "Failed to save" }, { status: 500 });
   await logActivity(
-    "announcement.updated",
-    `Announcement ${announcement.enabled ? "enabled" : "disabled"}: "${announcement.text.slice(0, 80)}"`
+    "announcement.created",
+    `Announcement created (${announcement.enabled ? "enabled" : "disabled"}): "${announcement.text.slice(0, 80)}"`
   );
-  return NextResponse.json({ ok: true, announcement });
+  return NextResponse.json({ ok: true, announcement, announcements: [announcement, ...list] }, { status: 201 });
 }

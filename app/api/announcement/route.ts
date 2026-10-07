@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getKV } from "@/lib/kv";
-import { DEFAULT_ANNOUNCEMENT, type SiteAnnouncement } from "@/lib/announcement";
+import { getAnnouncements, publicAnnouncements } from "@/lib/announcement";
 
 export const dynamic = "force-dynamic";
 
@@ -9,11 +8,12 @@ export const dynamic = "force-dynamic";
 // stale KV rows to the public feed.
 export const fetchCache = "force-no-store";
 
-/** Public: current site announcement for AnnouncementBar. */
+/** Public: enabled site announcements, newest first, for AnnouncementBar. */
 export async function GET() {
-  const announcement = await getKV<SiteAnnouncement>("site_announcement", DEFAULT_ANNOUNCEMENT);
+  const list = await getAnnouncements();
+  const announcements = publicAnnouncements(list);
   return NextResponse.json(
-    { announcement },
+    { announcements },
     {
       headers: {
         "Cache-Control": "no-store, max-age=0",
