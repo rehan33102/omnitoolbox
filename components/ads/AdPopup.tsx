@@ -69,6 +69,12 @@ export default function AdPopup() {
   // Pick an ad on every navigation: eligible = route match + frequency
   // dismissal keys + device target + schedule window, then random pick.
   useEffect(() => {
+    // Always reset first: on SPA navigation onto an excluded route (auth,
+    // admin), an already-selected ad from the previous page must disappear
+    // immediately — otherwise it leaks over the login/signup form and its
+    // card swallows every tap ("nothing happens" bug).
+    setAd(null);
+    setShown(false);
     // Ads are for website visitors only — never render inside the admin.
     const p = pathname ?? "/";
     if (p.startsWith("/admin")) return;
@@ -76,8 +82,6 @@ export default function AdPopup() {
     // to swallow taps on login/signup buttons (reported dead on app + web).
     if (p === "/login" || p === "/signup" || p.startsWith("/auth")) return;
     let cancelled = false;
-    setAd(null);
-    setShown(false);
     (async () => {
       try {
         // no-store: the feed must never serve a cached (deleted) ad.
@@ -171,8 +175,10 @@ export default function AdPopup() {
   }, [ad, shown]);
 
   if (!ad || !shown) return null;
-  // Safety net: ads must never render on admin routes, even if state raced.
-  if ((pathname ?? "/").startsWith("/admin")) return null;
+  // Safety net: ads must never render on admin/auth routes, even if state raced.
+  const rp = pathname ?? "/";
+  if (rp.startsWith("/admin") || rp === "/login" || rp === "/signup" || rp.startsWith("/auth"))
+    return null;
 
   const frequency = ad.frequency ?? AD_DEFAULTS.frequency;
   const position = ad.position ?? AD_DEFAULTS.position;
