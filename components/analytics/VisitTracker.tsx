@@ -31,11 +31,18 @@ import Button from "@/components/ui/Button";
  *    now granted it captures silently, if reset to "prompt" it triggers the
  *    native dialog, and if still denied it shows a clear inline hint instead
  *    of silently doing nothing.
- * 6. Inside the OmniToolBox Android app (window.OmniBoxApp bridge present),
- *    the guide card shows an app variant: "Open Settings" deep-links into
- *    the phone's app-settings page (via the bridge), because browser site
- *    settings don't exist there. Successful capture always dismisses the
- *    guide card.
+ * 6. Inside the OmniToolBox Android app the guide card shows an app variant:
+ *    "Open Settings" deep-links into the phone's app-settings page (via
+ *    the window.OmniBoxApp bridge on v16+), because browser site settings
+ *    don't exist there. Older app versions show only "Try again".
+ *    Successful capture always dismisses the guide card.
+ * 7. In-app permission handling NEVER uses navigator.permissions.query:
+ *    the Android WebView's Permissions API can return a sticky "denied"
+ *    that never updates even after the user enables location in Android
+ *    settings. So inside the app the flow is: pre-prompt card first, then
+ *    every getCurrentPosition hands off to the native
+ *    onGeolocationPermissionsShowPrompt, which evaluates the REAL Android
+ *    permission and shows the system dialog when needed.
  *
  * All posts are fire-and-forget and must NEVER break UX or throw.
  */
@@ -101,11 +108,28 @@ export default function VisitTracker() {
   // permission is still denied — so the tap never feels like it did nothing.
   const [guideHint, setGuideHint] = useState(false);
 
-  // True when running inside the OmniToolBox Android app, which injects the
-  // window.OmniBoxApp bridge (v16+). In-app, the guide card must point at the
-  // app settings page (via the bridge), not at browser site settings.
+  // True when running inside the OmniToolBox Android app. The app injects
+  // the window.OmniBoxApp bridge (v16+) and has injected the
+  // window.OmniBoxDownloader bridge since v10 — either one proves the app
+  // shell. In-app, navigator.permissions.query({name:'geolocation'}) is
+  // UNRELIABLE inside the Android WebView (it can return a sticky "denied"
+  // that never updates), so the entire app path skips the Permissions API
+  // and lets the native onGeolocationPermissionsShowPrompt do the real
+  // permission evaluation on every getCurrentPosition call.
   const isInApp =
-    typeof window !== "undefined" && !!(window as any).OmniBoxApp;
+    typeof window !== "undefined" &&
+    !!((window as any).OmniBoxApp || (window as any).OmniBoxDownloader);
+
+  // The "Open Settings" deep-link only exists on app v16+
+  // (window.OmniBoxApp.openLocationSettings). Older app versions show only
+  // "Try again" in the guide card.
+  const hasSettingsBridge =
+    typeof window !== "undefined" &&
+    !!(
+      window as unknown as {
+        OmniBoxApp?: { openLocationSettings?: () => void };
+      }
+    ).OmniBoxApp?.openLocationSettings;
 
   // Identity linkage: browser Supabase session → every track POST.
   useEffect(() => {
@@ -223,7 +247,11 @@ export default function VisitTracker() {
 
     // Re-check on return-to-page: the visitor may have flipped the permission
     // in the browser site settings while the tab was hidden/backgrounded.
+    // In-app: SKIPPED — the WebView Permissions API can report a sticky
+    // "denied" that never updates, so it must never be trusted here. The
+    // guide card's own buttons (Open Settings / Try again) handle recovery.
     const recheckPermission = () => {
+      if (isInApp) return;
       try {
         if (!perms?.query) return;
         perms
@@ -255,6 +283,14 @@ export default function VisitTracker() {
         }
         setShowPrompt(true);
       };
+      if (isInApp) {
+        // In-app: skip the unreliable WebView Permissions API entirely and
+        // go straight to the pre-prompt. Tapping "Share location" hands off
+        // to the native Android permission dialog via getCurrentPosition;
+        // the native side evaluates the REAL permission every time.
+        showPrePrompt();
+        return;
+      }
       try {
         if (perms?.query) {
           perms
@@ -308,15 +344,23 @@ export default function VisitTracker() {
 
   const acceptPrompt = () => {
     setShowPrompt(false);
-    // User tapped "Share location" → trigger the browser's native dialog.
+    // User tapped "Share location" → getCurrentPosition hands off to the
+    // platform: the Android system dialog in the app, the browser's native
+    // dialog on web. Denial shows the guide card.
     requestPosition(maybeShowGuide);
   };
 
   const dismissPrompt = () => setShowPrompt(false);
 
   // Smart "Try again": re-check the permission state BEFORE requesting, so a
-  // tap never silently does nothing.
+  // tap never silently does nothing. In-app, the Permissions API is
+  // unreliable (sticky "denied") — request directly and let the native
+  // side evaluate the real Android permission; success dismisses the card.
   const tryAgain = async () => {
+    if (isInApp) {
+      requestPosition(() => setGuideHint(true));
+      return;
+    }
     try {
       const perms = (
         navigator as unknown as {
@@ -433,10 +477,16 @@ export default function VisitTracker() {
                       and allow Location, then come back and tap Try again.
                     </p>
                     <div className="mt-3 flex gap-2">
-                      <Button size="sm" onClick={openAppSettings}>
-                        Open Settings
-                      </Button>
-                      <Button size="sm" variant="secondary" onClick={tryAgain}>
+                      {hasSettingsBridge && (
+                        <Button size="sm" onClick={openAppSettings}>
+                          Open Settings
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant={hasSettingsBridge ? "secondary" : undefined}
+                        onClick={tryAgain}
+                      >
                         Try again
                       </Button>
                     </div>
