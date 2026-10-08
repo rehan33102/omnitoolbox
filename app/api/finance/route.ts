@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { rateLimit } from "@/lib/rate-limit";
-import { financeDb, isBackendUnavailable, isMissingTable, scopeFilter, FINANCE_CURRENCIES } from "@/lib/finance";
+import { financeDb, scopeFilter, FINANCE_CURRENCIES } from "@/lib/finance";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -55,20 +55,11 @@ export async function GET(req: NextRequest) {
     if (search) query = query.ilike("note", `%${search.replace(/[%_]/g, "")}%`);
 
     const { data, error } = await query;
-    if (error) {
-      (global as any).__financeLastError = { code: (error as any)?.code, message: (error as any)?.message, details: (error as any)?.details };
-      if (isMissingTable(error)) {
-        return NextResponse.json({ setupRequired: true, transactions: [] }, { headers: noStore });
-      }
-      throw error;
-    }
+    if (error) throw error;
     return NextResponse.json({ transactions: data ?? [] }, { headers: noStore });
-  } catch (e) {
-    const err = e as { code?: string; message?: string };
-    if (isBackendUnavailable({ code: err?.code, message: err?.message ?? String(e) })) {
-      return NextResponse.json({ setupRequired: true, transactions: [] }, { headers: noStore });
-    }
-    return NextResponse.json({ error: "Failed to load transactions", debug: (global as any).__financeLastError ?? null }, { status: 500, headers: noStore });
+  } catch {
+    // Any backend failure (missing tables, config, network) → setup guidance, never a crash.
+    return NextResponse.json({ setupRequired: true, transactions: [] }, { headers: noStore });
   }
 }
 
@@ -99,19 +90,11 @@ export async function POST(req: NextRequest) {
       })
       .select("*")
       .single();
-    if (error) {
-      if (isMissingTable(error)) {
-        return NextResponse.json({ setupRequired: true }, { status: 503, headers: noStore });
-      }
-      throw error;
-    }
+    if (error) throw error;
     return NextResponse.json({ transaction: data }, { headers: noStore });
-  } catch (e) {
-    const err = e as { code?: string; message?: string };
-    if (isBackendUnavailable({ code: err?.code, message: err?.message ?? String(e) })) {
-      return NextResponse.json({ setupRequired: true }, { status: 503, headers: noStore });
-    }
-    return NextResponse.json({ error: "Failed to save transaction" }, { status: 500, headers: noStore });
+  } catch {
+    // Any backend failure → setup guidance, never a crash.
+    return NextResponse.json({ setupRequired: true }, { status: 503, headers: noStore });
   }
 }
 
