@@ -72,6 +72,9 @@ export default function AdPopup() {
     // Ads are for website visitors only — never render inside the admin.
     const p = pathname ?? "/";
     if (p.startsWith("/admin")) return;
+    // Auth pages must stay fully interactive — an overlay must never be able
+    // to swallow taps on login/signup buttons (reported dead on app + web).
+    if (p === "/login" || p === "/signup" || p.startsWith("/auth")) return;
     let cancelled = false;
     setAd(null);
     setShown(false);
@@ -264,28 +267,27 @@ export default function AdPopup() {
 
       {isCenter ? (
         <div
-          className={`fixed inset-0 z-[90] flex items-center justify-center p-4 ${backdropClass} ${
-            backdrop === "none" ? "pointer-events-none" : ""
-          }`}
+          // Non-blocking overlay: the backdrop NEVER intercepts pointer events.
+          // Only the ad card itself is clickable — a stuck/invisible overlay can
+          // no longer swallow taps on the page behind it (the dead-buttons bug).
+          className={`pointer-events-none fixed inset-0 z-[90] flex items-center justify-center p-4 ${backdropClass}`}
           role="dialog"
-          aria-modal="true"
           aria-label={ad.name}
-          onClick={backdrop === "none" || !canClose ? undefined : close}
         >
-          <div className={backdrop === "none" ? "pointer-events-auto" : "contents"}>
+          <div className="pointer-events-auto">
             {card}
           </div>
         </div>
       ) : (
         <>
           {/* Corner cards need no full-screen overlay — only a subtle
-              backdrop layer when the ad asks for one. */}
+              backdrop layer when the ad asks for one. Non-interactive so it
+              can never block page taps. */}
           {backdrop !== "none" && (
             <div
-              className={`fixed inset-0 z-[80] ${
+              className={`pointer-events-none fixed inset-0 z-[80] ${
                 backdrop === "dim" ? "bg-black/40" : "backdrop-blur-[2px]"
               }`}
-              onClick={canClose ? close : undefined}
               aria-hidden="true"
             />
           )}
