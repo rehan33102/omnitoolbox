@@ -34,6 +34,7 @@ const TOOL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "qr-generator": dynamic(() => import("@/components/web/QrGenerator")),
   "password-generator": dynamic(() => import("@/components/web/PasswordGenerator")),
   "currency-converter": dynamic(() => import("@/components/calc/CurrencyConverter")),
+  "finance-tracker": dynamic(() => import("@/components/finance/FinanceTracker")),
   "unit-converter": dynamic(() => import("@/components/calc/UnitConverter")),
   "bmi-calorie-calculator": dynamic(() => import("@/components/calc/BmiCalculator")),
   "age-calculator": dynamic(() => import("@/components/calc/AgeCalculator")),
