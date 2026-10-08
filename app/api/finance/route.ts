@@ -63,7 +63,8 @@ export async function GET(req: NextRequest) {
     }
     return NextResponse.json({ transactions: data ?? [] }, { headers: noStore });
   } catch (e) {
-    if (isBackendUnavailable({ message: e instanceof Error ? e.message : String(e) })) {
+    const err = e as { code?: string; message?: string };
+    if (isBackendUnavailable({ code: err?.code, message: err?.message ?? String(e) })) {
       return NextResponse.json({ setupRequired: true, transactions: [] }, { headers: noStore });
     }
     return NextResponse.json({ error: "Failed to load transactions" }, { status: 500, headers: noStore });
@@ -105,7 +106,8 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ transaction: data }, { headers: noStore });
   } catch (e) {
-    if (isBackendUnavailable({ message: e instanceof Error ? e.message : String(e) })) {
+    const err = e as { code?: string; message?: string };
+    if (isBackendUnavailable({ code: err?.code, message: err?.message ?? String(e) })) {
       return NextResponse.json({ setupRequired: true }, { status: 503, headers: noStore });
     }
     return NextResponse.json({ error: "Failed to save transaction" }, { status: 500, headers: noStore });
