@@ -56,6 +56,7 @@ export async function GET(req: NextRequest) {
 
     const { data, error } = await query;
     if (error) {
+      (global as any).__financeLastError = { code: (error as any)?.code, message: (error as any)?.message, details: (error as any)?.details };
       if (isMissingTable(error)) {
         return NextResponse.json({ setupRequired: true, transactions: [] }, { headers: noStore });
       }
@@ -67,7 +68,7 @@ export async function GET(req: NextRequest) {
     if (isBackendUnavailable({ code: err?.code, message: err?.message ?? String(e) })) {
       return NextResponse.json({ setupRequired: true, transactions: [] }, { headers: noStore });
     }
-    return NextResponse.json({ error: "Failed to load transactions" }, { status: 500, headers: noStore });
+    return NextResponse.json({ error: "Failed to load transactions", debug: (global as any).__financeLastError ?? null }, { status: 500, headers: noStore });
   }
 }
 
