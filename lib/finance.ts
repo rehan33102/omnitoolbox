@@ -11,7 +11,8 @@ export function isBackendUnavailable(error: { code?: string; message?: string } 
   const msg = `${error.code ?? ""} ${error.message ?? ""}`;
   return (
     error.code === "42P01" ||
-    /relation .* does not exist/i.test(msg) ||
+    /^PGRST/.test(error.code ?? "") ||
+    /relation .* does not exist|could not find the table/i.test(msg) ||
     /supabaseurl is required|supabasekey is required/i.test(msg) ||
     /fetch failed|network|econnrefused|enotfound|timeout/i.test(msg)
   );
