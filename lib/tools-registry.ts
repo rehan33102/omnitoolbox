@@ -130,14 +130,6 @@ export const TOOLS: Tool[] = [
     keywords: ["currency converter", "currency exchange", "usd to pkr", "pkr to usd", "money converter", "dollar to rupee", "forex converter", "exchange rate", "eur to usd", "usdt price", "dollar rate today", "currency calculator", "dollar to pkr"],
   },
   {
-    id: "t22", slug: "finance-tracker", title: "Finance Tracker",
-    tagline: "Track income & expenses with smart insights",
-    description: "Personal finance tracker: log income and expenses, organize by category, filter by month, and see spending insights with charts. Your data syncs securely.",
-    category: "web", href: "/tools/finance-tracker", icon: "Wallet", badge: "new",
-    enabled: true, sortOrder: 16.5, usageCount: 0, updatedAt: "2026-10-08",
-    keywords: ["finance tracker", "expense tracker", "budget tracker", "money tracker", "income expense tracker", "personal finance", "spending tracker", "budget planner", "expense manager", "kharcha tracker", "paisa hisab", "budget app"],
-  },
-  {
     id: "t17", slug: "unit-converter", title: "Unit Converter",
     tagline: "Length, weight, temperature, volume & more",
     description: "Instant conversions across 6 unit categories with a full equivalents table. All client-side.",
