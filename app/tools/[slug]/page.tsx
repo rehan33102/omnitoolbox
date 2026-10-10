@@ -24,6 +24,7 @@ const TOOL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "background-studio": dynamic(() => import("@/components/media/BackgroundStudio")),
   "watermark-remover": dynamic(() => import("@/components/media/WatermarkRemover")),
   "fancy-text": dynamic(() => import("@/components/social/FancyTextStylator")),
+  "youtube-thumbnail-downloader": dynamic(() => import("@/components/social/YoutubeThumbnailDownloader")),
   "bio-generator": dynamic(() => import("@/components/social/BioGenerator")),
   "hashtag-finder": dynamic(() => import("@/components/social/HashtagFinder")),
   "ai-directory": dynamic(() => import("@/components/directory/DirectoryExplorer")),

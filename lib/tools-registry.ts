@@ -154,6 +154,14 @@ export const TOOLS: Tool[] = [
     keywords: ["age calculator", "how old am i", "birthday calculator", "calculate age", "date of birth calculator", "age finder", "years old calculator", "days lived", "next birthday", "dob calculator", "my age", "age in days"],
   },
   {
+    id: "t22", slug: "youtube-thumbnail-downloader", title: "YouTube Thumbnail Downloader",
+    tagline: "Download any YouTube thumbnail in Full HD — free, no signup",
+    description: "Paste any YouTube link — watch, youtu.be, Shorts or embed — and download the thumbnail in Full HD 1280×720, SD, HQ or MQ. One click, straight from YouTube's servers to your device. 100% free, no watermark, nothing uploaded.",
+    category: "social", href: "/tools/youtube-thumbnail-downloader", icon: "ImageDown", image: "/images/tools/youtube-thumbnail-downloader.jpg", badge: "new",
+    enabled: true, sortOrder: 21, usageCount: 0, updatedAt: "2026-10-11",
+    keywords: ["youtube thumbnail downloader", "download youtube thumbnail", "yt thumbnail downloader", "youtube thumbnail grabber", "youtube thumbnail saver", "hd thumbnail downloader", "youtube shorts thumbnail downloader", "get youtube thumbnail", "download yt thumbnail", "youtube thumbnail image download", "youtube cover downloader", "thumbnail downloader hd 1080p", "save youtube thumbnail", "youtube thumbnail extractor"],
+  },
+  {
     id: "t20", slug: "watermark-remover", title: "Watermark Remover",
     tagline: "Erase watermarks from photos & videos",
     description: "Paint over watermarks, logos or text marks and erase them with smart AI inpainting — works on IMAGES and VIDEOS. Auto-detects corner watermarks (like Gemini AI marks). 100% client-side — nothing uploaded.",
