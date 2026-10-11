@@ -11,10 +11,15 @@ import { getListings } from "@/lib/get-directory";
 
 /**
  * Every tool gets its own clean slug URL: /tools/<slug>
- * (e.g. /tools/background-remover). Tool cards link here.
+ * (e.g. /tools/background-studio). Tool cards link here.
  * Old hub pages (/media-tools, /pdf-tools, /social-tools, /calculators)
  * keep working as category overviews.
+ *
+ * dynamicParams = false: only registry slugs are valid — unknown slugs get a
+ * proper router-level 404 instead of a soft-404 (200 with not-found UI),
+ * which notFound() was producing on this route in production.
  */
+export const dynamicParams = false;
 
 const TOOL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "ai-prompt-studio": dynamic(() => import("@/components/prompt-studio/PromptBuilder")),
