@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { edgeTts, resolveEdgeParams, EDGE_LANGUAGES, type EdgeTtsOptions, type SpeechCue } from "@/lib/edge-tts";
+import { tts as edgeTtsNpm } from "edge-tts";
+import { resolveEdgeParams, EDGE_LANGUAGES, type SpeechCue } from "@/lib/edge-tts";
 import { rateLimit } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
@@ -99,12 +100,17 @@ const EDGE_RETRY_BACKOFF_MS = 800;
  * Microsoft Edge neural TTS, retried up to 3 times with ~800ms backoff.
  * Google is strictly a last resort — the neural voice is the product.
  */
-async function edgeTtsRetry(opts: EdgeTtsOptions): Promise<{ audio: Buffer; cues: SpeechCue[] }> {
+async function edgeTtsRetry(opts: { text: string; voice: string; rate: string; pitch: string }): Promise<{ audio: Buffer; cues: SpeechCue[] }> {
   let lastErr: unknown = null;
   for (let attempt = 1; attempt <= EDGE_RETRY_ATTEMPTS; attempt++) {
     try {
-      console.log(`[tts] Edge TTS attempt ${attempt}/${EDGE_RETRY_ATTEMPTS} voice=${opts.voice}`);
-      return await edgeTts(opts);
+      console.log(`[tts] Edge TTS (npm) attempt ${attempt}/${EDGE_RETRY_ATTEMPTS} voice=${opts.voice}`);
+      const audioBuffer = await edgeTtsNpm(opts.text, {
+        voice: opts.voice,
+        rate: opts.rate,
+        pitch: opts.pitch,
+      });
+      return { audio: Buffer.from(audioBuffer), cues: [] };
     } catch (e) {
       lastErr = e;
       console.error(
@@ -184,7 +190,6 @@ export async function POST(req: NextRequest) {
           voice: p.voiceName,
           rate: p.rate,
           pitch: p.pitch,
-          pauseSec: p.pause,
         });
         audio = r.audio;
         cues = r.cues;
