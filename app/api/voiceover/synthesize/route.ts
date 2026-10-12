@@ -137,6 +137,7 @@ type Body = {
   ratePct?: unknown;   // Edge: speed override, percent (-40..40)
   pitchHz?: unknown;   // Edge: pitch override, Hz (-15..15)
   pauseSec?: unknown;  // Edge: paragraph pause seconds (0..3)
+  debug?: unknown;     // debug: return Edge TTS error instead of falling back
 };
 
 function num(v: unknown): number | undefined {
@@ -184,8 +185,10 @@ export async function POST(req: NextRequest) {
     // (User's own VoiceoverStudio tool approach — ElevenLabs is videos-only.)
     if (EDGE_LANGUAGES[lang]) {
       // Primary path: Microsoft Edge neural voices (free, no key) — retried 3x.
+      let edgeVoiceName = "";
       try {
         const p = resolveEdgeParams(lang, voice, style, ratePct, pitchHz, pauseSec);
+        edgeVoiceName = p.voiceName;
         const r = await edgeTtsRetry({
           text,
           voice: p.voiceName,
@@ -200,7 +203,7 @@ export async function POST(req: NextRequest) {
         console.error("Edge TTS failed, falling back to Google:", errMsg);
         if (debug) {
           return NextResponse.json(
-            { error: "Edge TTS failed", detail: errMsg, voice: p.voiceName },
+            { error: "Edge TTS failed", detail: errMsg, voice: edgeVoiceName },
             { status: 502 }
           );
         }
