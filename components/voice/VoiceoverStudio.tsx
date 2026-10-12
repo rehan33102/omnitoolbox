@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/Toast";
 import { deleteBlob, getBlob, saveBlob } from "@/lib/db";
 import { saveToLibrary } from "@/lib/library-save";
 import { downloadBlob as downloadBlobFile } from "@/lib/download";
+import { synthesizeInBrowser, getVoiceName, hasClientVoice } from "@/lib/edge-tts-client";
 
 const MAX_CHARS = 100000; // effectively unlimited — chunked server-side
 const PART_CHARS = 500; // per server request; server chunks further internally
@@ -231,12 +232,33 @@ export default function VoiceoverStudio() {
       return;
     }
     setPreviewing(true);
+    const sampleText = PREVIEW_SAMPLES[lang] ?? PREVIEW_SAMPLES.en;
+    // Try client-side Edge TTS first (direct browser → Microsoft, free, male/female work).
+    // Falls back to server API if client-side fails.
+    const clientVoice = hasClientVoice(lang) ? getVoiceName(lang, edgeVoice) : null;
+    if (clientVoice) {
+      try {
+        const result = await synthesizeInBrowser(sampleText, clientVoice);
+        const url = URL.createObjectURL(result.audio);
+        const el = previewAudioRef.current;
+        if (!el) throw new Error("no audio element");
+        el.src = url;
+        el.onended = () => {
+          setPreviewing(false);
+          URL.revokeObjectURL(url);
+        };
+        await el.play();
+        return;
+      } catch {
+        // Fall through to server API
+      }
+    }
     try {
       const res = await fetch("/api/voiceover/synthesize", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          text: PREVIEW_SAMPLES[lang] ?? PREVIEW_SAMPLES.en,
+          text: sampleText,
           lang,
           voice: edgeVoice,
           style: edgeStyle,
@@ -274,45 +296,66 @@ export default function VoiceoverStudio() {
     try {
       const parts = chunkText(script);
       const partData: { text: string; blob: Blob; cues: SpeechCue[] }[] = [];
+      // Client-side Edge TTS: try direct browser → Microsoft first (free, male/female work).
+      const clientVoiceName = hasClientVoice(lang) ? getVoiceName(lang, edgeVoice) : null;
       for (let i = 0; i < parts.length; i++) {
         if (stopRef.current) return;
         setGenStep(parts.length > 1 ? `Generating part ${i + 1} of ${parts.length}…` : "Generating voice…");
-        const payload: Record<string, unknown> = { text: parts[i], lang };
-        if (edgeLangs.some((l) => l.code === lang)) {
-          payload.voice = edgeVoice;
-          payload.style = edgeStyle;
-          if (useCustomRate) payload.ratePct = ratePct;
-          if (useCustomPitch) payload.pitchHz = pitchHz;
-          if (useCustomPause) payload.pauseSec = pauseSec;
-        }
-        const res = await fetch("/api/voiceover/synthesize", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) {
-          const err = (await res.json().catch(() => ({}))) as { error?: string };
-          throw new Error(err.error ?? "Generation failed");
-        }
-        const buf = await res.arrayBuffer();
-        if (buf.byteLength < 500) throw new Error("Empty audio");
-        if (i === 0) {
-          const h = res.headers.get("X-TTS-Engine");
-          setEngine(h === "edge" || h === "elevenlabs" || h === "google" || h === "google-fallback" ? h : "google");
-        }
+        let blob: Blob | null = null;
         let cues: SpeechCue[] = [];
-        const cuesHeader = res.headers.get("X-Speech-Cues");
-        if (cuesHeader) {
+        let usedEngine: TtsEngine = "";
+        // Attempt 1: client-side Edge TTS (direct browser → Microsoft)
+        if (clientVoiceName) {
           try {
-            const raw = atob(cuesHeader.replace(/-/g, "+").replace(/_/g, "/"));
-            const json = decodeURIComponent(escape(raw));
-            const parsed = JSON.parse(json) as SpeechCue[];
-            if (Array.isArray(parsed)) cues = parsed;
+            const result = await synthesizeInBrowser(parts[i], clientVoiceName);
+            blob = result.audio;
+            usedEngine = "edge";
           } catch {
-            /* fall back to estimates */
+            // Fall through to server API
           }
         }
-        partData.push({ text: parts[i], blob: new Blob([buf], { type: "audio/mpeg" }), cues });
+        // Attempt 2: server API (fallback)
+        if (!blob) {
+          const payload: Record<string, unknown> = { text: parts[i], lang };
+          if (edgeLangs.some((l) => l.code === lang)) {
+            payload.voice = edgeVoice;
+            payload.style = edgeStyle;
+            if (useCustomRate) payload.ratePct = ratePct;
+            if (useCustomPitch) payload.pitchHz = pitchHz;
+            if (useCustomPause) payload.pauseSec = pauseSec;
+          }
+          const res = await fetch("/api/voiceover/synthesize", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          if (!res.ok) {
+            const err = (await res.json().catch(() => ({}))) as { error?: string };
+            throw new Error(err.error ?? "Generation failed");
+          }
+          const buf = await res.arrayBuffer();
+          if (buf.byteLength < 500) throw new Error("Empty audio");
+          blob = new Blob([buf], { type: "audio/mpeg" });
+          if (i === 0) {
+            const h = res.headers.get("X-TTS-Engine");
+            usedEngine = h === "edge" || h === "elevenlabs" || h === "google" || h === "google-fallback" ? h : "google";
+          }
+          const cuesHeader = res.headers.get("X-Speech-Cues");
+          if (cuesHeader) {
+            try {
+              const raw = atob(cuesHeader.replace(/-/g, "+").replace(/_/g, "/"));
+              const json = decodeURIComponent(escape(raw));
+              const parsed = JSON.parse(json) as SpeechCue[];
+              if (Array.isArray(parsed)) cues = parsed;
+            } catch {
+              /* fall back to estimates */
+            }
+          }
+        }
+        if (i === 0 && usedEngine) {
+          setEngine(usedEngine);
+        }
+        partData.push({ text: parts[i], blob, cues });
       }
       if (stopRef.current) return;
       const blob = new Blob(partData.map((p) => p.blob), { type: "audio/mpeg" });
