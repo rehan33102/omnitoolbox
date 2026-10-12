@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { tts as edgeTtsNpm } from "@/lib/edge-tts-vendor.js";
+import { edgeTtsWs } from "@/lib/edge-tts-ws";
 import { resolveEdgeParams, EDGE_LANGUAGES, type SpeechCue } from "@/lib/edge-tts";
 import { rateLimit } from "@/lib/rate-limit";
 
@@ -104,13 +104,13 @@ async function edgeTtsRetry(opts: { text: string; voice: string; rate: string; p
   let lastErr: unknown = null;
   for (let attempt = 1; attempt <= EDGE_RETRY_ATTEMPTS; attempt++) {
     try {
-      console.log(`[tts] Edge TTS (npm) attempt ${attempt}/${EDGE_RETRY_ATTEMPTS} voice=${opts.voice}`);
-      const audioBuffer = await edgeTtsNpm(opts.text, {
+      console.log(`[tts] Edge TTS (ws) attempt ${attempt}/${EDGE_RETRY_ATTEMPTS} voice=${opts.voice}`);
+      const audio = await edgeTtsWs(opts.text, {
         voice: opts.voice,
         rate: opts.rate,
         pitch: opts.pitch,
       });
-      return { audio: Buffer.from(audioBuffer), cues: [] };
+      return { audio, cues: [] };
     } catch (e) {
       lastErr = e;
       console.error(
