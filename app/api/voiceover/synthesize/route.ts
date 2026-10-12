@@ -166,6 +166,7 @@ export async function POST(req: NextRequest) {
   const ratePct = num(body.ratePct);
   const pitchHz = num(body.pitchHz);
   const pauseSec = num(body.pauseSec);
+  const debug = body.debug === true || body.debug === "1";
 
   if (!text || text.length > MAX_CHARS) {
     return NextResponse.json({ error: `Text must be 1–${MAX_CHARS} characters per part.` }, { status: 400 });
@@ -195,7 +196,14 @@ export async function POST(req: NextRequest) {
         cues = r.cues;
         engine = "edge";
       } catch (e) {
-        console.error("Edge TTS failed, falling back to Google:", e instanceof Error ? e.message : e);
+        const errMsg = e instanceof Error ? e.message : String(e);
+        console.error("Edge TTS failed, falling back to Google:", errMsg);
+        if (debug) {
+          return NextResponse.json(
+            { error: "Edge TTS failed", detail: errMsg, voice: p.voiceName },
+            { status: 502 }
+          );
+        }
         audio = await googleTTS(text, lang);
         engine = "google-fallback";
       }
