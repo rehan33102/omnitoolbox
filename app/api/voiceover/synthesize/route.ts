@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { tts as edgeTtsNpm } from "edge-tts";
+import { tts as edgeTtsNpm } from "@/lib/edge-tts-vendor.js";
 import { resolveEdgeParams, EDGE_LANGUAGES, type SpeechCue } from "@/lib/edge-tts";
 import { rateLimit } from "@/lib/rate-limit";
 
