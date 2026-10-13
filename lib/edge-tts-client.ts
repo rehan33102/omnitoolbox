@@ -209,6 +209,15 @@ const VOICE_MAP: Record<string, { male: string; female: string }> = {
   fa: { male: "fa-IR-FaridNeural", female: "fa-IR-DilaraNeural" },
   th: { male: "th-TH-NiwatNeural", female: "th-TH-PremwadeeNeural" },
   vi: { male: "vi-VN-NamMinhNeural", female: "vi-VN-HoaiMyNeural" },
+  sv: { male: "sv-SE-MattiasNeural", female: "sv-SE-SofieNeural" },
+  da: { male: "da-DK-JeppeNeural", female: "da-DK-ChristelNeural" },
+  fi: { male: "fi-FI-HarriNeural", female: "fi-FI-NooraNeural" },
+  no: { male: "nb-NO-FinnNeural", female: "nb-NO-PernilleNeural" },
+  el: { male: "el-GR-NestorasNeural", female: "el-GR-AthinaNeural" },
+  he: { male: "he-IL-AvriNeural", female: "he-IL-HilaNeural" },
+  ro: { male: "ro-RO-EmilNeural", female: "ro-RO-AlinaNeural" },
+  uk: { male: "uk-UA-OstapNeural", female: "uk-UA-PolinaNeural" },
+  cs: { male: "cs-CZ-AntoninNeural", female: "cs-CZ-VlastaNeural" },
 };
 
 /** Get the Edge voice ShortName for a language + gender. Returns null if not mapped. */
