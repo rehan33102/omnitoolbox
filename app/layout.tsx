@@ -84,7 +84,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ServiceWorkerRegister />
             <AutoUpdater />
             <VisitTracker />
-            <AdPopup />
+            {/* AdPopup disabled 2026-10-13: centered promo popups were covering
+                tool cards and blocking clicks ("buttons not working" reports).
+                Ads data is intact in the DB; re-enable by restoring <AdPopup />. */}
             <CommandPalette />
             <GlobalErrorHooks />
             <ErrorBoundary name="root">
