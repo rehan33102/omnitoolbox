@@ -9,7 +9,7 @@
 
 const TRUSTED_CLIENT_TOKEN = "6A5AA1D4EAFF4E9FB37E23D68491D6F4";
 const VOICE_LIST_URL = "https://speech.platform.bing.com/consumer/speech/synthesize/readaloud/voices/list?trustedclienttoken=" + TRUSTED_CLIENT_TOKEN;
-const SYNTH_URL = "wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=" + TRUSTED_CLIENT_TOKEN;
+const SYNTH_BASE = "wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=" + TRUSTED_CLIENT_TOKEN;
 
 export type EdgeVoiceInfo = {
   Name: string;
@@ -56,8 +56,10 @@ export async function synthesizeInBrowser(
 
   return new Promise((resolve, reject) => {
     let ws: WebSocket;
+    const connectionId = uuid().replace(/-/g, "");
+    const wsUrl = `${SYNTH_BASE}&ConnectionId=${connectionId}`;
     try {
-      ws = new WebSocket(SYNTH_URL);
+      ws = new WebSocket(wsUrl);
     } catch (e) {
       reject(new Error("WebSocket not supported"));
       return;
@@ -124,15 +126,17 @@ export async function synthesizeInBrowser(
         return;
       }
 
-      // Binary message — parse header to find audio data
+      // Binary message — extract audio data after "Path:audio\r\n" separator
+      // (matches the proven edge-tts npm package implementation)
       const buffer = event.data as ArrayBuffer;
       const bytes = new Uint8Array(buffer);
-      // Find "Path:audio\r\n\r\n" separator
-      const headerEnd = findHeaderEnd(bytes);
-      if (headerEnd > 0 && headerEnd < bytes.length) {
-        const headerText = new TextDecoder().decode(bytes.slice(0, headerEnd));
-        if (headerText.includes("Path:audio")) {
-          audioChunks.push(buffer.slice(headerEnd));
+      const separator = "Path:audio\r\n";
+      const sepBytes = new TextEncoder().encode(separator);
+      const idx = findSequence(bytes, sepBytes);
+      if (idx >= 0) {
+        const audioStart = idx + sepBytes.length;
+        if (audioStart < bytes.length) {
+          audioChunks.push(buffer.slice(audioStart));
         }
       }
     };
@@ -155,12 +159,13 @@ export async function synthesizeInBrowser(
   });
 }
 
-function findHeaderEnd(bytes: Uint8Array): number {
-  // Look for \r\n\r\n sequence
-  for (let i = 0; i < bytes.length - 3; i++) {
-    if (bytes[i] === 13 && bytes[i + 1] === 10 && bytes[i + 2] === 13 && bytes[i + 3] === 10) {
-      return i + 4;
+function findSequence(haystack: Uint8Array, needle: Uint8Array): number {
+  // Find needle byte sequence in haystack
+  outer: for (let i = 0; i <= haystack.length - needle.length; i++) {
+    for (let j = 0; j < needle.length; j++) {
+      if (haystack[i + j] !== needle[j]) continue outer;
     }
+    return i;
   }
   return -1;
 }
