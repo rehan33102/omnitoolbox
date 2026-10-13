@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/Toast";
 import { deleteBlob, getBlob, saveBlob } from "@/lib/db";
 import { saveToLibrary } from "@/lib/library-save";
 import { downloadBlob as downloadBlobFile } from "@/lib/download";
-import { synthesizeInBrowser, getVoiceName, hasClientVoice } from "@/lib/edge-tts-client";
+import { synthesizePiper, hasPiperVoice, type PiperProgress } from "@/lib/piper-tts-client";
 
 const MAX_CHARS = 100000; // effectively unlimited — chunked server-side
 const PART_CHARS = 500; // per server request; server chunks further internally
@@ -86,7 +86,7 @@ type SpeechCue = { start: number; end: number; text: string };
 const DEFAULT_TEXT =
   "Hello, and welcome to the OmniToolBox A.I. Voiceover Studio. Type, or paste your script here... pick a language, then press Generate. You'll get real, studio-quality MP3 audio, that you can play, download, and reuse anywhere.";
 
-/* Localized preview samples — one short line per neural-voice language. */
+/* Localized preview samples — one short line per on-device voice language. */
 const PREVIEW_SAMPLES: Record<string, string> = {
   en: "Hello! This is a preview of the selected voice.",
   es: "¡Hola! Esta es una vista previa de la voz seleccionada.",
@@ -94,9 +94,27 @@ const PREVIEW_SAMPLES: Record<string, string> = {
   de: "Hallo! Dies ist eine Vorschau der ausgewählten Stimme.",
   ja: "こんにちは！選択した音声のプレビューです。",
   fr: "Bonjour ! Ceci est un aperçu de la voix sélectionnée.",
+  ru: "Привет! Это предварительный просмотр выбранного голоса.",
+  it: "Ciao! Questa è un'anteprima della voce selezionata.",
+  pl: "Cześć! To jest podgląd wybranego głosu.",
+  nl: "Hallo! Dit is een voorbeeld van de geselecteerde stem.",
+  ar: "مرحباً! هذه معاينة للصوت المحدد.",
+  pt: "Olá! Esta é uma prévia da voz selecionada.",
+  zh: "你好！这是所选声音的预览。",
+  tr: "Merhaba! Bu, seçilen sesin bir önizlemesidir.",
+  fa: "سلام! این پیش‌نمایش صدای انتخاب شده است.",
+  vi: "Xin chào! Đây là bản xem trước của giọng nói đã chọn.",
+  sv: "Hej! Det här är en förhandsvisning av den valda rösten.",
+  da: "Hej! Dette er en forhåndsvisning af den valgte stemme.",
+  fi: "Hei! Tämä on esikatselu valitusta äänestä.",
+  no: "Hei! Dette er en forhåndsvisning av den valgte stemmen.",
+  el: "Γεια σας! Αυτή είναι μια προεπισκόπηση της επιλεγμένης φωνής.",
+  ro: "Bună! Aceasta este o previzualizare a vocii selectate.",
+  uk: "Привіт! Це попередній перегляд вибраного голосу.",
+  cs: "Ahoj! Toto je náhled vybraného hlasu.",
 };
 
-type TtsEngine = "edge" | "elevenlabs" | "google" | "google-fallback" | "";
+type TtsEngine = "edge" | "elevenlabs" | "google" | "google-fallback" | "piper" | "";
 
 /** Split long scripts into sentence-aware parts for sequential server requests. */
 function chunkText(text: string, maxLen = PART_CHARS): string[] {
@@ -175,6 +193,7 @@ export default function VoiceoverStudio() {
   const [useCustomPause, setUseCustomPause] = useState(savedForm?.useCustomPause ?? true);
   const [engine, setEngine] = useState<TtsEngine>("");
   const [previewing, setPreviewing] = useState(false);
+  const [previewStep, setPreviewStep] = useState("");
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Persist form state — script and settings survive navigation/refresh
@@ -224,35 +243,65 @@ export default function VoiceoverStudio() {
     edgeLangs.find((l) => l.code === code)?.label ??
     BASIC_LANGUAGES.find((l) => l.code === code)?.label ?? code;
 
-  /** Preview the selected voice/style with a short localized sample — not saved to history. */
+  /** Preview the selected voice with a short localized sample — not saved to history. */
   const previewVoice = useCallback(async () => {
     if (previewing) {
       previewAudioRef.current?.pause();
       setPreviewing(false);
+      setPreviewStep("");
       return;
     }
     setPreviewing(true);
+    setPreviewStep("");
     const sampleText = PREVIEW_SAMPLES[lang] ?? PREVIEW_SAMPLES.en;
-    // Try client-side Edge TTS first (direct browser → Microsoft, free, male/female work).
-    // Falls back to server API if client-side fails.
-    const clientVoice = hasClientVoice(lang) ? getVoiceName(lang, edgeVoice) : null;
-    if (clientVoice) {
+    const playBlob = async (blob: Blob) => {
+      const url = URL.createObjectURL(blob);
+      const el = previewAudioRef.current;
+      if (!el) throw new Error("no audio element");
+      el.src = url;
+      el.onended = () => {
+        setPreviewing(false);
+        setPreviewStep("");
+        URL.revokeObjectURL(url);
+      };
+      await el.play();
+    };
+    const piperProgress = (p: PiperProgress) => {
+      const pct = Math.round(p.fraction * 100);
+      setPreviewStep(
+        p.stage === "download"
+          ? `Downloading voice model… ${pct}% (first time only)`
+          : p.stage === "encode"
+            ? `Encoding… ${pct}%`
+            : `Generating… ${pct}%`,
+      );
+    };
+    // Attempt 1: OUR OWN on-device Piper TTS — real male/female, no server involved.
+    if (hasPiperVoice(lang)) {
       try {
-        const result = await synthesizeInBrowser(sampleText, clientVoice);
-        const url = URL.createObjectURL(result.audio);
-        const el = previewAudioRef.current;
-        if (!el) throw new Error("no audio element");
-        el.src = url;
-        el.onended = () => {
-          setPreviewing(false);
-          URL.revokeObjectURL(url);
-        };
-        await el.play();
+        const { blob } = await synthesizePiper(sampleText, lang, edgeVoice, piperProgress);
+        setPreviewStep("");
+        await playBlob(blob);
         return;
-      } catch {
-        // Fall through to server API
+      } catch (e) {
+        setPreviewing(false);
+        setPreviewStep("");
+        toast({ title: "Preview failed", variant: "error", description: e instanceof Error ? e.message : "Try again in a moment." });
+        return;
       }
     }
+    // No on-device voice for this language. Never serve the server's
+    // female-sounding fallback as "Male" — say so clearly instead.
+    if (edgeVoice === "male") {
+      setPreviewing(false);
+      toast({
+        title: "No male voice for this language yet",
+        variant: "error",
+        description: "On-device male voices are ready for English, German, French, Russian, Italian, Polish and Dutch. Pick Female for a basic voice, or switch language.",
+      });
+      return;
+    }
+    // Attempt 2: server basic voice (female only) — the UI labels it honestly.
     try {
       const res = await fetch("/api/voiceover/synthesize", {
         method: "POST",
@@ -296,25 +345,38 @@ export default function VoiceoverStudio() {
     try {
       const parts = chunkText(script);
       const partData: { text: string; blob: Blob; cues: SpeechCue[] }[] = [];
-      // Client-side Edge TTS: try direct browser → Microsoft first (free, male/female work).
-      const clientVoiceName = hasClientVoice(lang) ? getVoiceName(lang, edgeVoice) : null;
+      const usePiper = hasPiperVoice(lang);
+      // No on-device voice + Male selected: never serve the server's
+      // female-sounding fallback as "Male" — fail loudly instead.
+      if (!usePiper && edgeVoice === "male") {
+        throw new Error(
+          "No on-device male voice for this language yet. English, German, French, Russian, Italian, Polish and Dutch have real male voices — or pick Female for a basic voice.",
+        );
+      }
       for (let i = 0; i < parts.length; i++) {
         if (stopRef.current) return;
         setGenStep(parts.length > 1 ? `Generating part ${i + 1} of ${parts.length}…` : "Generating voice…");
         let blob: Blob | null = null;
         let cues: SpeechCue[] = [];
         let usedEngine: TtsEngine = "";
-        // Attempt 1: client-side Edge TTS (direct browser → Microsoft)
-        if (clientVoiceName) {
-          try {
-            const result = await synthesizeInBrowser(parts[i], clientVoiceName);
-            blob = result.audio;
-            usedEngine = "edge";
-          } catch {
-            // Fall through to server API
-          }
+        // Attempt 1: OUR OWN on-device Piper TTS — real male/female, no server.
+        if (usePiper) {
+          const partLabel = parts.length > 1 ? ` (part ${i + 1}/${parts.length})` : "";
+          const { blob: piperBlob } = await synthesizePiper(parts[i], lang, edgeVoice, (p) => {
+            if (stopRef.current) return;
+            const pct = Math.round(p.fraction * 100);
+            const stageLabel =
+              p.stage === "download"
+                ? "Downloading voice model (first time only)"
+                : p.stage === "encode"
+                  ? "Encoding MP3"
+                  : "Generating voice";
+            setGenStep(`${stageLabel}… ${pct}%${partLabel}`);
+          });
+          blob = piperBlob;
+          usedEngine = "piper";
         }
-        // Attempt 2: server API (fallback)
+        // Attempt 2: server API (last resort — female only; male is rejected above).
         if (!blob) {
           const payload: Record<string, unknown> = { text: parts[i], lang };
           if (edgeLangs.some((l) => l.code === lang)) {
@@ -501,7 +563,9 @@ export default function VoiceoverStudio() {
             </optgroup>
           </select>
           <p className="text-xs text-zinc-500 mt-1.5 flex items-center gap-1.5">
-            {isEdgeLang ? (
+            {hasPiperVoice(lang) ? (
+              <><Sparkles size={12} className="text-brand-700 dark:text-brand-400" /> On-device AI voice · real {edgeVoice} voice · free · works offline after first use</>
+            ) : isEdgeLang ? (
               <><Sparkles size={12} className="text-brand-700 dark:text-brand-400" /> HD AI voice · male/female · styles · free</>
             ) : (
               <>Basic free voice · MP3 download</>
@@ -511,7 +575,7 @@ export default function VoiceoverStudio() {
 
         {showEdgeControls && (
           <>
-            <div className="grid grid-cols-2 gap-4">
+            <div className={`grid gap-4 ${hasPiperVoice(lang) ? "grid-cols-1" : "grid-cols-2"}`}>
               <div>
                 <label htmlFor="vo-evoice" className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 flex items-center gap-2">
                   <Mic size={15} className="text-brand-700 dark:text-brand-400" /> Voice
@@ -521,6 +585,7 @@ export default function VoiceoverStudio() {
                   <option value="female"> Female</option>
                 </select>
               </div>
+              {!hasPiperVoice(lang) && (
               <div>
                 <label htmlFor="vo-style" className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2 block">Style</label>
                 <select id="vo-style" value={edgeStyle} onChange={(e) => setEdgeStyle(e.target.value)} className="input-base w-full">
@@ -529,6 +594,7 @@ export default function VoiceoverStudio() {
                   ))}
                 </select>
               </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3">
@@ -540,12 +606,17 @@ export default function VoiceoverStudio() {
                 <span className="grid place-items-center size-9 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 text-white shadow-[0_4px_16px_rgba(168,85,247,0.4)] group-hover:shadow-[0_4px_24px_rgba(168,85,247,0.6)] transition-shadow">
                   {previewing ? <Square size={13} /> : <Play size={13} className="ml-0.5" />}
                 </span>
-                {previewing ? "Playing… tap to stop" : "Preview voice"}
+                {previewing ? (previewStep || "Playing… tap to stop") : "Preview voice"}
               </button>
-              <p className="text-[11px] text-zinc-500">Hear a short sample of this voice before generating.</p>
+              <p className="text-[11px] text-zinc-500">{previewStep ? "On-device voice — first use downloads the model once." : "Hear a short sample of this voice before generating."}</p>
               <audio ref={previewAudioRef} className="hidden" aria-hidden />
             </div>
 
+            {hasPiperVoice(lang) ? (
+              <p className="text-[11px] text-zinc-500 leading-relaxed rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4">
+                The on-device voice speaks at its natural speed and pitch — the model is downloaded once (~60&nbsp;MB) and then works offline.
+              </p>
+            ) : (
             <div className="space-y-4 rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
@@ -593,6 +664,7 @@ export default function VoiceoverStudio() {
                   className="w-full accent-brand-500 disabled:opacity-30" aria-label="Paragraph pause" />
               </div>
             </div>
+            )}
           </>
         )}
 
@@ -626,13 +698,17 @@ export default function VoiceoverStudio() {
 
         {audioUrl && !generating && (
           <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/5 p-4 space-y-3 animate-fade-up">
-            {engine === "edge" || engine === "elevenlabs" ? (
+            {engine === "piper" ? (
+              <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1">
+                On-device AI Voice · {edgeVoice === "male" ? "Male" : "Female"}
+              </p>
+            ) : engine === "edge" || engine === "elevenlabs" ? (
               <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1">
                  {engine === "edge" ? "HD AI Voice" : "Premium AI Voice"}
               </p>
             ) : engine === "google-fallback" || engine === "google" ? (
               <p className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-full px-3 py-1">
-                 Basic voice — HD voice was unavailable, please try again
+                 Basic voice — on-device voice unavailable for this language
               </p>
             ) : null}
             <audio controls src={audioUrl} className="w-full" />
@@ -647,7 +723,7 @@ export default function VoiceoverStudio() {
         )}
 
         <p className="text-[11px] text-zinc-500 leading-relaxed">
-          Free AI voices generated on our server — the MP3 is yours to download and use anywhere.
+          Free AI voices generated on your own device — the MP3 is yours to download and use anywhere.
           Your recordings stay on this device.
         </p>
       </Card>
