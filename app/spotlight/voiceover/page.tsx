@@ -10,8 +10,8 @@ import Card from "@/components/ui/Card";
 
 export async function generateMetadata() {
   return buildMetadata({
-    title: "AI Voice Cloner Showcase — Clone Any Voice Free",
-    description: "See the OmniToolBox AI Voice Cloner in action: clone any voice from a 6–30 second sample and generate real MP3 voiceovers in that voice — free.",
+    title: "AI Voice Studio — Clone & Create Voices Free",
+    description: "See the OmniToolBox AI Voice Studio in action: clone any voice from a 6–30 second sample and generate real MP3 voiceovers in that voice — free.",
     path: "/spotlight/voiceover",
     keywords: ["ai voice cloner", "voice cloning showcase", "clone my voice", "free voice clone", "ai voice copy"],
   });
@@ -45,7 +45,7 @@ export default function VoiceoverSpotlightPage() {
   return (
     <div className="relative overflow-hidden">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox AI Voice Cloner", description: "Free AI voice cloning — upload a voice sample, generate speech in that voice, download as MP3.", url: serverSiteUrl("/spotlight/voiceover"), category: "audio" }),
+        softwareAppJsonLd({ name: "OmniToolBox AI Voice Studio", description: "Free AI voice cloning — upload a voice sample, generate speech in that voice, download as MP3.", url: serverSiteUrl("/spotlight/voiceover"), category: "audio" }),
         breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Voice Cloner", path: "/ai-voiceover" }, { name: "Showcase", path: "/spotlight/voiceover" }]),
       ]} />
 

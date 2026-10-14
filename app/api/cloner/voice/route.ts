@@ -5,7 +5,7 @@ import { rateLimit } from "@/lib/rate-limit";
 export const maxDuration = 60;
 
 /** Backend reference-path shape: data/uploads/rec_<8 hex>_<name>.wav (never absolute). */
-const REF_PATH_RE = /^data\/uploads\/rec_[0-9a-f]{8}_[^/\\]+\.wav$/;
+const REF_PATH_RE = /^data\/uploads\/rec_[0-9a-f]{8}_[^/\\]+\.(wav|mp3|m4a|webm|ogg|aac|flac)$/i;
 
 function clientIp(req: NextRequest): string {
   return (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";

@@ -74,9 +74,9 @@ export const TOOLS: Tool[] = [
     keywords: ["ai tools directory", "ai tools list", "new ai tools", "best ai tools", "ai apps", "discover ai", "ai website list", "chatgpt alternatives", "ai tools website", "find ai tools", "ai apps list"],
   },
   {
-    id: "t10", slug: "ai-voiceover", title: "AI Voice Cloner",
-    tagline: "Clone any voice from a 10-second sample — free",
-    description: "Upload a 6–30 second voice sample and turn any English text into speech in that exact voice. Real AI voice cloning (GPT-SoVITS) — your voice, your permission, your MP3. Nothing is faked.",
+    id: "t10", slug: "ai-voiceover", title: "AI Voice Studio",
+    tagline: "Studio voices & voice cloning — free AI voiceovers",
+    description: "Pick a ready studio voice (male/female, American/British) or clone your own voice from a 6–30 second sample. Type any script, choose a purpose, download a real MP3 voiceover. Nothing is faked.",
     category: "ai", href: "/ai-voiceover", icon: "Mic", image: "/images/tools/ai-voice-cloner.jpg", badge: "new",
     enabled: true, sortOrder: 10, usageCount: 0, updatedAt: "2026-10-14",
     keywords: ["ai voice cloner", "voice cloning", "clone my voice", "voice clone free", "ai voice copy", "clone voice from sample", "voice impersonator ai", "custom ai voice", "voiceover with my voice", "text to speech my voice", "ai voice replica", "voice changer ai"],

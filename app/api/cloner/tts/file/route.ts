@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
       status: 200,
       headers: {
         "content-type": "audio/mpeg",
-        "content-disposition": 'inline; filename="voice-clone.mp3"',
+        "content-disposition": 'attachment; filename="voice-clone.mp3"',
         "content-length": String(buf.length),
         "cache-control": "no-store",
       },

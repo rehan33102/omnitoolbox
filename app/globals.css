@@ -436,3 +436,24 @@
   opacity: 1;
   filter: blur(40px);
 }
+
+/* Voice studio animations */
+@keyframes vs-fade-slide {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.anim-vs-in { animation: vs-fade-slide 0.35s ease both; }
+@keyframes vs-eq {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+.anim-vs-eq { transform-origin: center; animation: vs-eq 0.9s ease-in-out infinite; }
+@keyframes vs-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.anim-vs-shimmer {
+  background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);
+  background-size: 400px 100%;
+  animation: vs-shimmer 1.4s linear infinite;
+}

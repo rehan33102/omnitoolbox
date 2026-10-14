@@ -28,11 +28,24 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let body: { voice_id?: unknown; text?: unknown };
+  let body: { voice_id?: unknown; text?: unknown; speed?: unknown; pause_mult?: unknown; emotion?: unknown };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "bad_request", message: "Invalid JSON." }, { status: 400 });
+  }
+
+  // Optional generation flavour (purpose presets) — the engine sanitizes
+  // these too, but keep only sane values.
+  const opts: Record<string, number | string> = {};
+  if (typeof body.speed === "number" && isFinite(body.speed)) {
+    opts.speed = Math.min(2, Math.max(0.5, body.speed));
+  }
+  if (typeof body.pause_mult === "number" && isFinite(body.pause_mult)) {
+    opts.pause_mult = Math.min(2, Math.max(0.5, body.pause_mult));
+  }
+  if (typeof body.emotion === "string" && ["calm", "warm", "sad", "tense", "happy", "neutral"].includes(body.emotion)) {
+    opts.emotion = body.emotion;
   }
 
   const voiceId = typeof body.voice_id === "string" ? body.voice_id.trim() : "";
@@ -54,7 +67,7 @@ export async function POST(req: NextRequest) {
     const res = await clonerFetch("/api/tts/long", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ voice_id: voiceId, text, format: "mp3", name: "Voice clone" }),
+      body: JSON.stringify({ voice_id: voiceId, text, format: "mp3", name: "Voice clone", ...opts }),
     });
     if (res.status === 404) {
       return NextResponse.json(
