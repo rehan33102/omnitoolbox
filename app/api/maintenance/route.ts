@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
-import { getKV } from "@/lib/kv";
 
 export const dynamic = "force-dynamic";
 
-const KEY = "maintenance_mode";
-
 /** Public: is maintenance mode on? */
 export async function GET() {
-  const enabled = await getKV<boolean>(KEY, false);
+  // Maintenance work is done (2026-10-14) — banner forced OFF site-wide.
+  // The admin toggle (/api/admin/maintenance, KV key "maintenance_mode")
+  // remains the source of truth; this override keeps visitors banner-free
+  // until the KV flag is fixed in the database.
+  const enabled = false;
   return NextResponse.json(
     { enabled: !!enabled },
     { headers: { "Cache-Control": "no-store, max-age=0" } }
