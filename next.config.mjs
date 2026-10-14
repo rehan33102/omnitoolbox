@@ -47,6 +47,14 @@ const nextConfig = {
           { key: "Content-Security-Policy", value: csp },
         ],
       },
+      {
+        // The AI Voice Studio records voice samples in the browser — allow
+        // the microphone on that page only (later rule wins for this key).
+        source: "/ai-voiceover",
+        headers: [
+          { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=(self), payment=(), usb=()" },
+        ],
+      },
     ];
   },
 };
