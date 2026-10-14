@@ -4,7 +4,7 @@ export const SITE_TAGLINE = "Free AI & web utilities.";
 export const NAV_LINKS = [
   { href: "/", label: "Home", icon: "Home" },
   { href: "/ai-prompt-studio", label: "Prompt Studio", icon: "Sparkles" },
-  { href: "/ai-voiceover", label: "Voiceover Studio", icon: "Mic" },
+  { href: "/ai-voiceover", label: "AI Voice Cloner", icon: "Mic" },
   { href: "/media-tools", label: "Media Tools", icon: "Image" },
   { href: "/pdf-tools", label: "PDF Tools", icon: "FileText" },
   { href: "/social-tools", label: "Social Tools", icon: "Share2" },

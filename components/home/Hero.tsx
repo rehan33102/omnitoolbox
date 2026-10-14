@@ -7,7 +7,7 @@ const MARQUEE_ITEMS = [
   "AI Prompt Studio",
   "Image Converter",
   "Background Remover",
-  "AI Voiceover",
+  "AI Voice Cloner",
   "QR Generator",
   "PDF Merger",
   "Fancy Text",

@@ -29,7 +29,7 @@ type GroupDef = {
 const GROUPS: GroupDef[] = [
   {
     kind: "voiceover", title: "Voiceovers", blurb: "Generated MP3 voiceovers", icon: Mic,
-    audio: true, toolHref: "/ai-voiceover", toolLabel: "Open Voiceover Studio",
+    audio: true, toolHref: "/ai-voiceover", toolLabel: "Open AI Voice Cloner",
   },
   {
     kind: "qr", title: "QR codes", blurb: "Generated QR code images", icon: QrCode,
@@ -286,7 +286,7 @@ export default function LibraryClient() {
             Generate a voiceover, a QR code, or convert an image — it lands here automatically.
           </p>
           <div className={cn("flex flex-wrap justify-center gap-2")}>
-            <Link href="/ai-voiceover"><Button size="sm"><Mic size={14} /> Voiceover Studio</Button></Link>
+            <Link href="/ai-voiceover"><Button size="sm"><Mic size={14} /> AI Voice Cloner</Button></Link>
             <Link href="/web-tools"><Button size="sm" variant="secondary"><QrCode size={14} /> QR Generator</Button></Link>
             <Link href="/media-tools"><Button size="sm" variant="secondary"><ImagePlus size={14} /> Image Converter</Button></Link>
           </div>

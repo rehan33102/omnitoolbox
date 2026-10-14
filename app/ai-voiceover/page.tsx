@@ -4,16 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { Sparkles, ArrowRight } from "lucide-react";
 import JsonLd from "@/components/seo/JsonLd";
-import VoiceoverStudio from "@/components/voice/VoiceoverStudio";
+import VoiceCloner from "@/components/voice/VoiceCloner";
 import TrackUsage from "@/components/analytics/TrackUsage";
 import Badge from "@/components/ui/Badge";
 
 export async function generateMetadata() {
   return buildMetadata({
-    title: "Free AI Voiceover Studio — Text to Speech Online",
-    description: "Turn text into natural voiceovers free in 38 languages. Generate real MP3 audio — play, download, and keep history. No signup.",
+    title: "Free AI Voice Cloner — Clone Any Voice Online",
+    description: "Clone any voice from a 6–30 second sample. Type English text and get real AI voiceovers in your own voice — play, download as MP3. Free, no signup.",
     path: "/ai-voiceover",
-    keywords: ["text to speech", "ai voiceover", "tts free", "voiceover generator", "text to voice online", "mp3 voiceover"],
+    keywords: ["ai voice cloner", "voice cloning", "clone my voice", "voice clone free", "ai voice copy", "clone voice from sample", "custom ai voice", "voiceover with my voice"],
   });
 }
 
@@ -21,8 +21,8 @@ export default function AIVoiceoverPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox AI Voiceover Studio", description: "Free AI text-to-speech voiceover studio with MP3 download.", url: serverSiteUrl("/ai-voiceover"), category: "audio" }),
-        breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Voiceover Studio", path: "/ai-voiceover" }]),
+        softwareAppJsonLd({ name: "OmniToolBox AI Voice Cloner", description: "Free AI voice cloning — upload a voice sample, generate speech in that voice, download as MP3.", url: serverSiteUrl("/ai-voiceover"), category: "audio" }),
+        breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Voice Cloner", path: "/ai-voiceover" }]),
       ]} />
       <TrackUsage slug="ai-voiceover" />
 
@@ -32,10 +32,10 @@ export default function AIVoiceoverPage() {
           <Badge variant="new">MP3 download</Badge>
         </div>
         <h1 className="font-display text-3xl md:text-4xl font-extrabold tracking-tight">
-          AI Voiceover <span className="text-gradient">Studio</span>
+          AI Voice <span className="text-gradient">Cloner</span>
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">
-          Text-to-speech in 38 languages — MP3 download and history.
+          Upload a 6–30 second voice sample, type your text — get it spoken in your voice, free MP3 download.
         </p>
         <Link
           href="/spotlight/voiceover"
@@ -48,7 +48,7 @@ export default function AIVoiceoverPage() {
       <div className="relative rounded-2xl overflow-hidden mb-8 border border-black/10 dark:border-white/10 max-w-3xl">
         <Image
           src="/images/voiceover-hero.webp"
-          alt="AI voiceover studio — turn text into natural speech online free"
+          alt="AI voice cloner — clone any voice from a short sample and generate speech online free"
           width={1200}
           height={480}
           className="w-full h-44 md:h-56 object-cover"
@@ -58,7 +58,7 @@ export default function AIVoiceoverPage() {
       </div>
 
       <div className="max-w-3xl">
-        <VoiceoverStudio />
+        <VoiceCloner />
       </div>
 
     </div>

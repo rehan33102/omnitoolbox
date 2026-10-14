@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ArrowRight, Download, LibraryBig, Mic2, Sparkles } from "lucide-react";
 import { buildMetadata, breadcrumbJsonLd, serverSiteUrl, softwareAppJsonLd } from "@/lib/seo";
 import JsonLd from "@/components/seo/JsonLd";
-import VoiceoverStudio from "@/components/voice/VoiceoverStudio";
+import VoiceCloner from "@/components/voice/VoiceCloner";
 import SectionHeader from "@/components/home/SectionHeader";
 import { Reveal } from "@/hooks/useReveal";
 import Button from "@/components/ui/Button";
@@ -10,25 +10,25 @@ import Card from "@/components/ui/Card";
 
 export async function generateMetadata() {
   return buildMetadata({
-    title: "Voiceover Studio Showcase — Free Neural Text to Speech",
-    description: "See the OmniToolBox Voiceover Studio in action: free neural voices in 38 languages, real MP3 downloads, and a private on-device library.",
+    title: "AI Voice Cloner Showcase — Clone Any Voice Free",
+    description: "See the OmniToolBox AI Voice Cloner in action: clone any voice from a 6–30 second sample and generate real MP3 voiceovers in that voice — free.",
     path: "/spotlight/voiceover",
-    keywords: ["voiceover studio", "neural text to speech", "free tts", "ai voiceover showcase"],
+    keywords: ["ai voice cloner", "voice cloning showcase", "clone my voice", "free voice clone", "ai voice copy"],
   });
 }
 
 const FEATURES = [
   {
     icon: Mic2,
-    title: "Neural voices, free",
-    text: "Natural neural voices — male & female, calm, sleep and energetic styles.",
+    title: "Your voice, cloned",
+    text: "Upload a 6–30 second sample of any single voice — yours, a character, a narrator — and the clone engine speaks in that exact voice.",
     accent: "text-violet-300",
     glow: "from-violet-600/30",
   },
   {
     icon: Download,
-    title: "Real MP3 + SRT",
-    text: "Every generation gives you a real MP3 you can play and download, plus matching SRT subtitles timed to the actual speech.",
+    title: "Real MP3 downloads",
+    text: "Every generation gives you a real MP3 you can play, download and use anywhere — plus consent checks so nothing is faked.",
     accent: "text-cyan-300",
     glow: "from-cyan-600/30",
   },
@@ -45,8 +45,8 @@ export default function VoiceoverSpotlightPage() {
   return (
     <div className="relative overflow-hidden">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox Voiceover Studio", description: "Free neural text-to-speech voiceover studio with MP3 download.", url: serverSiteUrl("/spotlight/voiceover"), category: "audio" }),
-        breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "Voiceover Studio", path: "/ai-voiceover" }, { name: "Showcase", path: "/spotlight/voiceover" }]),
+        softwareAppJsonLd({ name: "OmniToolBox AI Voice Cloner", description: "Free AI voice cloning — upload a voice sample, generate speech in that voice, download as MP3.", url: serverSiteUrl("/spotlight/voiceover"), category: "audio" }),
+        breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Voice Cloner", path: "/ai-voiceover" }, { name: "Showcase", path: "/spotlight/voiceover" }]),
       ]} />
 
       {/* Premium glow field — ember → magenta → purple */}
@@ -60,22 +60,22 @@ export default function VoiceoverSpotlightPage() {
       <div className="container pt-14 pb-10 md:pt-20 md:pb-14 text-center">
         <p className="eyebrow justify-center mb-6 animate-fade-up">
           <Sparkles size={12} className="text-ember-600 dark:text-ember-400" />
-          Spotlight · Voiceover Studio
+          Spotlight · Voice Cloner
         </p>
 
         <h1 className="font-condensed uppercase leading-[0.92] tracking-tight text-zinc-900 dark:text-white text-[16vw] sm:text-7xl md:text-8xl lg:text-[7rem] select-none">
           <span className="block overflow-hidden">
-            <span className="block animate-hero-line">Voiceover</span>
+            <span className="block animate-hero-line">Voice</span>
           </span>
           <span className="block overflow-hidden">
             <span className="block animate-hero-line [animation-delay:120ms]">
-              <span className="text-gradient-warm">Studio.</span>
+              <span className="text-gradient-warm">Cloner.</span>
             </span>
           </span>
         </h1>
 
         <p className="mt-6 text-zinc-600 dark:text-zinc-400 text-base md:text-lg max-w-2xl mx-auto animate-fade-up [animation-delay:240ms]">
-          Type a script. Pick a voice. Get studio-quality narration in seconds —
+          Upload a voice sample. Type your script. Get studio-quality narration in that exact voice —
           free, private, and yours to keep.
         </p>
 
@@ -95,7 +95,7 @@ export default function VoiceoverSpotlightPage() {
         <SectionHeader
           eyebrow="Why it hits different"
           title={<>Built for creators, <span className="text-gradient-warm">not robots</span></>}
-          sub="Neural voices that sound human, downloads that work everywhere, and a library that respects your privacy."
+          sub="Your own voice, on demand — downloads that work everywhere, and a library that respects your privacy."
         />
         <div className="grid sm:grid-cols-3 gap-4 max-w-5xl mx-auto">
           {FEATURES.map((f, i) => (
@@ -115,10 +115,10 @@ export default function VoiceoverSpotlightPage() {
         <div className="max-w-3xl mx-auto">
           <SectionHeader
             eyebrow="Live demo"
-            title="Make your first voiceover"
-            sub="The real studio, right here — everything you generate is saved to your library automatically."
+            title="Clone your first voice"
+            sub="The real cloner, right here — everything you generate is saved to your library automatically."
           />
-          <VoiceoverStudio />
+          <VoiceCloner />
         </div>
       </div>
 
@@ -130,7 +130,7 @@ export default function VoiceoverSpotlightPage() {
               Your creations live in <span className="text-gradient-warm">your library</span>
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mt-3 max-w-xl mx-auto relative">
-              Every voiceover, QR code and converted image is saved on your device.
+              Every cloned voiceover, QR code and converted image is saved on your device.
               Play them back, download them again, delete them — anytime.
             </p>
             <Link href="/library" className="inline-block mt-6 relative">

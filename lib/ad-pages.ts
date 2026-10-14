@@ -11,7 +11,7 @@ export interface PageTarget {
 
 export const PAGE_TARGETS: PageTarget[] = [
   { path: "/", label: "Homepage" },
-  { path: "/ai-voiceover", label: "AI Voiceover Studio" },
+  { path: "/ai-voiceover", label: "AI Voice Cloner" },
   { path: "/ai-prompt-studio", label: "AI Prompt Studio" },
   { path: "/calculators", label: "Calculators" },
   { path: "/media-tools", label: "Media Tools" },
