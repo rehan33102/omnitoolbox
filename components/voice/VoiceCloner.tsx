@@ -19,6 +19,7 @@ interface SavedVoiceover {
   text: string;
   createdAt: number;
   blob: Blob;
+  jobId?: string;
 }
 
 function idbOpen(): Promise<IDBDatabase> {
@@ -138,7 +139,7 @@ export default function VoiceCloner() {
   const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const genSeq = useRef(0);
   const pollFails = useRef(0);
-  const [result, setResult] = useState<{ url: string; blob: Blob; label: string } | null>(null);
+  const [result, setResult] = useState<{ url: string; blob: Blob; label: string; jobId: string } | null>(null);
   const [error, setError] = useState("");
 
   /* library */
@@ -360,7 +361,7 @@ export default function VoiceCloner() {
             if (blob.size < 1000) throw new Error("The voice came back empty.");
             if (seq !== genSeq.current) return;
             const mp3 = new Blob([blob], { type: "audio/mpeg" });
-            setResult({ url: URL.createObjectURL(mp3), blob: mp3, label });
+            setResult({ url: URL.createObjectURL(mp3), blob: mp3, label, jobId });
             setRenderMsg("");
             setGenerating(false);
             // auto-save to "My voiceovers" on this device
@@ -371,6 +372,7 @@ export default function VoiceCloner() {
               text: text.trim(),
               createdAt: Date.now(),
               blob: mp3,
+              jobId,
             };
             await idbPut(item);
             setLibrary(await idbAll());
@@ -712,12 +714,13 @@ export default function VoiceCloner() {
               <p className="text-sm font-bold text-emerald-700 dark:text-emerald-300 mb-2.5">Your voiceover is ready</p>
               <audio src={result.url} controls className="w-full" />
               <div className="flex flex-wrap gap-2 mt-3.5">
-                <button
-                  onClick={() => downloadBlob(result.blob, `${safeFileName(result.label.split(" · ")[0])}-voiceover.mp3`)}
+                <a
+                  href={`/api/cloner/tts/file?jobId=${encodeURIComponent(result.jobId)}`}
+                  download={`${safeFileName(result.label.split(" · ")[0])}-voiceover.mp3`}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 text-white text-sm font-bold shadow hover:bg-emerald-500 active:scale-[0.98] transition"
                 >
                   <Download className="w-4 h-4" /> Download MP3
-                </button>
+                </a>
                 <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 dark:text-emerald-300 self-center">
                   <Check className="w-3.5 h-3.5" /> Auto-saved in My voiceovers below
                 </span>
@@ -755,13 +758,24 @@ export default function VoiceCloner() {
                 >
                   Reuse text
                 </button>
-                <button
-                  onClick={() => downloadBlob(item.blob, `${safeFileName(item.name)}.mp3`)}
-                  aria-label="Download"
-                  className="w-9 h-9 grid place-items-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition shrink-0"
-                >
-                  <Download className="w-4 h-4" />
-                </button>
+                {item.jobId ? (
+                  <a
+                    href={`/api/cloner/tts/file?jobId=${encodeURIComponent(item.jobId)}`}
+                    download={`${safeFileName(item.name)}.mp3`}
+                    aria-label="Download"
+                    className="w-9 h-9 grid place-items-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition shrink-0"
+                  >
+                    <Download className="w-4 h-4" />
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => downloadBlob(item.blob, `${safeFileName(item.name)}.mp3`)}
+                    aria-label="Download"
+                    className="w-9 h-9 grid place-items-center rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition shrink-0"
+                  >
+                    <Download className="w-4 h-4" />
+                  </button>
+                )}
                 <button
                   onClick={() => libDelete(item)}
                   aria-label="Delete"
