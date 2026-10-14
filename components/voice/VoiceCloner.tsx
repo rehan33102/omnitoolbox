@@ -267,7 +267,12 @@ export default function VoiceCloner() {
       }, 250);
     } catch (e) {
       const name = (e as { name?: string })?.name || "";
-      if (name === "NotAllowedError" || name === "SecurityError") {
+      // Android WebViews (in-app browsers) can never grant the mic — the
+      // host app blocks it before any prompt. Detect and say so plainly.
+      const inAppBrowser = /; wv\)|FBAN|FBAV|Instagram|Line\/|MicroMessenger/i.test(navigator.userAgent);
+      if (inAppBrowser) {
+        setError("Recording doesn't work inside app browsers — the app blocks the microphone. Open this page in Chrome to record, or stay here and use \"Upload from gallery\" with a recording from your phone's voice recorder app.");
+      } else if (name === "NotAllowedError" || name === "SecurityError") {
         setError("Microphone is blocked for this site. Tap the icon at the left of the address bar → Site settings → Microphone → Allow, then tap record again. Or upload a recording from your gallery instead.");
       } else if (name === "NotFoundError" || name === "OverconstrainedError") {
         setError("No microphone was found on this device. You can upload a recording from your gallery instead.");
