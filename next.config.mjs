@@ -3,7 +3,10 @@ const csp = [
   "default-src 'self'",
   // Next.js ships inline bootstrapping scripts; keep unsafe-inline for scripts
   // (no unsafe-eval in production builds).
-  "script-src 'self' 'unsafe-inline' https://www.youtube.com https://s.ytimg.com",
+  // 'wasm-unsafe-eval' is required for the on-device Piper TTS (ONNX Runtime
+  // Web compiles WebAssembly in the browser). It permits WASM compilation
+  // only — it does NOT allow general eval().
+  "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' https://www.youtube.com https://s.ytimg.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   // Tools render user images / generated media via blob: and data: URLs.
