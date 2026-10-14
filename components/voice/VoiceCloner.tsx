@@ -149,12 +149,25 @@ export default function VoiceCloner() {
   const [libUrls, setLibUrls] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    fetch("/api/cloner/status")
-      .then((r) => r.json())
-      .then((d) => setOnline(d?.online === true))
-      .catch(() => setOnline(false));
+    // The backend's free tunnel address rotates about hourly, which can
+    // show a brief false "offline" — keep re-checking so the banner
+    // clears itself as soon as the studio is reachable again.
+    let alive = true;
+    const checkStatus = () =>
+      fetch("/api/cloner/status")
+        .then((r) => r.json())
+        .then((d) => {
+          if (alive) setOnline(d?.online === true);
+        })
+        .catch(() => {
+          if (alive) setOnline(false);
+        });
+    checkStatus();
+    const statusTimer = setInterval(checkStatus, 25_000);
     idbAll().then(setLibrary);
     return () => {
+      alive = false;
+      clearInterval(statusTimer);
       stopPoll();
       stopStream();
       previewAudio.current?.pause();
@@ -252,8 +265,15 @@ export default function VoiceCloner() {
         setRecSecs(s);
         if (s >= 30) stopRecording();
       }, 250);
-    } catch {
-      setError("Microphone access was blocked. Allow the mic, or upload a recording from your gallery instead.");
+    } catch (e) {
+      const name = (e as { name?: string })?.name || "";
+      if (name === "NotAllowedError" || name === "SecurityError") {
+        setError("Microphone is blocked for this site. Tap the icon at the left of the address bar → Site settings → Microphone → Allow, then tap record again. Or upload a recording from your gallery instead.");
+      } else if (name === "NotFoundError" || name === "OverconstrainedError") {
+        setError("No microphone was found on this device. You can upload a recording from your gallery instead.");
+      } else {
+        setError("Recording is not available in this browser. Open this page in Chrome, or upload a recording from your gallery instead.");
+      }
     }
   }
   function stopRecording() {

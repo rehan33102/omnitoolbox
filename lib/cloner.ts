@@ -47,28 +47,65 @@ async function getClonerConfig(): Promise<ClonerConfig> {
  * URL, cached in module memory for a minute; `invalidateEndpointCache`
  * forces a fresh read after a network failure.
  */
-const ENDPOINT_JSON_URL =
-  "https://raw.githubusercontent.com/rehan33102/omnitoolbox/cloner-endpoint/endpoint.json";
+const ENDPOINT_JSON_URLS = [
+  "https://raw.githubusercontent.com/rehan33102/omnitoolbox/cloner-endpoint/endpoint.json",
+  // Independent mirror of the same file — the two CDNs go stale at
+  // different times when the tunnel URL rotates, so checking both (and
+  // probing on disagreement) closes most of the "offline" gap.
+  "https://cdn.jsdelivr.net/gh/rehan33102/omnitoolbox@cloner-endpoint/endpoint.json",
+];
 let endpointCache: { url: string; at: number } | null = null;
 
 export function invalidateEndpointCache(): void {
   endpointCache = null;
 }
 
+async function readEndpointMirror(mirror: string): Promise<string> {
+  try {
+    const res = await fetch(mirror, { cache: "no-store" });
+    if (!res.ok) return "";
+    const data = (await res.json()) as { url?: unknown };
+    return typeof data?.url === "string" ? data.url.trim() : "";
+  } catch {
+    return "";
+  }
+}
+
+async function probeAlive(url: string): Promise<boolean> {
+  try {
+    const ctl = new AbortController();
+    const t = setTimeout(() => ctl.abort(), 4000);
+    const res = await fetch(`${url.replace(/\/+$/, "")}/health`, {
+      cache: "no-store",
+      signal: ctl.signal,
+    });
+    clearTimeout(t);
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
 async function fetchEndpointUrl(): Promise<string> {
   if (endpointCache && Date.now() - endpointCache.at < 60_000) {
     return endpointCache.url;
   }
-  try {
-    const res = await fetch(ENDPOINT_JSON_URL, { cache: "no-store" });
-    if (!res.ok) return endpointCache?.url || "";
-    const data = (await res.json()) as { url?: unknown };
-    const url = typeof data?.url === "string" ? data.url.trim() : "";
-    if (url) endpointCache = { url, at: Date.now() };
-    return url || endpointCache?.url || "";
-  } catch {
-    return endpointCache?.url || "";
+  const found = await Promise.all(ENDPOINT_JSON_URLS.map(readEndpointMirror));
+  const candidates = [...new Set(found.filter(Boolean))];
+  if (candidates.length === 0) return endpointCache?.url || "";
+  let winner = candidates[0];
+  if (candidates.length > 1) {
+    // Mirrors disagree (a rotation is propagating): keep the URL that is
+    // actually alive right now.
+    for (const c of candidates) {
+      if (await probeAlive(c)) {
+        winner = c;
+        break;
+      }
+    }
   }
+  endpointCache = { url: winner, at: Date.now() };
+  return winner;
 }
 
 /** Backend base URL without trailing slash, or "" when not configured. */
