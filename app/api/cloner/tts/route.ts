@@ -4,7 +4,7 @@ import { rateLimit } from "@/lib/rate-limit";
 
 export const maxDuration = 60;
 
-const MAX_CHARS = 800;
+const MAX_CHARS = 100_000;
 const VOICE_ID_RE = /^[A-Za-z0-9_-]{4,64}$/;
 const JOB_ID_RE = /^[a-f0-9]{12}$/;
 

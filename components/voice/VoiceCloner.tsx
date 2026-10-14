@@ -44,7 +44,7 @@ const FAQS = [
   },
 ];
 
-const MAX_CHARS = 800;
+const MAX_CHARS = 100_000;
 const OFFLINE_MSG = "The voice cloner is offline right now — please try again later.";
 
 type Step = "sample" | "text";
@@ -423,7 +423,7 @@ export default function VoiceCloner() {
         <h3>How to clone a voice in 3 steps</h3>
         <ol>
           <li><strong>Upload a voice sample.</strong> A clear 6–30 second clip of one speaker works best — no music or background noise. Confirm you own the voice or have permission to clone it.</li>
-          <li><strong>Write your script.</strong> English gives the best results; Chinese, Japanese and Korean also work. Up to 800 characters per generation.</li>
+          <li><strong>Write your script.</strong> English gives the best results; Chinese, Japanese and Korean also work. Up to 100,000 characters per generation — longer scripts render in chunks and take longer to finish.</li>
           <li><strong>Generate and download.</strong> The clone engine renders your MP3 — play it in the browser or download it to use anywhere.</li>
         </ol>
         <h3>Frequently asked questions</h3>
