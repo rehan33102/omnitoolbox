@@ -206,7 +206,7 @@ export default function VoiceCloner() {
           const r = await fetch(`/api/cloner/tts/status?jobId=${encodeURIComponent(jobId)}`);
           const d = await r.json().catch(() => ({}));
           if (!r.ok) {
-            if (d?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
+            if (d?.error === "cloner_offline") throw new Error("Status check hiccup — retrying.");
             throw new Error(d?.message || "Could not check the render.");
           }
           pollFails.current = 0;
@@ -219,7 +219,7 @@ export default function VoiceCloner() {
             const f = await fetch(`/api/cloner/tts/file?jobId=${encodeURIComponent(jobId)}`);
             if (!f.ok) {
               const fd = await f.json().catch(() => ({}));
-              if (fd?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
+              if (fd?.error === "cloner_offline") throw new Error("Download hiccup — retrying.");
               throw new Error(fd?.message || "Could not fetch the finished audio.");
             }
             const blob = await f.blob();
