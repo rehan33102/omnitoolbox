@@ -113,6 +113,7 @@ export default function VoiceCloner() {
 
   /* clone */
   const [source, setSource] = useState<Source>("record");
+  const [inApp, setInApp] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [fileUrl, setFileUrl] = useState("");
   const [fileFromRec, setFileFromRec] = useState(false);
@@ -164,6 +165,12 @@ export default function VoiceCloner() {
         });
     checkStatus();
     const statusTimer = setInterval(checkStatus, 25_000);
+    // In-app browsers (WebViews) can never grant the mic — land those
+    // visitors on the upload path, which works everywhere, with a hint.
+    if (/; wv\)|FBAN|FBAV|Instagram|MicroMessenger/i.test(navigator.userAgent)) {
+      setInApp(true);
+      setSource("upload");
+    }
     idbAll().then(setLibrary);
     return () => {
       alive = false;
@@ -576,6 +583,12 @@ export default function VoiceCloner() {
                 <Upload className="w-3.5 h-3.5 inline mr-1 -mt-0.5" /> Upload from gallery
               </button>
             </div>
+
+            {inApp && (
+              <p className="mb-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200 text-xs px-3.5 py-2.5">
+                You're in an app browser, which blocks the microphone — so we've selected <strong>Upload</strong> for you (record 10-20 seconds in your phone's voice recorder app, then upload it here). For live recording, open this page in Chrome.
+              </p>
+            )}
 
             {source === "record" && (
               <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 text-center">
