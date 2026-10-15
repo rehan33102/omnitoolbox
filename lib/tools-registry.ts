@@ -169,10 +169,18 @@ export const getEnabledTools = (): Tool[] =>
 export const getToolBySlug = (slug: string): Tool | undefined =>
   TOOLS.find((t) => t.slug === slug);
 
+/**
+ * Retired slugs: a stale DB row for the pre-rename "ai-voice-cloner" slug
+ * duplicates the registry's canonical AI Voice Studio (slug "ai-voiceover",
+ * href /ai-voiceover) as a second card. The row is a ghost — filter it out
+ * here until it is cleaned up in the database itself.
+ */
+const RETIRED_SLUGS = new Set(["ai-voice-cloner"]);
+
 /** Merge DB overrides (admin toggles/edits + admin-added tools) over the registry. */
 export function mergeTools(dbRows: Record<string, unknown>[]): Tool[] {
   // Soft-deleted rows (admin removed the tool) are skipped entirely.
-  const live = dbRows.filter((r) => !r.is_deleted);
+  const live = dbRows.filter((r) => !r.is_deleted && !RETIRED_SLUGS.has(r.slug as string));
   const bySlug = new Map(live.map((r) => [r.slug as string, r]));
   const merged: Tool[] = TOOLS.map((t) => ({ ...t, ...rowToPartial(bySlug.get(t.slug)) }));
   for (const row of live) {
