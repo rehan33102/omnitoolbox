@@ -46,6 +46,17 @@ async function withClonerRetry<T>(
   }
 }
 
+/* Job auto-resume: render jobs live only in the backend's memory, so a mid-render
+   backend restart turns the status poll into HTTP 404 { error: "job_not_found" }.
+   Instead of dead-ending, the poll loop re-submits the identical payload (with
+   the same offline/network retry protection) and keeps polling the new job id,
+   showing a calm "resuming" message — never an error. After MAX_RESUBMITS the
+   backend's own message surfaces. */
+const JOB_GONE = "__cloner_job_gone";
+const RESUME_MSG = "The voice engine restarted — resuming your render automatically…";
+const MAX_RESUBMITS = 3;
+const GONE_MSG = "This render job is gone.";
+
 /* ---------- tiny IndexedDB store for "My voiceovers" ---------- */
 interface SavedVoiceover {
   id: string;
@@ -395,33 +406,38 @@ export default function VoiceCloner() {
     setRenderMsg("Rendering your voice… this usually takes 1–3 minutes.");
     if (result) { URL.revokeObjectURL(result.url); setResult(null); }
     try {
-      const data = await withClonerRetry(
-        async () => {
-          const res = await fetch("/api/cloner/tts", {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              voice_id: activeVoiceId,
-              text: text.trim(),
-              speed: purposePreset.speed,
-              pause_mult: purposePreset.pauseMult,
-            }),
-          });
-          const d = await res.json().catch(() => ({}));
-          if (!res.ok) {
-            if (d?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
-            throw new Error(d?.message || "Voice generation failed — please try again.");
-          }
-          return d;
-        },
-        () => { if (seq === genSeq.current) setRenderMsg(RETRY_MSG); },
-        () => seq !== genSeq.current
-      );
-      const jobId = typeof data?.job_id === "string" ? data.job_id : "";
-      if (!jobId) throw new Error("The engine did not start the job.");
+      const submitOnce = async (): Promise<string> => {
+        const data = await withClonerRetry(
+          async () => {
+            const res = await fetch("/api/cloner/tts", {
+              method: "POST",
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({
+                voice_id: activeVoiceId,
+                text: text.trim(),
+                speed: purposePreset.speed,
+                pause_mult: purposePreset.pauseMult,
+              }),
+            });
+            const d = await res.json().catch(() => ({}));
+            if (!res.ok) {
+              if (d?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
+              throw new Error(d?.message || "Voice generation failed — please try again.");
+            }
+            return d;
+          },
+          () => { if (seq === genSeq.current) setRenderMsg(RETRY_MSG); },
+          () => seq !== genSeq.current
+        );
+        const newJobId = typeof data?.job_id === "string" ? data.job_id : "";
+        if (!newJobId) throw new Error("The engine did not start the job.");
+        return newJobId;
+      };
+      let jobId = await submitOnce();
 
       pollFails.current = 0;
-      const startedAt = Date.now();
+      let startedAt = Date.now();
+      let resubmitCount = 0;
       const pollOnce = async () => {
         if (seq !== genSeq.current) return;
         try {
@@ -429,6 +445,7 @@ export default function VoiceCloner() {
           const d = await r.json().catch(() => ({}));
           if (!r.ok) {
             if (d?.error === "cloner_offline") throw new Error("Status check hiccup — retrying.");
+            if (d?.error === "job_not_found") throw new Error(JOB_GONE);
             throw new Error(d?.message || "Could not check the render.");
           }
           pollFails.current = 0;
@@ -470,6 +487,32 @@ export default function VoiceCloner() {
           if (seq !== genSeq.current) return;
           if (e instanceof Error && e.message === OFFLINE_MSG) {
             stopPoll(); setGenerating(false); setRenderMsg(""); setError(OFFLINE_MSG);
+            return;
+          }
+          if (e instanceof Error && e.message === JOB_GONE) {
+            // Backend restarted mid-render and dropped the job from its memory:
+            // silently re-submit the identical payload and keep polling the new job id.
+            if (resubmitCount < MAX_RESUBMITS) {
+              resubmitCount += 1;
+              pollFails.current = 0;
+              if (seq === genSeq.current) setRenderMsg(RESUME_MSG);
+              try {
+                const freshJobId = await submitOnce();
+                if (seq !== genSeq.current) return;
+                jobId = freshJobId;
+                startedAt = Date.now();
+                setElapsed(0);
+                return; // keep the existing poll interval running on the new job id
+              } catch (re) {
+                if (seq !== genSeq.current || (re instanceof Error && re.message === RETRY_CANCELLED)) return;
+                stopPoll(); setGenerating(false); setRenderMsg("");
+                setError(re instanceof Error ? re.message : "Something went wrong.");
+                return;
+              }
+            }
+            // resubmit budget exhausted — surface the backend's own message, unchanged
+            stopPoll(); setGenerating(false); setRenderMsg("");
+            setError(GONE_MSG);
             return;
           }
           pollFails.current += 1;
