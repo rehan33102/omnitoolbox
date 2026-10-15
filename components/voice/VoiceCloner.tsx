@@ -11,6 +11,41 @@ import { CLONER_PRESETS, PURPOSE_PRESETS, type ClonerPreset } from "@/lib/cloner
 const MAX_CHARS = 100_000;
 const OFFLINE_MSG = "The voice studio is offline right now — please try again later.";
 
+/* Retry windows for cloner API calls: the voice backend restarts routinely
+   (the host wipes/restarts it), so a generation-start call that fails with
+   cloner_offline — or a raw network failure — waits 10s and retries for up
+   to ~3 minutes before surfacing the offline error. During retries the UI
+   shows a calm busy state (never an error), and a retry that eventually
+   succeeds continues the normal flow unchanged. */
+const RETRY_INTERVAL_MS = 10000;
+const RETRY_WINDOW_MS = 180000; // ~3 minutes
+const RETRY_MSG = "Connecting to the voice engine… this can take a moment — your voiceover will start automatically.";
+const RETRY_MSG_CLONE = "Connecting to the voice engine… this can take a moment — your clone will start automatically.";
+const RETRY_CANCELLED = "__cloner_retry_cancelled";
+
+/** Re-run `fn` on cloner_offline / network failure until RETRY_WINDOW_MS passes. */
+async function withClonerRetry<T>(
+  fn: () => Promise<T>,
+  onRetry: () => void,
+  isCancelled?: () => boolean
+): Promise<T> {
+  const deadline = Date.now() + RETRY_WINDOW_MS;
+  for (;;) {
+    if (isCancelled?.()) throw new Error(RETRY_CANCELLED);
+    try {
+      return await fn();
+    } catch (e) {
+      if (e instanceof Error && e.message === RETRY_CANCELLED) throw e;
+      if (isCancelled?.()) throw new Error(RETRY_CANCELLED);
+      const offline =
+        (e instanceof Error && e.message === OFFLINE_MSG) || e instanceof TypeError;
+      if (!offline || Date.now() >= deadline) throw e;
+      onRetry();
+      await new Promise((r) => setTimeout(r, RETRY_INTERVAL_MS));
+    }
+  }
+}
+
 /* ---------- tiny IndexedDB store for "My voiceovers" ---------- */
 interface SavedVoiceover {
   id: string;
@@ -307,23 +342,35 @@ export default function VoiceCloner() {
       setCreateMsg("Uploading your sample…");
       const fd = new FormData();
       fd.append("file", file);
-      const up = await fetch("/api/cloner/upload", { method: "POST", body: fd });
-      const upData = await up.json().catch(() => ({}));
-      if (!up.ok) {
-        if (upData?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
-        throw new Error(upData?.message || "Upload failed — please try again.");
-      }
+      const upData = await withClonerRetry(
+        async () => {
+          const up = await fetch("/api/cloner/upload", { method: "POST", body: fd });
+          const d = await up.json().catch(() => ({}));
+          if (!up.ok) {
+            if (d?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
+            throw new Error(d?.message || "Upload failed — please try again.");
+          }
+          return d;
+        },
+        () => setCreateMsg(RETRY_MSG_CLONE)
+      );
       setCreateMsg("Cloning your voice…");
-      const vc = await fetch("/api/cloner/voice", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ name: voiceName.trim(), ref_path: upData.path, consent: true }),
-      });
-      const vcData = await vc.json().catch(() => ({}));
-      if (!vc.ok) {
-        if (vcData?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
-        throw new Error(vcData?.message || "Voice creation failed — please try again.");
-      }
+      const vcData = await withClonerRetry(
+        async () => {
+          const vc = await fetch("/api/cloner/voice", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({ name: voiceName.trim(), ref_path: upData.path, consent: true }),
+          });
+          const d = await vc.json().catch(() => ({}));
+          if (!vc.ok) {
+            if (d?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
+            throw new Error(d?.message || "Voice creation failed — please try again.");
+          }
+          return d;
+        },
+        () => setCreateMsg(RETRY_MSG_CLONE)
+      );
       setCloned({ id: vcData.voice_id, name: voiceName.trim() });
       toast({ variant: "success", title: "Voice cloned", description: `"${voiceName.trim()}" is ready below.` });
     } catch (e) {
@@ -348,21 +395,28 @@ export default function VoiceCloner() {
     setRenderMsg("Rendering your voice… this usually takes 1–3 minutes.");
     if (result) { URL.revokeObjectURL(result.url); setResult(null); }
     try {
-      const res = await fetch("/api/cloner/tts", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          voice_id: activeVoiceId,
-          text: text.trim(),
-          speed: purposePreset.speed,
-          pause_mult: purposePreset.pauseMult,
-        }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        if (data?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
-        throw new Error(data?.message || "Voice generation failed — please try again.");
-      }
+      const data = await withClonerRetry(
+        async () => {
+          const res = await fetch("/api/cloner/tts", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+              voice_id: activeVoiceId,
+              text: text.trim(),
+              speed: purposePreset.speed,
+              pause_mult: purposePreset.pauseMult,
+            }),
+          });
+          const d = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            if (d?.error === "cloner_offline") throw new Error(OFFLINE_MSG);
+            throw new Error(d?.message || "Voice generation failed — please try again.");
+          }
+          return d;
+        },
+        () => { if (seq === genSeq.current) setRenderMsg(RETRY_MSG); },
+        () => seq !== genSeq.current
+      );
       const jobId = typeof data?.job_id === "string" ? data.job_id : "";
       if (!jobId) throw new Error("The engine did not start the job.");
 
@@ -430,6 +484,7 @@ export default function VoiceCloner() {
         pollTimer.current = setInterval(pollOnce, 4000);
       }
     } catch (e) {
+      if (e instanceof Error && e.message === RETRY_CANCELLED) return; // superseded by a newer generation
       stopPoll();
       setGenerating(false);
       setRenderMsg("");
