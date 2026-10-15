@@ -586,12 +586,6 @@ export default function VoiceCloner() {
               </button>
             </div>
 
-            {inApp && (
-              <p className="mb-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200 text-xs px-3.5 py-2.5">
-                Recording is not available inside app browsers, because the app blocks the microphone — so the record button is hidden here. Upload works: record 10-20 seconds in the voice recorder app on your phone, then add it below. Or open this page in Chrome to record live.
-              </p>
-            )}
-
             {source === "record" && !inApp && (
               <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 text-center">
                 {recState === "idle" && (
