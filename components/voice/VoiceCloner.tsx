@@ -586,7 +586,7 @@ export default function VoiceCloner() {
 
             {inApp && (
               <p className="mb-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200 text-xs px-3.5 py-2.5">
-                You're in an app browser, which blocks the microphone — so we've selected <strong>Upload</strong> for you (record 10-20 seconds in your phone's voice recorder app, then upload it here). For live recording, open this page in Chrome.
+                You are in an app browser, which blocks the microphone — so we have selected <strong>Upload</strong> for you (record 10-20 seconds in the voice recorder app on your phone, then upload it here). For live recording, open this page in Chrome.
               </p>
             )}
 
