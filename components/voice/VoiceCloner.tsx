@@ -576,9 +576,11 @@ export default function VoiceCloner() {
         {mode === "clone" && (
           <div className="p-4 sm:p-6 anim-vs-in" key="clone">
             <div className="flex gap-2 mb-5">
-              <button className={chip(source === "record")} onClick={() => setSource("record")}>
-                <Mic className="w-3.5 h-3.5 inline mr-1 -mt-0.5" /> Record live
-              </button>
+              {!inApp && (
+                <button className={chip(source === "record")} onClick={() => setSource("record")}>
+                  <Mic className="w-3.5 h-3.5 inline mr-1 -mt-0.5" /> Record live
+                </button>
+              )}
               <button className={chip(source === "upload")} onClick={() => setSource("upload")}>
                 <Upload className="w-3.5 h-3.5 inline mr-1 -mt-0.5" /> Upload from gallery
               </button>
@@ -586,11 +588,11 @@ export default function VoiceCloner() {
 
             {inApp && (
               <p className="mb-4 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200 text-xs px-3.5 py-2.5">
-                You are in an app browser, which blocks the microphone — so we have selected <strong>Upload</strong> for you (record 10-20 seconds in the voice recorder app on your phone, then upload it here). For live recording, open this page in Chrome.
+                Recording is not available inside app browsers, because the app blocks the microphone — so the record button is hidden here. Upload works: record 10-20 seconds in the voice recorder app on your phone, then add it below. Or open this page in Chrome to record live.
               </p>
             )}
 
-            {source === "record" && (
+            {source === "record" && !inApp && (
               <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 text-center">
                 {recState === "idle" && (
                   <div className="anim-vs-in">
