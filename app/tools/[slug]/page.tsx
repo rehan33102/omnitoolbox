@@ -42,6 +42,7 @@ const TOOL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "unit-converter": dynamic(() => import("@/components/calc/UnitConverter")),
   "bmi-calorie-calculator": dynamic(() => import("@/components/calc/BmiCalculator")),
   "age-calculator": dynamic(() => import("@/components/calc/AgeCalculator")),
+  "ebook-maker": dynamic(() => import("@/components/ebook/EbookMaker")),
 };
 
 export async function generateStaticParams() {

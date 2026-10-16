@@ -161,6 +161,14 @@ export const TOOLS: Tool[] = [
     enabled: true, sortOrder: 20, usageCount: 0, updatedAt: "2026-10-04",
     keywords: ["watermark remover", "remove watermark", "gemini watermark", "ai watermark remover", "logo remover", "remove logo from photo", "erase watermark", "watermark eraser", "text remover", "remove text from image", "clean image", "photo watermark remover", "free watermark remover", "video watermark remover", "remove watermark from video", "gemini video watermark"],
   },
+  {
+    id: "t22", slug: "ebook-maker", title: "Ebook Maker",
+    tagline: "Write chapters with text & pictures — download a real EPUB or PDF",
+    description: "Compose a real ebook in your browser: title, author, custom cover (upload art or pick a gradient), chapters with text and picture blocks, live cover preview. Export a genuine EPUB 3 file or a clean paginated PDF. Everything stays on your device.",
+    category: "text", href: "/tools/ebook-maker", icon: "BookOpen", badge: "new",
+    enabled: true, sortOrder: 21, usageCount: 0, updatedAt: "2026-10-16",
+    keywords: ["ebook maker", "make ebook", "epub maker", "create ebook", "ebook creator", "epub creator", "write ebook", "ebook generator", "pdf ebook maker", "make epub from text", "book creator", "free ebook maker", "ebook builder", "write a book online", "epub download"],
+  },
 ];
 
 export const getEnabledTools = (): Tool[] =>
