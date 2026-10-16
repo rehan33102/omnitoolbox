@@ -159,7 +159,9 @@ export default function VoiceCloner() {
 
   /* clone */
   const [source, setSource] = useState<Source>("record");
-  const [inApp, setInApp] = useState(false);
+  // "checking" → capability probe running; record button shows normally,
+  // the click reveals the truth anyway.
+  const [micStatus, setMicStatus] = useState<"checking" | "available" | "denied" | "unsupported">("checking");
   const [file, setFile] = useState<File | null>(null);
   const [fileUrl, setFileUrl] = useState("");
   const [fileFromRec, setFileFromRec] = useState(false);
@@ -211,12 +213,21 @@ export default function VoiceCloner() {
         });
     checkStatus();
     const statusTimer = setInterval(checkStatus, 25_000);
-    // In-app browsers (WebViews) can never grant the mic — land those
-    // visitors on the upload path, which works everywhere, with a hint.
-    if (/; wv\)|FBAN|FBAV|Instagram|MicroMessenger/i.test(navigator.userAgent)) {
-      setInApp(true);
-      setSource("upload");
-    }
+    // Real capability detection, not UA sniffing: the mic only works
+    // where the browser actually exposes getUserMedia. In-app WebViews
+    // usually don't — those land on the upload path automatically.
+    (async () => {
+      const gUM =
+        typeof navigator !== "undefined" &&
+        !!navigator.mediaDevices &&
+        typeof navigator.mediaDevices.getUserMedia === "function";
+      if (!gUM) { setMicStatus("unsupported"); return; }
+      try {
+        const st = await (navigator.permissions as any)?.query?.({ name: "microphone" });
+        if (st && st.state === "denied") { setMicStatus("denied"); return; }
+      } catch { /* Permissions API unavailable — the record click will tell us */ }
+      setMicStatus("available");
+    })();
     idbAll().then(setLibrary);
     return () => {
       alive = false;
@@ -292,6 +303,10 @@ export default function VoiceCloner() {
   async function startRecording() {
     setError("");
     try {
+      if (!navigator.mediaDevices || typeof navigator.mediaDevices.getUserMedia !== "function") {
+        setMicStatus("unsupported");
+        throw { name: "NoApi" };
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       streamRef.current = stream;
       const mime = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4", "audio/ogg"]
@@ -320,17 +335,19 @@ export default function VoiceCloner() {
       }, 250);
     } catch (e) {
       const name = (e as { name?: string })?.name || "";
-      // Android WebViews (in-app browsers) can never grant the mic — the
-      // host app blocks it before any prompt. Detect and say so plainly.
+      // One line, real reason, and the working alternative — every time.
       const inAppBrowser = /; wv\)|FBAN|FBAV|Instagram|Line\/|MicroMessenger/i.test(navigator.userAgent);
-      if (inAppBrowser) {
-        setError("Recording doesn't work inside app browsers — the app blocks the microphone. Open this page in Chrome to record, or stay here and use \"Upload from gallery\" with a recording from your phone's voice recorder app.");
+      if (name === "NoApi") {
+        setError("Recording isn't available in this browser. Upload a recording from your gallery instead.");
+      } else if (inAppBrowser) {
+        setError("Recording doesn&apos;t work inside this app&apos;s browser — the app blocks the microphone. Open this page in Chrome to record, or upload a recording from your gallery instead.");
       } else if (name === "NotAllowedError" || name === "SecurityError") {
+        setMicStatus("denied");
         setError("Microphone is blocked for this site. Tap the icon at the left of the address bar → Site settings → Microphone → Allow, then tap record again. Or upload a recording from your gallery instead.");
       } else if (name === "NotFoundError" || name === "OverconstrainedError") {
-        setError("No microphone was found on this device. You can upload a recording from your gallery instead.");
+        setError("No microphone was found on this device. Upload a recording from your gallery instead.");
       } else {
-        setError("Recording is not available in this browser. Open this page in Chrome, or upload a recording from your gallery instead.");
+        setError("Recording isn't available in this browser. Upload a recording from your gallery instead.");
       }
     }
   }
@@ -674,19 +691,33 @@ export default function VoiceCloner() {
         {mode === "clone" && (
           <div className="p-4 sm:p-6 anim-vs-in" key="clone">
             <div className="flex gap-2 mb-5">
-              {!inApp && (
-                <button className={chip(source === "record")} onClick={() => setSource("record")}>
-                  <Mic className="w-3.5 h-3.5 inline mr-1 -mt-0.5" /> Record live
-                </button>
-              )}
+              <button className={chip(source === "record")} onClick={() => setSource("record")}>
+                <Mic className="w-3.5 h-3.5 inline mr-1 -mt-0.5" /> Record live
+              </button>
               <button className={chip(source === "upload")} onClick={() => setSource("upload")}>
                 <Upload className="w-3.5 h-3.5 inline mr-1 -mt-0.5" /> Upload from gallery
               </button>
             </div>
 
-            {source === "record" && !inApp && (
+            {source === "record" && (
               <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 text-center">
-                {recState === "idle" && (
+                {(micStatus === "unsupported" || micStatus === "denied") && recState === "idle" ? (
+                  <div className="anim-vs-in">
+                    <Mic className="w-9 h-9 mx-auto text-zinc-400" />
+                    <p className="mt-3 text-sm font-semibold">
+                      {micStatus === "denied"
+                        ? "Microphone access is denied for this site."
+                        : "This browser can&apos;t access the microphone."}
+                    </p>
+                    <p className="text-xs text-zinc-500">Recording won't work here — but uploading works everywhere.</p>
+                    <button
+                      onClick={() => fileInput.current?.click()}
+                      className="mt-4 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-br from-ember-500 to-magent-500 text-white text-sm font-semibold shadow-lg shadow-magent-500/25 hover:scale-105 active:scale-95 transition-transform duration-200"
+                    >
+                      <Upload className="w-4 h-4" /> Upload a recording from your gallery
+                    </button>
+                  </div>
+                ) : recState === "idle" ? (
                   <div className="anim-vs-in">
                     <button
                       onClick={startRecording}
@@ -698,7 +729,7 @@ export default function VoiceCloner() {
                     <p className="mt-3 text-sm font-semibold">Tap to record your voice</p>
                     <p className="text-xs text-zinc-500">6–30 seconds of clear speech, no music or noise</p>
                   </div>
-                )}
+                ) : null}
                 {recState === "recording" && (
                   <div className="anim-vs-in">
                     <div className="relative w-20 h-20 mx-auto">
