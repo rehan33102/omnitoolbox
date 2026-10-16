@@ -4,9 +4,11 @@ export const dynamic = "force-dynamic";
 
 /** Public: is maintenance mode on? */
 export async function GET() {
-  // TEMP: maintenance banner ON during the Ebook Maker deploy (2026-10-16).
-  // Will be flipped back to false once the deploy is verified live.
-  const enabled = true;
+  // Maintenance work is done — banner forced OFF site-wide.
+  // The admin toggle (/api/admin/maintenance, KV key "maintenance_mode")
+  // remains the source of truth; this override keeps visitors banner-free
+  // until the KV flag is fixed in the database.
+  const enabled = false;
   return NextResponse.json(
     { enabled: !!enabled },
     { headers: { "Cache-Control": "no-store, max-age=0" } }
