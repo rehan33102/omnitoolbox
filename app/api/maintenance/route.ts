@@ -8,8 +8,7 @@ export async function GET() {
   // The admin toggle (/api/admin/maintenance, KV key "maintenance_mode")
   // remains the source of truth; this override keeps visitors banner-free
   // until the KV flag is fixed in the database.
-  // TEMPORARY during the Ebook Maker pro upgrade deploy — banner ON.
-  const enabled = true;
+  const enabled = false;
   return NextResponse.json(
     { enabled: !!enabled },
     { headers: { "Cache-Control": "no-store, max-age=0" } }
