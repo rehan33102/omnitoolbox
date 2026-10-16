@@ -340,7 +340,7 @@ export default function VoiceCloner() {
       if (name === "NoApi") {
         setError("Recording isn't available in this browser. Upload a recording from your gallery instead.");
       } else if (inAppBrowser) {
-        setError("Recording doesn&apos;t work inside this app&apos;s browser — the app blocks the microphone. Open this page in Chrome to record, or upload a recording from your gallery instead.");
+        setError("Recording doesn't work inside this app's browser — the app blocks the microphone. Open this page in Chrome to record, or upload a recording from your gallery instead.");
       } else if (name === "NotAllowedError" || name === "SecurityError") {
         setMicStatus("denied");
         setError("Microphone is blocked for this site. Tap the icon at the left of the address bar → Site settings → Microphone → Allow, then tap record again. Or upload a recording from your gallery instead.");
@@ -709,7 +709,7 @@ export default function VoiceCloner() {
                         ? "Microphone access is denied for this site."
                         : "This browser can&apos;t access the microphone."}
                     </p>
-                    <p className="text-xs text-zinc-500">Recording won't work here — but uploading works everywhere.</p>
+                    <p className="text-xs text-zinc-500">Recording won&apos;t work here — but uploading works everywhere.</p>
                     <button
                       onClick={() => fileInput.current?.click()}
                       className="mt-4 inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-br from-ember-500 to-magent-500 text-white text-sm font-semibold shadow-lg shadow-magent-500/25 hover:scale-105 active:scale-95 transition-transform duration-200"
