@@ -163,11 +163,11 @@ export const TOOLS: Tool[] = [
   },
   {
     id: "t22", slug: "ebook-maker", title: "Ebook Maker",
-    tagline: "Write chapters with text & pictures — download a real EPUB or PDF",
-    description: "Compose a real ebook in your browser: title, author, custom cover (upload art or pick a gradient), chapters with text and picture blocks, live cover preview. Export a genuine EPUB 3 file or a clean paginated PDF. Everything stays on your device.",
-    category: "text", href: "/tools/ebook-maker", icon: "BookOpen", badge: "new",
+    tagline: "Free Ebook Maker — create real EPUB & PDF ebooks with text and pictures",
+    description: "Create a real ebook online free: add a title, author and designer cover, write chapters with text and picture blocks, pick a professional page theme, and download a genuine EPUB 3 file or a clean paginated PDF. Everything runs in your browser — your book never leaves your device.",
+    category: "text", href: "/tools/ebook-maker", icon: "BookOpen", image: "/images/tools/ebook-maker.jpg", badge: "new",
     enabled: true, sortOrder: 21, usageCount: 0, updatedAt: "2026-10-16",
-    keywords: ["ebook maker", "make ebook", "epub maker", "create ebook", "ebook creator", "epub creator", "write ebook", "ebook generator", "pdf ebook maker", "make epub from text", "book creator", "free ebook maker", "ebook builder", "write a book online", "epub download"],
+    keywords: ["ebook maker", "create ebook online free", "epub maker", "make ebook from text and pictures", "pdf ebook creator", "ebook creator", "epub creator", "make epub", "create epub online", "free ebook maker", "ebook builder", "write ebook online", "book creator", "epub generator", "kindle ebook maker", "self publish ebook free"],
   },
 ];
 
