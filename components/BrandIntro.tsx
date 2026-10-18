@@ -20,6 +20,8 @@ const LETTER_STAGGER_MS = 40;
  *
  * pointer-events: none so a stuck overlay can never block taps.
  * Respects prefers-reduced-motion (static logo + name, near-instant).
+ * Session note: plays once per tab session; OS-level PWA splash (manifest
+ * name/description) is handled separately in app/manifest.ts.
  */
 export default function BrandIntro() {
   const [visible, setVisible] = useState(false);
