@@ -36,7 +36,7 @@ export const TOOLS: Tool[] = [
   {
     id: "t21", slug: "background-studio", title: "Background Studio",
     tagline: "Pro background studio — change backgrounds like a pro",
-    description: "Upload a photo, AI removes the background, then restyle it: solid colors, gradients, blurred background, custom photos, studio scenes. Add drop shadows, tune brightness & contrast, download in HD. 100% free, on-device.",
+    description: "Upload a photo, AI removes the background, then restyle it: solid colors, gradients, blurred background, custom photos, studio scenes. Add drop shadows, tune brightness & contrast, download in HD. Runs entirely on-device — your images never leave your browser.",
     category: "image", href: "/tools/background-studio", icon: "Palette", image: "/images/tools/background-studio.jpg", badge: "new",
     enabled: true, sortOrder: 5.5, usageCount: 0, updatedAt: "2026-10-04",
     keywords: ["background studio", "change background", "photo background changer", "free background remover", "blur background", "photo background editor", "replace background", "background changer app", "portrait background", "studio background", "add shadow to photo", "photo editor online free", "hintergrund ändern", "foto hintergrund wechseln"],
@@ -124,7 +124,7 @@ export const TOOLS: Tool[] = [
   {
     id: "t16", slug: "currency-converter", title: "Currency Converter",
     tagline: "Live USD, PKR, EUR, USDT & 15 currencies",
-    description: "Convert between 15 currencies with live mid-market rates (PKR, USD, EUR, GBP, AED, USDT…). 100% free.",
+    description: "Convert between 15 currencies with live mid-market rates (PKR, USD, EUR, GBP, AED, USDT…), refreshed automatically throughout the day.",
     category: "web", href: "/tools/currency-converter", icon: "Banknote", image: "/images/tools/currency-converter.jpg", badge: "new",
     enabled: true, sortOrder: 16, usageCount: 0, updatedAt: "2026-10-04",
     keywords: ["currency converter", "currency exchange", "usd to pkr", "pkr to usd", "money converter", "dollar to rupee", "forex converter", "exchange rate", "eur to usd", "usdt price", "dollar rate today", "currency calculator", "dollar to pkr"],
