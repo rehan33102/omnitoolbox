@@ -8,7 +8,7 @@ import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import AutoUpdater from "@/components/AutoUpdater";
-import AdPopup from "@/components/ads/AdPopup";
+import RehanTechAds from "@/components/ads/RehanTechAds";
 import VisitTracker from "@/components/analytics/VisitTracker";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import MaintenanceBanner from "@/components/MaintenanceBanner";
@@ -84,9 +84,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <ServiceWorkerRegister />
             <AutoUpdater />
             <VisitTracker />
-            {/* AdPopup disabled 2026-10-13: centered promo popups were covering
-                tool cards and blocking clicks ("buttons not working" reports).
-                Ads data is intact in the DB; re-enable by restoring <AdPopup />. */}
+            {/* RehanTechAds 2026-10-18: non-blocking REHAN TECH promo popup
+                (bottom sheet on mobile / corner card on desktop). Replaces the
+                old centered AdPopup, disabled 2026-10-13 for blocking taps. */}
+            <RehanTechAds />
             <CommandPalette />
             <GlobalErrorHooks />
             <ErrorBoundary name="root">
