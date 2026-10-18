@@ -33,7 +33,7 @@ export default function OG() {
           </span>
         </div>
         <div style={{ fontSize: 28, color: "#a1a1aa", marginTop: 16 }}>
-          50+ free AI & web utilities. No signup.
+          Every tool you need. One workspace.
         </div>
       </div>
     ),

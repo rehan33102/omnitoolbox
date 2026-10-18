@@ -42,7 +42,7 @@ export default function Hero({ toolCount }: { toolCount: number }) {
         {/* Magazine eyebrow */}
         <p className="eyebrow justify-center mb-6 animate-fade-up">
           <Sparkles size={12} className="text-ember-400" />
-          {toolCount}+ free tools
+          {toolCount}+ professional tools
         </p>
 
         {/* Giant condensed editorial headline — animated glow fun */}

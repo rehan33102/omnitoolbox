@@ -7,7 +7,7 @@ import TrackUsage from "@/components/analytics/TrackUsage";
 export async function generateMetadata() {
   return buildMetadata({
     title: "Free AI Voice Studio — Clone Any Voice & Create AI Voiceovers",
-    description: "Pick a ready studio voice or clone your own from a short sample. Type your script, choose a purpose, and download a real AI voiceover MP3 — free, no signup.",
+    description: "Pick a ready studio voice or clone your own from a short sample. Type your script, choose a purpose, and download a real AI voiceover MP3.",
     path: "/ai-voiceover",
     keywords: ["ai voice studio", "ai voice cloner", "voice cloning", "ai voiceover generator", "text to speech voices", "clone my voice", "youtube voiceover", "voice clone free"],
   });

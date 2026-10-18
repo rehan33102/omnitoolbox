@@ -13,7 +13,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/Tabs";
 export async function generateMetadata() {
   return buildMetadata({
     title: "Free Calculators — Currency, Unit, BMI & Age Calculator",
-    description: "Free online calculators: live currency converter (USD, PKR, EUR, USDT…), unit converter, BMI & calorie calculator, age calculator. No signup, instant results.",
+    description: "Online calculators: live currency converter (USD, PKR, EUR, USDT…), unit converter, BMI & calorie calculator, age calculator. Instant results.",
     path: "/calculators",
     keywords: ["currency converter", "usd to pkr", "unit converter", "bmi calculator", "calorie calculator", "age calculator", "free calculators"],
   });

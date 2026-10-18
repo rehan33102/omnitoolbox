@@ -9,7 +9,7 @@ import Badge from "@/components/ui/Badge";
 export async function generateMetadata() {
   return buildMetadata({
     title: "Free Web Tools — QR Generator & Password Generator",
-    description: "Create custom QR codes (PNG/SVG) and generate cryptographically secure passwords — 100% client-side, private, free. No signup.",
+    description: "Create custom QR codes (PNG/SVG) and generate cryptographically secure passwords — 100% client-side and private, right in your browser.",
     path: "/web-tools",
     keywords: ["qr code generator", "password generator", "free qr maker", "strong password generator", "secure password", "qr code png download"],
   });

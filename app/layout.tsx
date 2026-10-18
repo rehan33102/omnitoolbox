@@ -66,6 +66,7 @@ export const metadata: Metadata = {
   },
 };
 
+import BrandIntro from "@/components/BrandIntro";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import GlobalErrorHooks from "@/components/GlobalErrorHooks";
 import JsonLd from "@/components/seo/JsonLd";
@@ -82,6 +83,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <ToastProvider>
             <ServiceWorkerRegister />
+            {/* BrandIntro 2026-10-19: premium animated brand intro, once per session */}
+            <BrandIntro />
             <AutoUpdater />
             <VisitTracker />
             {/* RehanTechAds 2026-10-18: non-blocking REHAN TECH promo popup

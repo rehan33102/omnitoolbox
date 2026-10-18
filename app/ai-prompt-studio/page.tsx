@@ -9,7 +9,7 @@ import Card from "@/components/ui/Card";
 export async function generateMetadata() {
   return buildMetadata({
     title: "AI Prompt Studio — Free AI Prompt Generator",
-    description: "Generate and optimize AI prompts with preset styles, negative-prompt builder and {variable} placeholders. One-click copy. Free, no signup.",
+    description: "Generate and optimize AI prompts with preset styles, negative-prompt builder and {variable} placeholders. One-click copy.",
     path: "/ai-prompt-studio",
     keywords: ["prompt generator", "midjourney prompt builder", "chatgpt prompt optimizer", "flux prompts", "claude prompts", "negative prompt"],
   });

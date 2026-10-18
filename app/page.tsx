@@ -17,21 +17,21 @@ export const revalidate = 300;
 export async function generateMetadata() {
   return buildMetadata({
     title: "Omni Tool Box — Free AI Tools, Image Utilities & Web Tools",
-    description: "50+ free AI & web utilities: AI prompt studio, image converter & compressor, fancy text stylizer, bio generator, hashtag finder. No signup required.",
+    description: "OmniToolBox puts every tool you need in one workspace: AI prompt studio, image converter & compressor, fancy text stylizer, bio generator, hashtag finder and more.",
     path: "/",
     keywords: ["free ai tools", "prompt generator", "image converter", "image compressor", "fancy text", "hashtag generator", "online utilities"],
   });
 }
 
 const FAQS = [
-  { question: "Is it free?", answer: "Yes. All tools are free, no signup needed." },
+  { question: "Is it free?", answer: "Yes — every tool on OmniToolBox is free to use." },
   { question: "Are my files uploaded?", answer: "No. Image tools run in your browser. Files stay on your device." },
   { question: "Does it work on mobile?", answer: "Yes. All tools work on phones, tablets, and desktops." },
   { question: "Can I suggest a tool?", answer: "Yes, use the contact page." },
 ];
 
 const FEATURES = [
-  { icon: Wallet, title: "Free", text: "Every tool is free. No paywalls." },
+  { icon: Wallet, title: "Open", text: "Every tool is free and ready when you are." },
   { icon: ShieldCheck, title: "Private", text: "Files are processed in your browser." },
   { icon: Gauge, title: "Fast", text: "Instant results, no waiting." },
   { icon: Sparkles, title: "More coming", text: "New tools added regularly." },
@@ -108,10 +108,10 @@ export default async function HomePage() {
                 All your tools.<br />
                 <span className="text-gradient-warm">One place.</span>
               </h2>
-              <p className="text-zinc-400 mt-4 max-w-xl mx-auto">Free tools for everyday tasks.</p>
+              <p className="text-zinc-400 mt-4 max-w-xl mx-auto">Professional tools for everyday tasks.</p>
               <Link href="/ai-prompt-studio" className="inline-block mt-8">
                 <Button size="lg" className="!bg-gradient-to-r !from-ember-500 !to-magent-500 hover:!shadow-glow-warm !border-0">
-                  Start creating free <ArrowRight size={17} />
+                  Start creating <ArrowRight size={17} />
                 </Button>
               </Link>
             </div>

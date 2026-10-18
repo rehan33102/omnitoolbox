@@ -9,7 +9,7 @@ import Badge from "@/components/ui/Badge";
 export async function generateMetadata() {
   return buildMetadata({
     title: "Free PDF Tools — Merge, Split & Images to PDF",
-    description: "Merge PDFs, split pages, and convert images to PDF — 100% client-side, private, free. No signup, no uploads.",
+    description: "Merge PDFs, split pages, and convert images to PDF — 100% client-side and private, no uploads.",
     path: "/pdf-tools",
     keywords: ["merge pdf", "split pdf", "images to pdf", "combine pdf online", "extract pdf pages", "jpg to pdf"],
   });

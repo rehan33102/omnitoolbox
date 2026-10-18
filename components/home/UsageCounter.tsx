@@ -41,7 +41,7 @@ export default function UsageCounter({ toolCount }: { toolCount: number }) {
   }, []);
 
   const stats = [
-    { value: <CountUp to={toolCount} suffix="+" />, label: "Free tools" },
+    { value: <CountUp to={toolCount} suffix="+" />, label: "Tools" },
     { value: <CountUp to={uses} suffix="+" />, label: "Tool uses tracked" },
   ];
 
