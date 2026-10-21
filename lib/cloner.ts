@@ -135,11 +135,18 @@ async function login(base: string): Promise<void> {
   if (!username || !password) {
     throw new ClonerOffline("Voice cloner credentials are not configured.");
   }
-  const res = await fetch(`${base}/api/login`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ username, password }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${base}/api/login`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+  } catch {
+    // Backend unreachable (tunnel down, DNS/connection failure) — not a
+    // credential problem — so the honest offline path handles it.
+    throw new ClonerOffline("Voice cloner login failed.");
+  }
   if (!res.ok) {
     throw new ClonerOffline("Voice cloner login failed.");
   }
