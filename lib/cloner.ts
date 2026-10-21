@@ -174,6 +174,14 @@ export async function clonerFetch(path: string, init: RequestInit = {}): Promise
       await login(base);
       res = await doFetch();
     }
+    // Gateway statuses mean the backend/tunnel is down or restarting — not a
+    // real engine error — so surface them as ClonerOffline. This lets every
+    // /api/cloner/* route return 503 { error:"cloner_offline" } (never a fake
+    // result) and gives the client its calm retry + honest offline UX instead
+    // of a hard 502 failure.
+    if (res.status === 502 || res.status === 503 || res.status === 504) {
+      throw new ClonerOffline(`Voice backend returned ${res.status}.`);
+    }
     return res;
   };
 
