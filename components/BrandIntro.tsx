@@ -2,31 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const STORAGE_KEY = "otb-intro-seen-v2";
+const STORAGE_KEY = "otb-intro-seen-v3";
 /**
- * Full intro timeline (~5.5s of choreography, out by ~6.0s):
- * 0.0–1.2s  glow breathes in, logo scales in, gradient ring draws/rotates
- * 1.2–2.4s  shine sweep across logo, sparkles rise, glow pulses
- * 2.4–4.2s  name reveals letter-by-letter (blur→sharp, masked slide-up),
- *            finishes with a gradient shimmer pass across the word
- * 4.2–5.5s  gentle settle float, then fade + slight scale out
+ * Origami intro timeline (~5.7s of choreography, out by ~5.8s):
+ * 0.15–1.3s  origami fox mark builds facet-by-facet (spring easing)
+ * 0.9s       halo glows in behind the mark
+ * 1.5–1.6s   wordmark slides up masked: "Omni" white + "ToolBox" gradient
+ * 2.35s      gradient rule grows
+ * 2.8s       tagline "Every tool. One place." fades up
+ * 3.15s      light sweep passes across
+ * 4.7–5.7s   veil settles to dark, overlay fades out
  * Tap/click anywhere (or any key) skips instantly.
  */
-const INTRO_MS = 5500;
-const LEAVE_AT_MS = 5500;
-const DONE_AT_MS = 6000;
+const LEAVE_AT_MS = 5200;
+const DONE_AT_MS = 5750;
 const REDUCED_MS = 700;
 const REDUCED_LEAVE_AT_MS = 250;
 
-const NAME_START_MS = 2400;
-const LETTER_STAGGER_MS = 45;
-
 /**
- * Premium "viral" brand intro — full-screen overlay that plays once per
- * session on first load: ONLY the logo + the brand name, on dark #050A14.
- * Nothing else — no tagline, no buttons. Content loads underneath the whole
- * time. Tap/click anywhere or any key skips it instantly.
- * Respects prefers-reduced-motion (static logo + name, near-instant).
+ * Origami brand intro — full-screen overlay that plays once per session
+ * on first load: the origami fox mark building facet-by-facet, then the
+ * "OmniToolBox" wordmark and tagline, on dark #050A14.
+ * Content loads underneath the whole time. Tap/click anywhere or any key
+ * skips it instantly. Respects prefers-reduced-motion (static mark +
+ * name, near-instant).
  */
 export default function BrandIntro() {
   const [visible, setVisible] = useState(false);
@@ -90,8 +89,9 @@ export default function BrandIntro() {
 
   if (!visible) return null;
 
-  const letters = "OmniToolBox".split("");
-  const sparks = [0, 1, 2, 3, 4, 5];
+  const facet = (delay: string) => ({
+    animationDelay: reduced ? "0ms" : delay,
+  });
 
   return (
     <div
@@ -116,209 +116,140 @@ export default function BrandIntro() {
       <style>{`
         .otb-intro {
           position: fixed; inset: 0; z-index: 9999;
-          display: grid; place-items: center;
+          display: flex; flex-direction: column; align-items: center; justify-content: center;
           background: #050A14;
           cursor: pointer;
           transition: opacity .5s ease, transform .5s ease;
           overflow: hidden;
+          -webkit-tap-highlight-color: transparent;
         }
         .otb-intro--leaving { opacity: 0; transform: scale(1.04); }
 
-        /* --- breathing radial glow behind everything --- */
-        .otb-intro-glow {
-          position: absolute; top: 50%; left: 50%;
-          width: 82vmin; height: 82vmin;
-          background: radial-gradient(circle,
-            rgba(168,85,247,.20) 0%,
-            rgba(34,211,238,.07) 42%,
-            transparent 70%);
-          animation: otb-glow-breathe 2.6s ease-in-out infinite alternate;
+        /* --- halo glow behind the mark --- */
+        .otb-origami-halo {
+          position: absolute; width: 340px; height: 340px; border-radius: 50%;
+          background: radial-gradient(circle, rgba(168,85,247,.30), rgba(59,130,246,.12) 55%, transparent 70%);
+          filter: blur(10px); opacity: 0; transform: scale(.7);
+          animation: otb-halo-in 1.4s ease .9s forwards;
         }
-        @keyframes otb-glow-breathe {
-          from { opacity: .5;  transform: translate(-50%,-50%) scale(.92); }
-          to   { opacity: 1;   transform: translate(-50%,-50%) scale(1.07); }
-        }
+        @keyframes otb-halo-in { to { opacity: 1; transform: scale(1); } }
 
-        .otb-intro-inner {
-          position: relative;
-          display: flex; flex-direction: column; align-items: center; gap: 26px;
-          padding: 0 24px;
-          animation: otb-settle-float 1.3s ease-in-out 4.2s 1;
+        /* --- origami fox mark --- */
+        .otb-origami-foxwrap { position: relative; width: 150px; height: 150px; margin-bottom: 26px; }
+        .otb-origami-fox { width: 100%; height: 100%; overflow: visible; }
+        .otb-origami-facet {
+          opacity: 0; transform-origin: 60px 62px;
+          animation: otb-facet-in .65s cubic-bezier(.34,1.4,.64,1) forwards;
         }
-        @keyframes otb-settle-float {
-          0%, 100% { transform: translateY(0); }
-          50%      { transform: translateY(-5px); }
+        @keyframes otb-facet-in {
+          from { opacity: 0; transform: scale(.4) rotate(-8deg); }
+          to { opacity: 1; transform: scale(1) rotate(0); }
         }
+        .otb-origami-shadow {
+          position: absolute; left: 50%; bottom: -16px; width: 110px; height: 16px;
+          transform: translateX(-50%);
+          background: radial-gradient(ellipse, rgba(0,0,0,.55), transparent 70%);
+          opacity: 0; animation: otb-fade-in 1s ease 1.3s forwards;
+        }
+        @keyframes otb-fade-in { to { opacity: 1; } }
 
-        /* --- logo stage --- */
-        .otb-intro-stage { position: relative; width: 136px; height: 136px; }
-
-        .otb-intro-ring-faint {
-          position: absolute; inset: -16px; border-radius: 50%;
-          border: 1px solid rgba(255,255,255,.09);
-          opacity: 0;
-          animation: otb-faint-in .9s ease .35s forwards;
-        }
-        @keyframes otb-faint-in { to { opacity: 1; } }
-
-        .otb-intro-ring-arc {
-          position: absolute; inset: -16px; border-radius: 50%;
-          background: conic-gradient(from 0deg,
-            rgba(240,171,252,0) 0deg,
-            rgba(240,171,252,.95) 50deg,
-            rgba(34,211,238,.95) 110deg,
-            rgba(34,211,238,0) 170deg,
-            rgba(240,171,252,0) 360deg);
-          -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
-          mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
-          opacity: 0;
-          animation: otb-arc-spin 1.4s linear infinite, otb-arc-life 4.5s linear .1s forwards;
-        }
-        @keyframes otb-arc-spin { to { transform: rotate(1turn); } }
-        @keyframes otb-arc-life {
-          0% { opacity: 0; } 6% { opacity: 1; } 90% { opacity: 1; } 100% { opacity: 0; }
-        }
-
-        .otb-intro-logo-clip {
-          position: relative; width: 136px; height: 136px;
-          border-radius: 50%; overflow: hidden;
-        }
-        .otb-intro-logo {
-          width: 136px; height: 136px; display: block; object-fit: contain;
-          opacity: 0; transform: scale(.8);
-          animation: otb-logo-in 1.2s cubic-bezier(.22,1,.36,1) forwards,
-                     otb-logo-pulse 1.3s ease-in-out 2s 1;
-        }
-        @keyframes otb-logo-in {
-          from {
-            opacity: 0; transform: scale(.8);
-            filter: drop-shadow(0 0 0 rgba(168,85,247,0));
-          }
-          to {
-            opacity: 1; transform: scale(1);
-            filter: drop-shadow(0 10px 44px rgba(168,85,247,.5));
-          }
-        }
-        @keyframes otb-logo-pulse {
-          50% {
-            transform: scale(1.035);
-            filter: drop-shadow(0 10px 64px rgba(240,171,252,.8));
-          }
-        }
-
-        .otb-intro-shine {
-          position: absolute; top: -40%; left: -70%;
-          width: 45%; height: 180%;
-          background: linear-gradient(100deg, transparent, rgba(255,255,255,.7), transparent);
-          transform: skewX(-18deg);
-          animation: otb-shine-sweep 1.15s ease-in-out 1.3s forwards;
-        }
-        @keyframes otb-shine-sweep { to { left: 140%; } }
-
-        .otb-intro-spark {
-          position: absolute; bottom: 8px;
-          width: 5px; height: 5px; border-radius: 50%;
-          background: #f0abfc; opacity: 0;
-          animation: otb-spark-rise 1.15s ease-out forwards;
-        }
-        .otb-intro-spark:nth-of-type(2n) { background: #22d3ee; }
-        @keyframes otb-spark-rise {
-          0%   { opacity: 0; transform: translateY(0) scale(.4); }
-          25%  { opacity: 1; }
-          100% { opacity: 0; transform: translateY(-96px) scale(1); }
-        }
-
-        /* --- name reveal --- */
-        .otb-intro-name {
-          position: relative;
-          overflow: hidden;
-          display: flex; justify-content: center;
+        /* --- wordmark: masked slide-up --- */
+        .otb-origami-word {
+          display: flex; align-items: baseline;
           font-family: var(--font-display), system-ui, sans-serif;
-          font-weight: 800;
-          font-size: clamp(32px, 8.5vw, 46px);
-          letter-spacing: -0.02em; line-height: 1.2;
-          padding: .05em .1em .18em;
+          font-size: clamp(36px, 9.6vw, 60px); font-weight: 700; letter-spacing: -.01em;
           user-select: none;
         }
-        .otb-intro-letter {
-          display: inline-block;
-          opacity: 0; transform: translateY(110%);
-          filter: blur(10px);
-          animation: otb-letter-in .55s cubic-bezier(.22,1,.36,1) forwards;
+        .otb-origami-mask { overflow: hidden; display: inline-flex; }
+        .otb-origami-mask > span {
+          display: inline-block; transform: translateY(112%);
+          animation: otb-rise .8s cubic-bezier(.22,1,.36,1) forwards;
         }
-        @keyframes otb-letter-in {
-          to { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-        .otb-intro-shimmer {
-          position: absolute; inset: 0; pointer-events: none;
-          background: linear-gradient(100deg,
-            transparent 25%, rgba(255,255,255,.5) 50%, transparent 75%);
-          background-size: 220% 100%;
-          opacity: 0;
-          animation: otb-shimmer-pass 1.05s ease-in-out 3.65s forwards;
-        }
-        @keyframes otb-shimmer-pass {
-          0%   { opacity: 0;  background-position: 200% 0; }
-          20%  { opacity: .85; }
-          80%  { opacity: .85; }
-          100% { opacity: 0;  background-position: -200% 0; }
+        @keyframes otb-rise { to { transform: translateY(0); } }
+        .otb-origami-w1 { color: #fff; }
+        .otb-origami-w2 {
+          background: linear-gradient(92deg, #38bdf8, #818cf8 55%, #e879f9);
+          -webkit-background-clip: text; background-clip: text; color: transparent;
         }
 
-        /* --- reduced motion: static logo + name, near-instant --- */
+        /* --- rule + tagline --- */
+        .otb-origami-rule {
+          width: 0; height: 2px; margin-top: 22px; border-radius: 99px;
+          background: linear-gradient(90deg, transparent, #38bdf8, #e879f9, transparent);
+          animation: otb-rule-grow .9s cubic-bezier(.65,0,.25,1) 2.35s forwards;
+        }
+        @keyframes otb-rule-grow { to { width: min(260px, 62vw); } }
+        .otb-origami-tag {
+          margin-top: 16px;
+          font-family: "Manrope", var(--font-display), system-ui, sans-serif;
+          font-weight: 600; font-size: 11.5px; letter-spacing: .5em; text-transform: uppercase;
+          color: rgba(255,255,255,.55); text-indent: .5em;
+          opacity: 0; animation: otb-tag-in .9s ease 2.8s forwards;
+        }
+        @keyframes otb-tag-in {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* --- light sweep + settling veil --- */
+        .otb-origami-sweep { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+        .otb-origami-sweep::after {
+          content: ''; position: absolute; top: -20%; bottom: -20%; width: 34%; left: -45%;
+          background: linear-gradient(100deg, transparent, rgba(255,255,255,.09), transparent);
+          transform: skewX(-14deg); animation: otb-sweep-move 1.3s ease 3.15s forwards;
+        }
+        @keyframes otb-sweep-move { to { left: 130%; } }
+        .otb-origami-veil {
+          position: absolute; inset: 0; background: #050A14; opacity: 0; pointer-events: none;
+          animation: otb-veil 1s ease 4.7s forwards;
+        }
+        @keyframes otb-veil { to { opacity: 1; } }
+
+        /* --- reduced motion: static mark + name, near-instant --- */
         .otb-intro--reduced * { animation: none !important; }
-        .otb-intro--reduced .otb-intro-logo {
-          opacity: 1; transform: none;
-          filter: drop-shadow(0 10px 44px rgba(168,85,247,.5));
-        }
-        .otb-intro--reduced .otb-intro-letter {
-          opacity: 1; transform: none; filter: none;
-        }
+        .otb-intro--reduced .otb-origami-facet { opacity: 1; transform: none; }
+        .otb-intro--reduced .otb-origami-mask > span { transform: none; }
+        .otb-intro--reduced .otb-origami-rule { width: min(260px, 62vw); }
+        .otb-intro--reduced .otb-origami-tag { opacity: 1; transform: none; }
+        .otb-intro--reduced .otb-origami-halo { opacity: 1; transform: none; }
+        .otb-intro--reduced .otb-origami-shadow { opacity: 1; }
+        .otb-intro--reduced .otb-origami-veil { opacity: 0; }
       `}</style>
 
-      <div className="otb-intro-glow" />
-      <div className="otb-intro-inner">
-        <div className="otb-intro-stage">
-          <div className="otb-intro-ring-faint" />
-          <div className="otb-intro-ring-arc" />
-          <div className="otb-intro-logo-clip">
-            <img
-              src="/images/logo-transparent.png"
-              alt=""
-              width={136}
-              height={136}
-              className="otb-intro-logo"
-              draggable={false}
-            />
-            <div className="otb-intro-shine" />
-          </div>
-          {sparks.map((s) => (
-            <span
-              key={s}
-              className="otb-intro-spark"
-              style={{
-                left: `${20 + s * 11}%`,
-                animationDelay: reduced ? "0ms" : `${1300 + s * 120}ms`,
-              }}
-            />
-          ))}
-        </div>
-        <div className="otb-intro-name">
-          {letters.map((ch, i) => (
-            <span
-              key={i}
-              className="otb-intro-letter text-gradient-warm"
-              style={{
-                animationDelay: reduced
-                  ? "0ms"
-                  : `${NAME_START_MS + i * LETTER_STAGGER_MS}ms`,
-              }}
-            >
-              {ch}
-            </span>
-          ))}
-          <div className="otb-intro-shimmer" />
-        </div>
+      <div className="otb-origami-halo" />
+      <div className="otb-origami-foxwrap">
+        <svg className="otb-origami-fox" viewBox="0 0 120 120" aria-hidden>
+          {/* ears */}
+          <polygon className="otb-origami-facet" style={facet(".15s")} points="18,14 44,34 22,44" fill="#f472b6" />
+          <polygon className="otb-origami-facet" style={facet(".25s")} points="102,14 76,34 98,44" fill="#e879f9" />
+          {/* head facets */}
+          <polygon className="otb-origami-facet" style={facet(".38s")} points="22,44 60,30 44,62" fill="#a78bfa" />
+          <polygon className="otb-origami-facet" style={facet(".48s")} points="98,44 60,30 76,62" fill="#818cf8" />
+          <polygon className="otb-origami-facet" style={facet(".58s")} points="44,62 60,30 76,62 60,78" fill="#60a5fa" />
+          {/* cheeks / muzzle */}
+          <polygon className="otb-origami-facet" style={facet(".70s")} points="22,44 44,62 52,92" fill="#38bdf8" />
+          <polygon className="otb-origami-facet" style={facet(".80s")} points="98,44 76,62 68,92" fill="#22d3ee" />
+          <polygon className="otb-origami-facet" style={facet(".92s")} points="52,92 60,78 68,92 60,106" fill="#f0abfc" />
+          {/* eyes */}
+          <circle className="otb-origami-facet" style={facet("1.15s")} cx="45" cy="58" r="3.2" fill="#050A14" />
+          <circle className="otb-origami-facet" style={facet("1.22s")} cx="75" cy="58" r="3.2" fill="#050A14" />
+          {/* nose */}
+          <polygon className="otb-origami-facet" style={facet("1.3s")} points="56,97 64,97 60,103" fill="#050A14" />
+        </svg>
+        <div className="otb-origami-shadow" />
       </div>
+      <div className="otb-origami-word">
+        <span className="otb-origami-mask">
+          <span className="otb-origami-w1" style={{ animationDelay: reduced ? "0ms" : "1500ms" }}>Omni</span>
+        </span>
+        <span className="otb-origami-mask">
+          <span className="otb-origami-w2" style={{ animationDelay: reduced ? "0ms" : "1620ms" }}>ToolBox</span>
+        </span>
+      </div>
+      <div className="otb-origami-rule" />
+      <div className="otb-origami-tag">Every tool. One place.</div>
+      <div className="otb-origami-sweep" />
+      <div className="otb-origami-veil" />
     </div>
   );
 }
