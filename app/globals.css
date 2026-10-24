@@ -17,12 +17,9 @@
   html { overflow-x: hidden; }
   /* Selection tint follows the admin-set brand accent (default = brand-500). */
   ::selection { background-color: color-mix(in srgb, var(--brand-accent) 30%, transparent); color: inherit; }
-  /* Butter-smooth page entrance — GPU-friendly transform/opacity only */
-  main { animation: page-in 0.45s cubic-bezier(0.22, 1, 0.36, 1); }
-  @keyframes page-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  /* Page entrances are owned by <PageTransition> (pathname-keyed), so
+     every client-side navigation replays the entrance — the old main-only
+     animation ran on first load alone. See the ORIGAMI MOTION section. */
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     main { animation: none; }
@@ -456,4 +453,80 @@
   background-image: linear-gradient(90deg, rgba(255,255,255,0) 0, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0) 100%);
   background-size: 400px 100%;
   animation: vs-shimmer 1.4s linear infinite;
+}
+
+/* ============================================================
+ * ORIGAMI MOTION SYSTEM (2026-10-24) — site-wide motion language,
+ * same family as the Origami splash intro: spring easing, light sweep,
+ * glassy clean surfaces. Rules of this section:
+ * - transform + opacity ONLY (GPU-composited; no layout properties),
+ *   so motion stays smooth at the display's native refresh rate.
+ * - Element selectors only, so component classes (.btn-base etc.)
+ *   keep winning where they already define motion — this section is
+ *   the fallback that makes EVERY button feel alive, not a restyle.
+ * - The mobile backdrop-blur guard above is untouched: glass stays
+ *   frosted on desktop, blur-free on phones.
+ * ============================================================ */
+/* Every page, every navigation: soft spring entrance (see Motion.tsx).
+   No fill mode: after the entrance the wrapper holds no transform,
+   so fixed/sticky elements inside pages position normally. */
+.otb-page-enter {
+  animation: otb-page-in 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes otb-page-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Every button / pressable: gentle lift on hover, tactile press.
+   Spring overshoot on the way up, snappy settle on press. */
+button,
+[role="button"],
+input[type="submit"],
+input[type="button"] {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.18s ease, box-shadow 0.18s ease;
+}
+button:hover,
+[role="button"]:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.07);
+}
+button:active,
+[role="button"]:active,
+input[type="submit"]:active,
+input[type="button"]:active {
+  transform: translateY(0) scale(0.97);
+  filter: brightness(0.98);
+}
+button:disabled,
+[role="button"][aria-disabled="true"],
+input[type="submit"]:disabled,
+input[type="button"]:disabled {
+  transform: none;
+  filter: none;
+}
+
+/* Accessibility: all Origami Motion off for reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+  .otb-page-enter { animation: none; }
+  button,
+  [role="button"],
+  input[type="submit"],
+  input[type="button"] {
+    transition: none;
+  }
+  button:hover,
+  [role="button"]:hover,
+  input[type="submit"]:hover,
+  input[type="button"]:hover,
+  button:active,
+  [role="button"]:active,
+  input[type="submit"]:active,
+  input[type="button"]:active {
+    transform: none;
+    filter: none;
+  }
 }

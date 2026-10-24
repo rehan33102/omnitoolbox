@@ -67,6 +67,7 @@ export const metadata: Metadata = {
 };
 
 import BrandIntro from "@/components/BrandIntro";
+import PageTransition from "@/components/Motion";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import GlobalErrorHooks from "@/components/GlobalErrorHooks";
 import JsonLd from "@/components/seo/JsonLd";
@@ -97,7 +98,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <AnnouncementBar />
               <MaintenanceBanner />
               <Header />
-              <main className="flex-1">{children}</main>
+              <main className="flex-1">
+                <PageTransition>{children}</PageTransition>
+              </main>
               <Footer />
             </ErrorBoundary>
             <WhatsAppFloat />
