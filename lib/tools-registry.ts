@@ -162,6 +162,14 @@ export const TOOLS: Tool[] = [
     keywords: ["watermark remover", "remove watermark", "gemini watermark", "ai watermark remover", "logo remover", "remove logo from photo", "erase watermark", "watermark eraser", "text remover", "remove text from image", "clean image", "photo watermark remover", "free watermark remover", "video watermark remover", "remove watermark from video", "gemini video watermark"],
   },
   {
+    id: "t23", slug: "json-formatter", title: "JSON Formatter",
+    tagline: "Format, minify & validate JSON in your browser",
+    description: "Paste JSON to pretty-print it, minify it, sort keys A–Z at every level, or validate it with a clear error message. Upload a .json file, copy the result, or download it — everything runs client-side, your data never leaves your device.",
+    category: "web", href: "/tools/json-formatter", icon: "Braces", image: "/images/tools/json-formatter.jpg", badge: "new",
+    enabled: true, sortOrder: 22, usageCount: 0, updatedAt: "2026-10-26",
+    keywords: ["json formatter", "format json", "json validator", "validate json", "json beautifier", "prettify json", "json minifier", "minify json", "sort json keys", "json viewer", "json parser", "json pretty print", "json checker", "json lint"],
+  },
+  {
     id: "t22", slug: "ebook-maker", title: "Ebook Maker",
     tagline: "Free Ebook Maker — create real EPUB & PDF ebooks with text and pictures",
     description: "Create a real ebook online free: add a title, author and designer cover, write chapters with text and picture blocks, pick a professional page theme, and download a genuine EPUB 3 file or a clean paginated PDF. Everything runs in your browser — your book never leaves your device.",
