@@ -10,7 +10,7 @@ export async function generateMetadata() {
   return buildMetadata({
     title: "AI Prompt Studio — Free AI Prompt Generator",
     description: "Generate and optimize AI prompts with preset styles, negative-prompt builder and {variable} placeholders. One-click copy.",
-    path: "/ai-prompt-studio",
+    path: "/tools/ai-prompt-studio",
     keywords: ["prompt generator", "midjourney prompt builder", "chatgpt prompt optimizer", "flux prompts", "claude prompts", "negative prompt"],
   });
 }
@@ -25,8 +25,8 @@ export default function PromptStudioPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "AI Prompt Studio", description: "Free multi-model AI prompt generator and optimizer.", url: serverSiteUrl("/ai-prompt-studio"), category: "ai" }),
-        breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Prompt Studio", path: "/ai-prompt-studio" }]),
+        softwareAppJsonLd({ name: "AI Prompt Studio", description: "Free multi-model AI prompt generator and optimizer.", url: serverSiteUrl("/tools/ai-prompt-studio"), category: "ai" }),
+        breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Prompt Studio", path: "/tools/ai-prompt-studio" }]),
       ]} />
       <TrackUsage slug="ai-prompt-studio" />
 

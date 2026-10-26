@@ -12,7 +12,7 @@ export async function generateMetadata() {
   return buildMetadata({
     title: "AI Tools Directory — New AI Tools, Community Voted",
     description: "Browse newly launched AI tools across video, audio, coding, productivity and more. Community-voted rankings, updated daily.",
-    path: "/ai-directory",
+    path: "/tools/ai-directory",
     keywords: ["ai tools directory", "new ai tools", "best ai tools 2026", "ai tools list"],
   });
 }
@@ -23,8 +23,8 @@ export default async function DirectoryPage() {
   return (
     <div className="container py-10">
       <JsonLd data={[
-        softwareAppJsonLd({ name: "OmniToolBox AI Directory", description: "Community-voted directory of new AI tools.", url: serverSiteUrl("/ai-directory"), category: "ai" }),
-        breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Directory", path: "/ai-directory" }]),
+        softwareAppJsonLd({ name: "OmniToolBox AI Directory", description: "Community-voted directory of new AI tools.", url: serverSiteUrl("/tools/ai-directory"), category: "ai" }),
+        breadcrumbJsonLd([{ name: "Home", path: "/" }, { name: "AI Directory", path: "/tools/ai-directory" }]),
       ]} />
       <TrackUsage slug="ai-directory" />
 

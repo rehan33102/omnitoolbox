@@ -53,10 +53,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: { slug: string } }) {
   const tool = getToolBySlug(params.slug);
   if (!tool) return {};
+  // Canonical consolidation: the AI Voice Studio card links to /ai-voiceover
+  // (its registry href), not /tools/ai-voiceover — so that URL is canonical.
+  const canonicalPath = tool.slug === "ai-voiceover" ? "/ai-voiceover" : `/tools/${tool.slug}`;
   return await buildMetadata({
     title: `${tool.title} — ${tool.tagline}`,
     description: tool.description,
-    path: `/tools/${tool.slug}`,
+    path: canonicalPath,
     keywords: tool.keywords.slice(0, 12),
     image: tool.image,
   });
@@ -69,6 +72,9 @@ export default async function ToolPage({ params }: { params: { slug: string } })
   const ToolComponent = TOOL_COMPONENTS[tool.slug];
   if (!ToolComponent) notFound();
 
+  // Same canonical rule as generateMetadata above.
+  const canonicalPath = tool.slug === "ai-voiceover" ? "/ai-voiceover" : `/tools/${tool.slug}`;
+
   // AI directory needs its listings passed in
   const extraProps: Record<string, unknown> =
     tool.slug === "ai-directory" ? { tools: await getListings() } : {};
@@ -80,13 +86,13 @@ export default async function ToolPage({ params }: { params: { slug: string } })
           softwareAppJsonLd({
             name: `OmniToolBox ${tool.title}`,
             description: tool.description,
-            url: serverSiteUrl(`/tools/${tool.slug}`),
+            url: serverSiteUrl(canonicalPath),
             category: tool.category,
           }),
           breadcrumbJsonLd([
             { name: "Home", path: "/" },
             { name: "Tools", path: "/#tools" },
-            { name: tool.title, path: `/tools/${tool.slug}` },
+            { name: tool.title, path: canonicalPath },
           ]),
         ]}
       />
@@ -108,6 +114,12 @@ export default async function ToolPage({ params }: { params: { slug: string } })
           {tool.title}
         </h1>
         <p className="text-zinc-600 dark:text-zinc-400 mt-3">{tool.tagline}</p>
+        {/* Visible description: the page previously showed only title + tagline,
+            leaving thin indexable text. The registry description is real,
+            honest copy about what the tool does. */}
+        <p className="text-zinc-600 dark:text-zinc-400 mt-2 text-[15px] leading-relaxed">
+          {tool.description}
+        </p>
       </div>
 
       <ToolComponent {...extraProps} />

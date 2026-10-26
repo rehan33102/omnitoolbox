@@ -1,7 +1,8 @@
 import type { MetadataRoute } from "next";
 import { serverSiteUrl } from "@/lib/seo";
 import { TOOLS } from "@/lib/tools-registry";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { getPosts } from "@/lib/blog";
+import { getListings } from "@/lib/get-directory";
 import { getKV } from "@/lib/kv";
 
 export const revalidate = 3600; // regenerate at most once per hour
@@ -67,36 +68,41 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  // Dynamic: published blog posts + AI directory listings (build-safe fallback)
+  // Dynamic: published blog posts + AI directory listings — use the SAME
+  // sources as the pages themselves (built-in seeds + DB overrides), because
+  // the old Supabase-only query silently omitted every seed post the blog
+  // index actually shows (8 posts were missing from the sitemap).
   try {
-    const supabase = createAdminClient();
-    const [postsRes, listingsRes] = await Promise.all([
-      toggles.blog
-        ? supabase.from("blog_posts").select("slug, updated_at").not("published_at", "is", null)
-        : Promise.resolve({ data: null }),
-      toggles.directory
-        ? supabase.from("ai_tools").select("slug, created_at")
-        : Promise.resolve({ data: null }),
+    const [posts, listings] = await Promise.all([
+      toggles.blog ? getPosts() : Promise.resolve([]),
+      toggles.directory ? getListings() : Promise.resolve([]),
     ]);
-    postsRes.data?.forEach((p) =>
+    posts.forEach((p) =>
       urls.push({
         url: serverSiteUrl(`/blog/${p.slug}`),
-        lastModified: new Date(p.updated_at),
+        lastModified: new Date(p.updatedAt),
         changeFrequency: "monthly",
         priority: 0.7,
       })
     );
-    listingsRes.data?.forEach((l) =>
+    listings.forEach((l) =>
       urls.push({
         url: serverSiteUrl(`/ai-directory/${l.slug}`),
-        lastModified: new Date(l.created_at),
+        lastModified: new Date(l.createdAt),
         changeFrequency: "weekly",
         priority: 0.7,
       })
     );
   } catch {
-    /* DB unreachable during build — static routes still ship */
+    /* seeds unavailable — static routes still ship */
   }
 
-  return urls;
+  // Dedupe: the same URL must never appear twice (e.g. /ai-voiceover is
+  // both a static route and a registry href).
+  const seen = new Set<string>();
+  return urls.filter((u) => {
+    if (seen.has(u.url)) return false;
+    seen.add(u.url);
+    return true;
+  });
 }
