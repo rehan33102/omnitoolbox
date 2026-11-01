@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk, Anton } from "next/font/google";
-import Script from "next/script";
 import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -106,19 +105,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <WhatsAppFloat />
             <Toaster />
           </ToastProvider>
-          {(() => {
-            // Publisher ID is public by design (also in ads.txt); env var takes precedence.
-            const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-2122433170269090";
-            return (
-              <Script
-                id="adsense-script"
-                async
-                strategy="afterInteractive"
-                src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
-                crossOrigin="anonymous"
-              />
-            );
-          })()}
         </ThemeProvider>
         <InstallPrompt />
       </body>
