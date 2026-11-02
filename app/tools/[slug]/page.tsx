@@ -44,6 +44,7 @@ const TOOL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "age-calculator": dynamic(() => import("@/components/calc/AgeCalculator")),
   "ebook-maker": dynamic(() => import("@/components/ebook/EbookMaker")),
   "json-formatter": dynamic(() => import("@/components/web/JsonFormatter")),
+  "csv-to-json": dynamic(() => import("@/components/web/CsvToJson")),
 };
 
 export async function generateStaticParams() {

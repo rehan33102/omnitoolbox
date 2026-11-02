@@ -170,6 +170,14 @@ export const TOOLS: Tool[] = [
     keywords: ["json formatter", "format json", "json validator", "validate json", "json beautifier", "prettify json", "json minifier", "minify json", "sort json keys", "json viewer", "json parser", "json pretty print", "json checker", "json lint"],
   },
   {
+    id: "t24", slug: "csv-to-json", title: "CSV to JSON Converter",
+    tagline: "Turn spreadsheet exports into clean JSON in your browser",
+    description: "Paste CSV or upload a .csv file to get a JSON array: quoted commas, escaped quotes and multi-line fields handled correctly, with delimiter choice, header-row toggle and number/boolean detection. Copy the result or download it as .json — everything runs client-side, your data never leaves your device.",
+    category: "web", href: "/tools/csv-to-json", icon: "Table2", badge: "new",
+    enabled: true, sortOrder: 23, usageCount: 0, updatedAt: "2026-11-02",
+    keywords: ["csv to json", "convert csv to json", "csv converter", "csv to json online", "spreadsheet to json", "csv parser", "csv json converter", "excel to json", "tsv to json", "csv to array", "json from csv", "csv file to json"],
+  },
+  {
     id: "t22", slug: "ebook-maker", title: "Ebook Maker",
     tagline: "Free Ebook Maker — create real EPUB & PDF ebooks with text and pictures",
     description: "Create a real ebook online free: add a title, author and designer cover, write chapters with text and picture blocks, pick a professional page theme, and download a genuine EPUB 3 file or a clean paginated PDF. Everything runs in your browser — your book never leaves your device.",

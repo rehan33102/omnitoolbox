@@ -3,7 +3,7 @@ import {
   RefreshCw, Type, UserRound, Wand2, Wrench, Mic, Files, Scissors,
   FileImage, QrCode, KeyRound, Banknote, Ruler, Flame, Cake, Droplets,
   Palette, Home, Sparkles, Image, FileText, Share2, Globe, Newspaper, FolderOpen, PlayCircle, Briefcase,
-  Download, Braces,
+  Download, Braces, Table2,
   type LucideIcon,
 } from "lucide-react";
 
@@ -12,7 +12,7 @@ const MAP: Record<string, LucideIcon> = {
   UserRound, Hash, LayoutGrid, ImagePlus, Wrench, Mic, Files, Scissors,
   FileImage, QrCode, KeyRound, Banknote, Ruler, Flame, Cake, Droplets,
   Palette, Home, Sparkles, Image, FileText, Share2, Globe, Newspaper, FolderOpen, PlayCircle, Briefcase,
-  Download, Braces,
+  Download, Braces, Table2,
 };
 
 export default function ToolIcon({ name, size = 20, className }: { name: string; size?: number; className?: string }) {
