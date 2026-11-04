@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk, Anton } from "next/font/google";
+import Script from "next/script";
 import { ThemeProvider } from "next-themes";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -105,6 +106,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <WhatsAppFloat />
             <Toaster />
           </ToastProvider>
+          {/* Publisher ID is public by design (also in ads.txt). Hardcoded on purpose: the Vercel env var may still hold the sold account's ID. */}
+          <Script
+            id="adsense-script"
+            async
+            strategy="afterInteractive"
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7076110252638514"
+            crossOrigin="anonymous"
+          />
         </ThemeProvider>
         <InstallPrompt />
       </body>
