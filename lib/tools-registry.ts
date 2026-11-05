@@ -178,6 +178,14 @@ export const TOOLS: Tool[] = [
     keywords: ["csv to json", "convert csv to json", "csv converter", "csv to json online", "spreadsheet to json", "csv parser", "csv json converter", "excel to json", "tsv to json", "csv to array", "json from csv", "csv file to json"],
   },
   {
+    id: "t25", slug: "video-shorts-studio", title: "Video Shorts Studio",
+    tagline: "Turn horizontal videos into vertical shorts in your browser",
+    description: "Upload a horizontal video and turn it into a vertical short for TikTok, Reels or Shorts: pick 9:16, 1:1 or 4:5, drag the preview to frame the speaker, choose a blurred, solid or black background, and add karaoke captions that light up word by word. Trim the clip and export it as a WebM video with audio — everything runs client-side, your footage never leaves your device.",
+    category: "image", href: "/tools/video-shorts-studio", icon: "Scissors", badge: "new",
+    enabled: true, sortOrder: 24, usageCount: 0, updatedAt: "2026-11-06",
+    keywords: ["video to shorts", "horizontal to vertical video", "16:9 to 9:16", "video reframer", "shorts maker", "tiktok video converter", "reels maker", "vertical video converter", "karaoke captions", "auto captions video", "crop video vertical", "video to tiktok", "youtube shorts maker", "video cropper online"],
+  },
+  {
     id: "t22", slug: "ebook-maker", title: "Ebook Maker",
     tagline: "Free Ebook Maker — create real EPUB & PDF ebooks with text and pictures",
     description: "Create a real ebook online free: add a title, author and designer cover, write chapters with text and picture blocks, pick a professional page theme, and download a genuine EPUB 3 file or a clean paginated PDF. Everything runs in your browser — your book never leaves your device.",
