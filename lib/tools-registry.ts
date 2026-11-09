@@ -186,6 +186,14 @@ export const TOOLS: Tool[] = [
     keywords: ["video to shorts", "horizontal to vertical video", "16:9 to 9:16", "video reframer", "shorts maker", "tiktok video converter", "reels maker", "vertical video converter", "karaoke captions", "auto captions video", "crop video vertical", "video to tiktok", "youtube shorts maker", "video cropper online"],
   },
   {
+    id: "t26", slug: "text-diff-checker", title: "Text Diff Checker",
+    tagline: "Compare two texts side by side and spot every change",
+    description: "Paste two versions of any text and see exactly what changed: added lines in green, removed lines in red, with the changed words highlighted inside each line. Line and word counts plus a similarity score, copy or download the diff as a plain-text report. Everything runs in your browser — your text never leaves your device.",
+    category: "text", href: "/tools/text-diff-checker", icon: "GitCompareArrows", badge: "new",
+    enabled: true, sortOrder: 25, usageCount: 0, updatedAt: "2026-11-09",
+    keywords: ["text diff checker", "compare text", "diff checker", "text comparison", "find differences in text", "compare two texts", "text diff online", "word diff", "compare documents", "text compare tool", "spot text changes", "diff tool"],
+  },
+  {
     id: "t22", slug: "ebook-maker", title: "Ebook Maker",
     tagline: "Free Ebook Maker — create real EPUB & PDF ebooks with text and pictures",
     description: "Create a real ebook online free: add a title, author and designer cover, write chapters with text and picture blocks, pick a professional page theme, and download a genuine EPUB 3 file or a clean paginated PDF. Everything runs in your browser — your book never leaves your device.",
