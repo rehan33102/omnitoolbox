@@ -110,8 +110,8 @@ export default function ToolCard({ tool }: { tool: Tool }) {
           {tool.image ? (
             <>
               <Image
-                // ?v=3 cache-busts old tool card images stuck in browser/CDN cache
-                src={`${tool.image}?v=3`}
+                // ?v=4 cache-busts old tool card images stuck in browser/CDN cache
+                src={`${tool.image}?v=4`}
                 alt={tool.title}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
