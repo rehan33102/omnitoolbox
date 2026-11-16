@@ -194,6 +194,14 @@ export const TOOLS: Tool[] = [
     keywords: ["text diff checker", "compare text", "diff checker", "text comparison", "find differences in text", "compare two texts", "text diff online", "word diff", "compare documents", "text compare tool", "spot text changes", "diff tool"],
   },
   {
+    id: "t27", slug: "word-counter", title: "Word Counter & Readability",
+    tagline: "Live word counts, reading time and a readability score as you type",
+    description: "Paste any text and get live counts — words, characters, sentences and paragraphs — plus reading and speaking time, a Flesch Reading Ease score with grade level, and your most frequent words. Everything runs in your browser — your text never leaves your device.",
+    category: "text", href: "/tools/word-counter", icon: "WholeWord", image: "/images/tools/word-counter.jpg", badge: "new",
+    enabled: true, sortOrder: 26, usageCount: 0, updatedAt: "2026-11-16",
+    keywords: ["word counter", "count words", "character counter", "readability checker", "flesch reading ease", "flesch kincaid", "reading time calculator", "word count tool", "sentence counter", "paragraph counter", "how many words", "text word count", "readability score", "keyword density"],
+  },
+  {
     id: "t22", slug: "ebook-maker", title: "Ebook Maker",
     tagline: "Free Ebook Maker — create real EPUB & PDF ebooks with text and pictures",
     description: "Create a real ebook online free: add a title, author and designer cover, write chapters with text and picture blocks, pick a professional page theme, and download a genuine EPUB 3 file or a clean paginated PDF. Everything runs in your browser — your book never leaves your device.",

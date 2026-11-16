@@ -47,6 +47,7 @@ const TOOL_COMPONENTS: Record<string, React.ComponentType<any>> = {
   "csv-to-json": dynamic(() => import("@/components/web/CsvToJson")),
   "video-shorts-studio": dynamic(() => import("@/components/media/VideoShortsStudio")),
   "text-diff-checker": dynamic(() => import("@/components/web/TextDiffChecker")),
+  "word-counter": dynamic(() => import("@/components/web/WordCounter")),
 };
 
 export async function generateStaticParams() {
