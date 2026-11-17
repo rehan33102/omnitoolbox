@@ -224,11 +224,6 @@
  * GPU-friendly: opacity + custom-property only. The ring spins only while
  * the card is in view (.aura-on) to keep off-screen cards cheap.
  */
-@property --aura-angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
 @keyframes aura-breathe {
   0%, 100% { opacity: 0.35; }
   50% { opacity: 0.65; }
@@ -241,7 +236,43 @@
   100% { opacity: 0; transform: scale(1); }
 }
 @keyframes aura-ring-spin {
-  to { --aura-angle: 360deg; }
+  0.00% { background: conic-gradient(from 0deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  2.78% { background: conic-gradient(from 10deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  5.56% { background: conic-gradient(from 20deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  8.33% { background: conic-gradient(from 30deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  11.11% { background: conic-gradient(from 40deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  13.89% { background: conic-gradient(from 50deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  16.67% { background: conic-gradient(from 60deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  19.44% { background: conic-gradient(from 70deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  22.22% { background: conic-gradient(from 80deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  25.00% { background: conic-gradient(from 90deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  27.78% { background: conic-gradient(from 100deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  30.56% { background: conic-gradient(from 110deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  33.33% { background: conic-gradient(from 120deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  36.11% { background: conic-gradient(from 130deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  38.89% { background: conic-gradient(from 140deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  41.67% { background: conic-gradient(from 150deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  44.44% { background: conic-gradient(from 160deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  47.22% { background: conic-gradient(from 170deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  50.00% { background: conic-gradient(from 180deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  52.78% { background: conic-gradient(from 190deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  55.56% { background: conic-gradient(from 200deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  58.33% { background: conic-gradient(from 210deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  61.11% { background: conic-gradient(from 220deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  63.89% { background: conic-gradient(from 230deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  66.67% { background: conic-gradient(from 240deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  69.44% { background: conic-gradient(from 250deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  72.22% { background: conic-gradient(from 260deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  75.00% { background: conic-gradient(from 270deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  77.78% { background: conic-gradient(from 280deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  80.56% { background: conic-gradient(from 290deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  83.33% { background: conic-gradient(from 300deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  86.11% { background: conic-gradient(from 310deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  88.89% { background: conic-gradient(from 320deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  91.67% { background: conic-gradient(from 330deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  94.44% { background: conic-gradient(from 340deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  97.22% { background: conic-gradient(from 350deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
+  100% { background: conic-gradient(from 360deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg); }
 }
 .card-aura { position: relative; }
 .card-aura .aura-glow,
@@ -275,7 +306,7 @@
   inset: -1.5px;
   border-radius: 26px;
   padding: 1.5px;
-  background: conic-gradient(from var(--aura-angle, 0deg), transparent 0deg, transparent 190deg, rgba(190, 242, 100, 0.9) 245deg, #facc15 285deg, #4ade80 320deg, transparent 355deg);
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 282deg, rgba(190, 242, 100, 0.95) 300deg, #facc15 315deg, #4ade80 330deg, transparent 345deg, transparent 360deg);
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
