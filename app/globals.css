@@ -202,11 +202,101 @@
 /* Accessibility: kill ambient motion for users who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .tool-img-drift, .tool-img-breathe, .tool-glow { animation: none; }
+  .aura-glow, .aura-flash, .aura-ring { animation: none !important; }
+  .aura-flash { opacity: 0; }
+  .aura-glow { opacity: 0.3; }
+  .aura-ring { opacity: 0.4; }
 }
 
 /* Mobile: keep the drift (cheap transform) but drop the glow pulse overlay */
 @media (max-width: 640px) {
   .tool-glow { animation: none; opacity: 0.3; }
+}
+
+/*
+ * TOOL CARD AURA — greenish-yellow glow around every tool card.
+ * .card-aura  : relative wrapper (in ToolCard) holding the aura layers.
+ * .aura-glow : soft blurred lime/yellow/green halo behind the card, breathing.
+ * .aura-flash: bright flash that BLINKS when the card scrolls into view
+ *               (IntersectionObserver toggles .aura-on on the wrapper).
+ * .aura-ring : travelling light beam around the card edge — conic-gradient
+ *               arc rotating via @property --aura-angle (static arc fallback).
+ * GPU-friendly: opacity + custom-property only. The ring spins only while
+ * the card is in view (.aura-on) to keep off-screen cards cheap.
+ */
+@property --aura-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes aura-breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.65; }
+}
+@keyframes aura-blink {
+  0% { opacity: 0; transform: scale(0.985); }
+  25% { opacity: 0.95; transform: scale(1.012); }
+  50% { opacity: 0.22; transform: scale(1); }
+  75% { opacity: 0.9; transform: scale(1.012); }
+  100% { opacity: 0; transform: scale(1); }
+}
+@keyframes aura-ring-spin {
+  to { --aura-angle: 360deg; }
+}
+.card-aura { position: relative; }
+.card-aura .aura-glow,
+.card-aura .aura-flash,
+.card-aura .aura-ring {
+  position: absolute;
+  pointer-events: none;
+}
+.card-aura .aura-glow {
+  inset: -6px;
+  border-radius: 30px;
+  background: radial-gradient(ellipse 80% 90% at 50% 50%, rgba(190, 242, 100, 0.5), rgba(250, 204, 21, 0.28) 45%, rgba(74, 222, 128, 0.22) 65%, transparent 75%);
+  filter: blur(14px);
+  opacity: 0.35;
+  animation: aura-breathe 4.5s ease-in-out infinite;
+  animation-delay: var(--anim-delay, 0s);
+  z-index: 0;
+}
+.card-aura .aura-flash {
+  inset: -6px;
+  border-radius: 30px;
+  background: radial-gradient(ellipse 85% 90% at 50% 50%, rgba(220, 255, 120, 0.85), rgba(250, 204, 21, 0.5) 45%, rgba(74, 222, 128, 0.35) 65%, transparent 78%);
+  filter: blur(14px);
+  opacity: 0;
+  z-index: 0;
+}
+.card-aura.aura-on .aura-flash {
+  animation: aura-blink 1.2s ease-out;
+}
+.card-aura .aura-ring {
+  inset: -1.5px;
+  border-radius: 26px;
+  padding: 1.5px;
+  background: conic-gradient(from var(--aura-angle, 0deg), transparent 0deg, transparent 190deg, rgba(190, 242, 100, 0.9) 245deg, #facc15 285deg, #4ade80 320deg, transparent 355deg);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  box-shadow: inset 0 0 0 1px rgba(190, 242, 100, 0.22);
+  opacity: 0.55;
+  z-index: 1;
+}
+.card-aura.aura-on .aura-ring {
+  animation: aura-ring-spin 6s linear infinite;
+  opacity: 0.9;
+}
+.card-aura:hover .aura-ring {
+  animation-duration: 3s;
+  opacity: 1;
+}
+/* Mobile: smaller blur, slower ring to keep scrolling smooth */
+@media (max-width: 640px) {
+  .card-aura .aura-glow,
+  .card-aura .aura-flash { filter: blur(10px); }
+  .card-aura.aura-on .aura-ring { animation-duration: 9s; }
 }
 
 /*

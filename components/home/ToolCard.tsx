@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
@@ -97,8 +98,36 @@ export default function ToolCard({ tool }: { tool: Tool }) {
   // Stagger ambient animations so cards don't pulse in sync (derived from sort order)
   const animDelay = `${((tool.sortOrder ?? 0) % 6) * 1.1}s`;
 
+  // Scroll blink: when the card scrolls into view, .aura-on fires the flash
+  // blink + starts the travelling ring beam; off-screen cards stay cheap.
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { threshold: 0.12, rootMargin: "0px 0px -5% 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <Link href={tool.href} onClick={() => track(tool.slug, "use")} className="block h-full">
+    <div
+      ref={wrapRef}
+      className={cn("card-aura h-full", inView && "aura-on")}
+      style={{ ["--anim-delay" as string]: animDelay }}
+    >
+      {/* greenish-yellow aura layers — glow + scroll blink flash + travelling ring */}
+      <div className="aura-glow" aria-hidden />
+      <div className="aura-flash" aria-hidden />
+      <div className="aura-ring" aria-hidden />
+      <Link href={tool.href} onClick={() => track(tool.slug, "use")} className="relative z-[1] block h-full">
       <Card
         className={cn(
           "h-full !p-0 group overflow-hidden relative flex flex-col tool-card-hover glass-shimmer",
@@ -185,6 +214,7 @@ export default function ToolCard({ tool }: { tool: Tool }) {
         {/* bottom accent line that lights up on hover */}
         <div className={cn("h-0.5 w-full bg-gradient-to-r opacity-40 group-hover:opacity-100 transition-opacity", s.band)} aria-hidden />
       </Card>
-    </Link>
+      </Link>
+    </div>
   );
 }
