@@ -213,6 +213,16 @@
   .tool-glow { animation: none; opacity: 0.3; }
 }
 
+/* Mobile perf (Nov 20 fix — the homepage lagged on phones): the travelling
+ * ring beam repaints a conic-gradient background every frame on every
+ * in-view card, and the blurred aura halo breathes on top of it. On phones
+ * both go static — the bright beam arc + glow stay visible, they just don't
+ * move, so scrolling stays smooth. Desktop keeps the full motion. */
+@media (max-width: 640px) {
+  .card-aura.aura-on .aura-ring { animation: none; opacity: 0.9; }
+  .card-aura .aura-glow { animation: none; opacity: 0.4; }
+}
+
 /*
  * TOOL CARD AURA — greenish-yellow glow around every tool card.
  * .card-aura  : relative wrapper (in ToolCard) holding the aura layers.
@@ -323,11 +333,11 @@
   animation-duration: 3s;
   opacity: 1;
 }
-/* Mobile: smaller blur, slower ring to keep scrolling smooth */
+/* Mobile: smaller blur to keep scrolling smooth (the ring spin is disabled
+ * on phones by the perf block above — the static beam arc stays). */
 @media (max-width: 640px) {
   .card-aura .aura-glow,
   .card-aura .aura-flash { filter: blur(10px); }
-  .card-aura.aura-on .aura-ring { animation-duration: 9s; }
 }
 
 /*

@@ -139,18 +139,20 @@ export default function ToolCard({ tool }: { tool: Tool }) {
           {tool.image ? (
             <>
               <Image
-                // ?v=4 cache-busts old tool card images stuck in browser/CDN cache
-                src={`${tool.image}?v=4`}
+                // ?v=5 cache-busts old tool card images stuck in browser/CDN cache
+                // (sources resized to 800px + recompressed Nov 20 — 88% smaller)
+                src={`${tool.image}?v=5`}
                 alt={tool.title}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
                 className="object-cover tool-img-drift transition-transform duration-500 group-hover:scale-[1.06]"
                 style={{ ["--anim-delay" as string]: animDelay }}
               />
               {/* soft ambient glow pulse over the image */}
               <div className="absolute inset-0 tool-glow" style={{ ["--anim-delay" as string]: animDelay }} />
-              {/* contrast wash so the icon tile + badge stay legible */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-black/25" />
+              {/* light contrast wash so the icon tile + badge stay legible —
+                  kept thin so the photo itself stays clearly visible */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-black/5 to-black/15" />
             </>
           ) : (
             <>
